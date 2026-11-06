@@ -4,6 +4,7 @@ site/shared/verses.js(export const VERSES = {...})로 저장한다. data.js와 �
 실행: python3 -I tools/build_verses.py          (저장소 맨 위에서)
       python3 -I tools/build_verses.py --check  (주장과 본문을 나란히 출력해 눈으로 대조한다)
       python3 -I tools/build_verses.py --guides genesis exodus  (책 해설의 주장과 본문을 대조한다. 책 id를 빼면 전부)
+      python3 -I tools/build_verses.py --bg patriarchs genesis  (당대 배경의 주장과 본문을 대조한다. 시대·책 id를 빼면 전부)
 
 개역한글 본문은 bluesaurel/Korean-Bible-1961-KRV의 JSON을 tools/.cache/에 받아 쓴다.
 장절 표기: "창 12:1-3", "왕하 9:20, 24", "출 2:21; 3:1"처럼 쓴다. 책 이름을 빼면 앞 조각의 책을, 장을 빼면 앞 조각의 장을 이어 쓴다.
@@ -67,7 +68,7 @@ def collect_refs(js):
     return list(dict.fromkeys(refs))
 
 
-SOURCES = ["data.js", "events_more.js", "profiles.js", "profiles_*.js", "guides_*.js"]
+SOURCES = ["data.js", "events_more.js", "profiles.js", "profiles_*.js", "guides_*.js", "bg_*.js"]
 
 
 def read_sources():
@@ -102,6 +103,27 @@ def main():
     if "--guides" in sys.argv:
         ids = [a for a in sys.argv[sys.argv.index("--guides") + 1:] if not a.startswith("--")]
         check_guides(out, set(ids) or None)
+    if "--bg" in sys.argv:
+        ids = [a for a in sys.argv[sys.argv.index("--bg") + 1:] if not a.startswith("--")]
+        check_bg(out, set(ids) or None)
+
+
+def check_bg(verses, only=None):
+    """bg_*.js(당대 배경)의 장절을 주장 옆에 붙여 출력한다. only가 있으면 그 시대·책 id만."""
+    # 시대 id와 책 id가 겹칠 수 있어(judges) 둘을 따로 받는다.
+    dump = subprocess.run(["node", "-e", 'import("./site/shared/backgrounds.js").then(m=>console.log(JSON.stringify([m.ERA_BG,m.BOOK_BG])))'],
+                          cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    body = lambda ref: " | ".join(f"{k} {t[:90]}" for k, t in verses.get(ref, [])) if ref else ""
+    eras, books = json.loads(dump)
+    for label, bid, g in [("시대", k, v) for k, v in eras.items()] + [("책", k, v) for k, v in books.items()]:
+        if only and bid not in only:
+            continue
+        print(f"\n===== {label} {bid}")
+        for kind in ("events", "culture", "literature", "rhetoric"):
+            for it in g.get(kind, []):
+                print(f"- [{kind}] {it['title']}: {it['text'][:120]}\n    출처: {', '.join(it.get('src', []))}")
+                for r in ([it["ref"]] if it.get("ref") else []) + it.get("refs", []):
+                    print(f"    {r} → {body(r)}")
 
 
 def check(verses):

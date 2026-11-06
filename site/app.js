@@ -166,6 +166,9 @@ function render() {
   };
   bands(G.emp, EMPIRES, L.emp.top, d.emp, (b) => hexA(b.color, 0.15), (b) => hexA(b.color, 0.4), (b) => darken(b.color), (b) => b.name);
   bands(G.era, ERAS, L.era.top, d.era, (b) => eraColor(b.hue), (b) => eraColor(b.hue, 72, 30), (b) => eraColor(b.hue, 27, 35), (b) => b.name);
+  // 시대 띠를 누르면 그 시대의 당대 배경을 연다.
+  G.era.selectAll("g.b").classed("era-link", true).on("click", (event, e) => books.openEra(e.id))
+    .select("title").text((e) => `${e.name} · ${rangeText(e.from, e.to)} · 누르면 시대 배경`);
 
   // 성경 책: 다루는 시기
   const bookItems = BOOK_PACK.items.filter((b) => vis(b.from, b.to));
@@ -346,7 +349,7 @@ function renderLaneLabels() {
   const el = $("lanes");
   el.style.setProperty("--lw", `${L.d.labelW}px`);
   const rows = [
-    [L.emp, "제국"], [L.era, "시대"], [L.book, "성경 66권", "누르면 해설"], [L.person, "인물"],
+    [L.emp, "제국"], [L.era, "시대", "누르면 배경"], [L.book, "성경 66권", "누르면 해설"], [L.person, "인물"],
     [L.ev, "사건"], [L.evid, "증거", "만든 때"],
   ];
   el.innerHTML = rows.map(([l, name, sub]) => `<div style="top:${l.top + l.h / 2}px">${name}${sub ? `<small>${sub}</small>` : ""}</div>`).join("");
@@ -760,7 +763,8 @@ const books = createBooks({
   onPerson: (id) => profiles.open(id),
   onStory: (id) => story.open(id),
   // 책을 여는 동안 연표를 그 책의 시기 가운데로 옮기고 막대를 강조한다.
-  onOpen: (b) => { if (b) { state.book = b.id; setCenter((b.from + b.to) / 2); } frame(); },
+  // 시대 배경을 열면 연표를 그 시대 가운데로 옮긴다.
+  onOpen: (b, era) => { state.book = b?.id ?? null; const at = b || era; if (at) setCenter((at.from + at.to) / 2); frame(); },
   onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
 });
 $("booksBtn").addEventListener("click", () => books.open(null));
@@ -891,6 +895,7 @@ async function init() {
   if (fromHash) openGallery(fromHash);
   else if (location.hash.startsWith("#p-")) profiles.open(location.hash.slice(3));
   else if (location.hash.startsWith("#b-")) books.open(location.hash.slice(3));
+  else if (location.hash.startsWith("#e-")) books.openEra(location.hash.slice(3));
   else if (location.hash.startsWith("#s-")) { const id = location.hash.slice(3); books.open(id); story.open(id); }
   else if (location.hash === "#books") books.open(null);
   document.fonts?.ready.then(frame);
