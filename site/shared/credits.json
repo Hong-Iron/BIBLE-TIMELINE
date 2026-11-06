@@ -96,5 +96,26 @@
   "author": "Gérard",
   "license": "CC BY-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+ },
+ "kurkh": {
+  "file": "File:Shalmaneser III-1.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Shalmaneser_III-1.jpg",
+  "author": "David Castor",
+  "license": "Public domain",
+  "licenseUrl": ""
+ },
+ "ishtar": {
+  "file": "File:Pergamon museum Ishtar Gate.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Pergamon_museum_Ishtar_Gate.jpg",
+  "author": "Sinoulpgc",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "babchron": {
+  "file": "File:The cuneiform inscription highlights the conquest of Jerusalem and the surrender of Jehoiakim, king of Judah, in 597 BCE. From Babylon, Iraq.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:The_cuneiform_inscription_highlights_the_conquest_of_Jerusalem_and_the_surrender_of_Jehoiakim,_king_of_Judah,_in_597_BCE._From_Babylon,_Iraq.jpg",
+  "author": "Osama Shukir Muhammed Amin",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
  }
 }

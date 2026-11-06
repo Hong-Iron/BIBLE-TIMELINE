@@ -4,6 +4,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "../shared/data.js";
 import { createMap, THEMES } from "../shared/map.js";
+import { createProfiles } from "./profile.js";
 
 const SPAN = RANGE[1] - RANGE[0];
 const PERSON = byId(PEOPLE);
@@ -58,7 +59,7 @@ const PEOPLE_PACK = pack(PEOPLE, 8);
 
 const state = {
   ppy: 2, viewW: 1000, viewH: 400, center: EVENTS[0].year, mobile: false,
-  selected: null, near: null, mapEv: null, focusKey: null,
+  selected: null, near: null, mapEv: null, focusKey: null, person: null,
 };
 let L = {}; // 차선 위치
 let map = null, credits = {};
@@ -80,6 +81,9 @@ function layout() {
   L.ev = lane("사건", d.evRows * d.evRow + 12);
   L.band = { top: y - d.gap, h: d.band };
   y = L.band.top + d.band;
+  // 연표가 오른쪽 열의 높이를 다 쓰도록, 남는 높이만큼 유물 사진 칸(전시 품목)을 키운다. 사진 두 줄이라 2로 나눈다.
+  const avail = scroller.clientHeight || 0;
+  d.thumb = clamp(Math.floor((avail - y - 12 - 16) / 2) - 8, d.thumb, m ? 64 : 96);
   L.evid = { top: y, h: 2 * (d.thumb + 8) + 6, name: "증거" };
   L.height = L.evid.top + L.evid.h + 6;
   document.body.style.setProperty("--chart-h", `${L.height + 1}px`);
@@ -117,6 +121,7 @@ function render() {
   const vis = (a, b) => X(b) > -40 && X(a) < W + 40;
   const sel = state.selected;
   const selPeople = new Set(sel ? sel.people : []);
+  if (state.person) selPeople.add(state.person);
 
   // 눈금과 세로 격자
   const step = niceStep();
@@ -188,8 +193,10 @@ function render() {
     g.append("line").attr("class", "bar");
     g.append("line").attr("class", "cap a");
     g.append("line").attr("class", "cap b");
+    g.append("rect").attr("class", "hit");
     g.append("text");
     g.append("title");
+    g.on("click", (event, p) => profiles.open(p.id));
     return g;
   }).attr("class", (p) => `person ${OFFICE.has(p.kind) ? "office" : p.kind === "활동" ? "act" : "life"}${selPeople.has(p.id) ? " on" : ""}`)
     .each(function (p) {
@@ -206,7 +213,8 @@ function render() {
       const start = Math.max(xa, leftEdge() + 2);
       const lx = start + w <= Math.max(xb, room) ? start : xb - w >= xa ? xb - w : null;
       g.select("text").attr("x", lx ?? 0).attr("y", ly - 5).style("display", lx == null ? "none" : null).text(p.name);
-      g.select("title").text(`${p.name} · ${p.kind} ${rangeText(p.from, p.to)} (추정)`);
+      g.select(".hit").attr("x", Math.min(xa, lx ?? xa) - 2).attr("y", top).attr("width", Math.max(xb, (lx ?? xa) + w) - Math.min(xa, lx ?? xa) + 4).attr("height", d.personRow);
+      g.select("title").text(`${p.name} · ${p.kind} ${rangeText(p.from, p.to)} (추정) · 눌러서 프로필 보기`);
     });
 
   // 사건: 점은 차선 맨 아래, 이름은 위쪽 세 줄 중 비어 있는 줄에
@@ -478,7 +486,7 @@ function roomHTML(ev, i) {
           <img src="${smUrl(e.img)}" alt="" loading="lazy" decoding="async"></button>`).join("")}</div>`
     : "";
   const people = ev.people.map((id) => PERSON[id]).filter(Boolean)
-    .map((p) => `${esc(p.name)}(${esc(p.kind)} ${esc(rangeText(p.from, p.to))})`).join(" · ");
+    .map((p) => `<button class="g-person" type="button" data-person="${esc(p.id)}" title="인물 프로필 보기">${esc(p.name)}</button>(${esc(p.kind)} ${esc(rangeText(p.from, p.to))})`).join(" · ");
   return `<section class="room${multi ? " multi" : ""}" data-i="${i}" aria-label="${esc(ev.yearLabel)}, ${esc(ev.title)}">
     <div class="bgyear" aria-hidden="true">${Math.abs(ev.year)}</div>
     <div class="g-inner">
@@ -682,6 +690,8 @@ function setMapOpen(open) {
 }
 
 gallery.addEventListener("click", (e) => {
+  const per = e.target.closest(".g-person");
+  if (per) { closeGallery(); profiles.open(per.dataset.person); return; }
   const thumb = e.target.closest(".g-thumb");
   if (thumb) {
     const room = thumb.closest(".room");
@@ -714,6 +724,15 @@ gallery.addEventListener("wheel", (e) => {
   lockUntil = now + 450;
   goRoom(here() + Math.sign(dy));
 }, { passive: false });
+
+/* ---------- 인물 프로필 ---------- */
+const profiles = createProfiles({
+  getCredits: () => credits,
+  onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
+  // 프로필을 여는 동안 뒤쪽 연표를 그 인물의 생애 가운데로 옮기고 막대를 강조한다. 닫으면 그 자리에서 이어 본다.
+  onOpen: (p) => { state.person = p.id; setCenter((p.from + p.to) / 2); frame(); },
+  onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
+});
 
 function stepEvent(dir) {
   if (isOpen()) { goRoom(here() + dir); return; }
@@ -766,6 +785,7 @@ stage.addEventListener("click", (e) => { if (swallowClick) { e.stopPropagation()
 
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input, textarea, select")) return;
+  if (profiles.isOpen()) { if (e.key === "Escape") profiles.popOpen() ? profiles.hidePop() : profiles.close(); return; }
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); stepEvent(e.key === "ArrowRight" ? 1 : -1); }
   else if (isOpen()) { /* 전시실에서는 확대 키를 쓰지 않는다 */ }
   else if (e.key === "+" || e.key === "=") zoomBy(1.5);
@@ -822,6 +842,7 @@ async function init() {
   credits = await fetch("../shared/credits.json").then((r) => r.json()).catch(() => ({}));
   rooms.forEach(fillCredit);
   if (fromHash) openGallery(fromHash);
+  else if (location.hash.startsWith("#p-")) profiles.open(location.hash.slice(3));
   document.fonts?.ready.then(frame);
 
   map = await createMap($("map"), THEMES.atlas, { pad: 0.4 });

@@ -19,10 +19,14 @@ FILES = {
     "pilate": "File:Dedicatory inscription found reused in the staircase of the theatre of Caesarea, the first and only mention of Pontius Pilates' name ever unearthed, 26-36 AD, Israel Museum, Jerusalem (15655925251).jpg",
     "caiaphas": "File:Ossuary of the high priest Joseph Caiaphas P1180839.JPG",
     "gallio": "File:Delphes Gallion.jpg",
+    "kurkh": "File:Shalmaneser III-1.jpg",
+    "ishtar": "File:Pergamon museum Ishtar Gate.jpg",
+    "babchron": "File:The cuneiform inscription highlights the conquest of Jerusalem and the surrender of Jehoiakim, king of Judah, in 597 BCE. From Babylon, Iraq.jpg",
 }
 # Commons의 작성자 칸이 긴 설명문인 사진은 화면에 이름만 보이도록 줄여 적는다.
 AUTHOR_SHORT = {"ur": "Hardnfast", "taylor": "David Castor", "lachish": "Mike Peel",
-                "cyrus": "Mike Peel (수정: مانفی)", "isaiah": "Ardon Bar Hama"}
+                "cyrus": "Mike Peel (수정: مانفی)", "isaiah": "Ardon Bar Hama",
+                "kurkh": "David Castor", "babchron": "Osama Shukir Muhammed Amin"}
 UA = "BibleTimeline/0.1 (https://github.com/Hong-Iron/BIBLE-TIMELINE)"
 ROOT = Path(__file__).resolve().parent.parent / "site"
 
