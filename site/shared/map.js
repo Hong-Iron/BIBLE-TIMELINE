@@ -58,9 +58,10 @@ const baseName = (id) => SHORT_NAME[id] ?? PLACES[id].name.replace(/\(.*\)/, "")
 // 글자 폭 어림: 한글은 글자 크기만큼, 나머지는 절반 남짓
 const textW = (t, size, spacing = 0) => 4 + [...t].reduce((n, c) => n + (/[\u3131-\uD79D]/.test(c) ? size * 1.06 : size * 0.6) + spacing, 0);
 
+// minor: false면 바탕 지명에 주요 도시(MAJOR)만 놓는다(첫 화면처럼 지도가 작을 때).
 // minSpan: 장소가 한 곳뿐일 때도 화면 짧은 변에 이만큼(경도, 도)은 보이게 한다.
 // reserve(w, h): 지도 위에 겹쳐 놓은 설명 상자처럼 바탕 지명을 놓지 않을 자리 [[x, y, 너비, 높이], ...]
-export async function createMap(el, theme = THEMES.parchment, { labels = true, base = true, pad = 0.35, reserve = null, minSpan = 3.2 } = {}) {
+export async function createMap(el, theme = THEMES.parchment, { labels = true, base = true, pad = 0.35, reserve = null, minSpan = 3.2, minor = true } = {}) {
   const geo = await loadGeo();
   const svg = d3.select(el).append("svg").attr("class", "bt-map").style("display", "block").style("width", "100%").style("height", "100%");
   const sea = svg.append("rect").attr("fill", theme.sea);
@@ -128,7 +129,7 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
     const featNames = new Set(FEATURES.map((f) => f.name));
     const cands = [
       ...FEATURES.filter((f) => !routeNames.has(f.name)),
-      ...Object.keys(PLACES).filter((id) => !onRoute.has(id) && !featNames.has(baseName(id))).map((id) => {
+      ...Object.keys(PLACES).filter((id) => !onRoute.has(id) && !featNames.has(baseName(id)) && (minor || MAJOR.includes(id))).map((id) => {
         const i = MAJOR.indexOf(id);
         return { name: baseName(id), at: PLACES[id].at, kind: PLACES[id].region ? "region" : "place", pri: i < 0 ? (PLACES[id].region ? 150 : 200) : i < 8 ? 2 + i * 0.1 : 50 + i };
       }),

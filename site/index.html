@@ -4,7 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>바이블 타임라인</title>
-<meta name="description" content="성경 속 사건·인물·책·제국을 실제 햇수 비율의 연표에 나란히 놓고, 사건을 누르면 그 사건의 유물을 밝은 전시실에서 크게 본다.">
+<meta name="description" content="성경 속 사건을 옆으로 넘기며, 그 사건의 구절과 지도와 실제 유물 사진을 함께 보는 연표입니다. 성경 66권 해설, 지도로 따라 읽기, 시대와 책마다 당대 배경을 담았습니다.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="바이블 타임라인">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="바이블 타임라인">
+<meta property="og:description" content="성경 속 사건을 옆으로 넘기며, 그 사건의 구절과 지도와 실제 유물 사진을 함께 보는 연표입니다. 성경 66권 해설, 지도로 따라 읽기, 시대와 책마다 당대 배경을 담았습니다.">
+<meta property="og:url" content="https://hong-iron.github.io/BIBLE-TIMELINE/">
+<meta property="og:image" content="https://hong-iron.github.io/BIBLE-TIMELINE/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="바이블 타임라인: 메사 석비, 산헤립 프리즘, 이슈타르 문 사진을 연표 위에 놓은 그림">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="바이블 타임라인">
+<meta name="twitter:description" content="성경 속 사건을 옆으로 넘기며, 그 사건의 구절과 지도와 실제 유물 사진을 함께 보는 연표입니다. 성경 66권 해설, 지도로 따라 읽기, 시대와 책마다 당대 배경을 담았습니다.">
+<meta name="twitter:image" content="https://hong-iron.github.io/BIBLE-TIMELINE/og.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,8 +74,15 @@ button { font: inherit; color: inherit; }
 .legend-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .lg-btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 4px 10px; font-size: 12px; color: var(--ink2); cursor: pointer; white-space: nowrap; }
 .lg-btn:hover, .lg-btn[aria-expanded="true"] { border-color: #cfc8bb; color: var(--ink); }
-.lg-inline { display: flex; gap: 14px; font-size: 12px; color: var(--ink2); white-space: nowrap; overflow: hidden; }
-.lg-inline span, .lg-pop span { display: inline-flex; align-items: center; gap: 6px; }
+.lg-pop span { display: inline-flex; align-items: center; gap: 6px; }
+/* 더 보기: 꺼 둔 차선을 켜는 단추 */
+.layers { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.layers button { border: 1px dashed #d4ccbe; background: none; border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--ink2); cursor: pointer; }
+.layers button::before { content: "+ "; color: var(--muted); }
+.layers button[aria-pressed="true"] { border-style: solid; border-color: var(--ink); background: var(--ink); color: #fff; }
+.layers button[aria-pressed="true"]::before { content: "✓ "; color: #fff; }
+.layers button:hover { border-color: var(--accent); }
+.lg-pop .layers.in-pop { display: flex; flex-wrap: wrap; }
 .k-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px rgba(194, 65, 12, 0.25); }
 .k-thumb { width: 12px; height: 12px; border-radius: 2px; background: #cfc6b5; border-bottom: 3px solid var(--s-direct); }
 .k-arc { width: 18px; height: 10px; border: 1.4px solid var(--accent); border-color: var(--accent) transparent transparent transparent; border-radius: 50% 50% 0 0 / 100% 100% 0 0; opacity: 0.7; }
@@ -70,7 +91,7 @@ button { font: inherit; color: inherit; }
 .k-act { border-top-style: dashed; }
 .k-s { width: 10px; height: 10px; border-radius: 2px; }
 .lg-pop {
-  position: absolute; left: 16px; top: calc(100% - 4px); z-index: 20; width: 300px;
+  position: absolute; left: 16px; top: calc(100% - 4px); z-index: 40; width: 300px;
   background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
   box-shadow: 0 10px 30px rgba(28, 27, 25, 0.12); font-size: 12.5px; color: var(--ink2);
 }
@@ -86,7 +107,7 @@ button { font: inherit; color: inherit; }
 .zoom button { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); font-size: 17px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
 .zoom button:hover { border-color: #cfc8bb; }
 .zoom button:disabled { opacity: 0.35; cursor: default; }
-.zoom output { font-size: 12px; color: var(--ink2); min-width: 92px; text-align: center; font-variant-numeric: tabular-nums; }
+.zoom output { display: none; }
 
 .overview { grid-column: 1 / -1; position: relative; height: 14px; margin: 9px 0 0; border-radius: 3px; background: var(--line2); cursor: pointer; touch-action: none; overflow: hidden; }
 .overview .ov-era { position: absolute; top: 0; bottom: 0; opacity: 0.85; }
@@ -167,11 +188,11 @@ button { font: inherit; color: inherit; }
 .thumb:hover rect.frame, .thumb.on rect.frame { stroke: var(--accent); stroke-width: 1.5; }
 .thumb rect.str { stroke: none; }
 
-.foot { display: flex; justify-content: space-between; gap: 12px; padding: 7px 20px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); background: var(--bg); }
+.foot { display: flex; justify-content: flex-end; gap: 12px; padding: 7px 20px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); background: var(--bg); }
 .foot span:last-child { white-space: nowrap; }
 
 @media (max-width: 1099px) {
-  .lg-inline { display: none; }
+  .layers > span { display: none; }
 }
 @media (max-width: 700px) {
   body { font-size: 13.5px; }
@@ -186,13 +207,12 @@ button { font: inherit; color: inherit; }
   .strip { grid-template-columns: auto 1fr auto; padding: 8px 10px 0; gap: 8px; }
   .now .yr { font-size: 19px; }
   .now .ctx { font-size: 11px; }
-  .zoom output { display: none; }
   .zoom button { width: 28px; height: 28px; }
+  .strip > .legend-wrap > .layers { display: none; }
   .lg-pop { left: 10px; width: calc(100vw - 20px); max-width: 340px; }
   .lanes div { left: 8px; font-size: 10.5px; font-weight: 600; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
   .lanes div small { display: none; }
   .foot { padding: 6px 12px; font-size: 10.5px; }
-  .foot span:first-child { display: none; }
   .hint { right: 50%; transform: translateX(50%); top: 34px; white-space: nowrap; }
   .hint.gone { transform: translate(50%, -6px); }
 }
@@ -799,7 +819,7 @@ button { font: inherit; color: inherit; }
 <body>
 <header class="top">
   <h1 class="brand">바이블 타임라인</h1>
-  <button class="books-btn" id="booksBtn" type="button">성경 66권</button>
+  <button class="books-btn" id="booksBtn" type="button">성경으로 보기</button>
 </header>
 
 <div class="split">
@@ -816,12 +836,19 @@ button { font: inherit; color: inherit; }
 <section class="strip">
   <div class="legend-wrap">
     <button class="lg-btn" id="lgBtn" type="button" aria-expanded="false" aria-controls="lgPop">범례</button>
-    <div class="lg-inline" aria-hidden="true">
-      <span><i class="k-dot"></i>사건</span>
-      <span><i class="k-thumb"></i>증거(만든 때)</span>
-      <span><i class="k-arc"></i>둘 사이에 흐른 시간</span>
+    <div class="layers" role="group" aria-label="차선 더 보기">
+      <span>더 보기</span>
+      <button type="button" data-layer="book" aria-pressed="false">성경 책</button>
+      <button type="button" data-layer="person" aria-pressed="false">인물</button>
+      <button type="button" data-layer="emp" aria-pressed="false">제국</button>
     </div>
     <div class="lg-pop" id="lgPop" hidden>
+      <h4>차선 더 보기</h4>
+      <div class="layers in-pop" role="group" aria-label="차선 더 보기">
+        <button type="button" data-layer="book" aria-pressed="false">성경 책</button>
+        <button type="button" data-layer="person" aria-pressed="false">인물</button>
+        <button type="button" data-layer="emp" aria-pressed="false">제국</button>
+      </div>
       <h4>표시</h4>
       <div>
         <span><i class="k-dot"></i>사건</span>
@@ -841,7 +868,8 @@ button { font: inherit; color: inherit; }
         <span><i class="k-s" style="background:var(--s-context)"></i>배경</span>
         <span><i class="k-s" style="background:var(--s-manuscript)"></i>옛 사본</span>
       </div>
-      <p>시간 눈금은 실제 비율입니다. 가운데 세로선이 가리키는 해의 사건이 위 지도에 나타납니다.</p>
+      <p>시간 눈금은 실제 비율입니다. 가운데 세로선이 가리키는 해의 사건이 지도에 나타납니다. 사건과 증거를 잇는 곡선은 가운데 사건 것만 그립니다.</p>
+      <p>← → 키로 사건을 넘기고, ⌘/Ctrl + 휠이나 두 손가락으로 확대합니다.</p>
     </div>
   </div>
   <div class="now" aria-live="polite">
@@ -870,7 +898,6 @@ button { font: inherit; color: inherit; }
 </section>
 
 <footer class="foot">
-  <span>← → 사건 넘기기 · ⌘/Ctrl + 휠 또는 두 손가락으로 확대</span>
   <span>구절: 개역한글(1961) · 사진: Wikimedia Commons · 지도: Natural Earth</span>
 </footer>
 </div>

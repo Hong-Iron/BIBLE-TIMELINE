@@ -64,7 +64,11 @@ const PEOPLE_PACK = pack(PEOPLE, 8);
 const state = {
   ppy: 2, viewW: 1000, viewH: 400, center: EVENTS[0].year, mobile: false,
   selected: null, near: null, mapEv: null, focusKey: null, person: null, book: null,
+  // 처음에는 시대·사건·증거 차선만 보인다. 제국·성경 책·인물 차선은 '더 보기'에서 켠다(이 브라우저에만 기억).
+  show: { emp: false, book: false, person: false },
 };
+const SHOW_KEY = "bt-show";
+try { Object.assign(state.show, JSON.parse(localStorage.getItem(SHOW_KEY)) || {}); } catch { /* 저장소를 못 쓰면 기본값 */ }
 let L = {}; // 차선 위치
 let map = null, credits = {};
 
@@ -75,19 +79,29 @@ function layout() {
     axis: 26, gap: m ? 6 : 8, emp: m ? 18 : 20, era: m ? 20 : 22, bookRow: m ? 16 : 17, personRow: m ? 19 : 21,
     evRow: m ? 15 : 16, evRows: m ? 3 : 4, band: m ? 46 : 54, thumb: m ? 34 : 42, labelW: m ? 52 : 96,
   };
+  const sh = state.show;
+  // 책·인물 차선을 끈 간단한 보기에서는 남는 높이로 사건 이름 줄을 늘려(최대 9줄) 이름이 덜 숨게 한다.
+  // 빼는 값: 눈금, 시대 띠, 띠 사이 간격, 사진 두 줄(최대 크기), 여백
+  if (!sh.book && !sh.person) {
+    const room = (scroller.clientHeight || 0) - d.axis - d.era - d.band - 2 * ((m ? 80 : 156) + 8) - 5 * d.gap - 40;
+    d.evRows = clamp(Math.floor(room / d.evRow), m ? 5 : 7, 9);
+  }
   let y = d.axis + d.gap;
   const lane = (name, h) => { const top = y; y += h + d.gap; return { top, h, name }; };
+  const off = () => ({ top: y, h: 0, hidden: true });
   L = { d };
-  L.emp = lane("제국", d.emp);
+  L.emp = sh.emp ? lane("제국", d.emp) : off();
   L.era = lane("시대", d.era);
-  L.book = lane("성경 책", BOOK_PACK.rows * d.bookRow);
-  L.person = lane("인물", PEOPLE_PACK.rows * d.personRow);
+  L.book = sh.book ? lane("성경 책", BOOK_PACK.rows * d.bookRow) : off();
+  L.person = sh.person ? lane("인물", PEOPLE_PACK.rows * d.personRow) : off();
   L.ev = lane("사건", d.evRows * d.evRow + 12);
   L.band = { top: y - d.gap, h: d.band };
   y = L.band.top + d.band;
   // 연표가 오른쪽 열의 높이를 다 쓰도록, 남는 높이만큼 유물 사진 칸(전시 품목)을 키운다. 사진 두 줄이라 2로 나눈다.
   const avail = scroller.clientHeight || 0;
-  d.thumb = clamp(Math.floor((avail - y - 12 - 16) / 2) - 8, d.thumb, m ? 64 : 96);
+  // 책·인물 차선을 끈 간단한 보기에서는 사진을 더 크게 둔다.
+  const simple = !sh.book && !sh.person;
+  d.thumb = clamp(Math.floor((avail - y - 12 - 16) / 2) - 8, d.thumb, m ? (simple ? 80 : 64) : simple ? 156 : 96);
   L.evid = { top: y, h: 2 * (d.thumb + 8) + 6, name: "증거" };
   L.height = L.evid.top + L.evid.h + 6;
   document.body.style.setProperty("--chart-h", `${L.height + 1}px`);
@@ -141,7 +155,7 @@ function render() {
     return g;
   }).attr("transform", (t) => `translate(${X(t)},0)`).select("text").text(tickLabel);
 
-  const seps = [d.axis, L.emp.top - d.gap / 2, L.book.top - d.gap / 2, L.person.top - d.gap / 2, L.ev.top - d.gap / 2, L.evid.top];
+  const seps = [d.axis, (L.emp.hidden ? L.era : L.emp).top - d.gap / 2, ...[L.book, L.person].filter((l) => !l.hidden).map((l) => l.top - d.gap / 2), L.ev.top - d.gap / 2, L.evid.top];
   G.seps.selectAll("line").data(seps).join("line").attr("class", "sep").attr("x1", 0).attr("x2", W).attr("y1", (y) => Math.round(y) + 0.5).attr("y2", (y) => Math.round(y) + 0.5);
 
   // 제국 띠와 시대 띠
@@ -164,14 +178,14 @@ function render() {
       gg.select("title").text(`${label(b)} · ${rangeText(b.from, b.to)}`);
     });
   };
-  bands(G.emp, EMPIRES, L.emp.top, d.emp, (b) => hexA(b.color, 0.15), (b) => hexA(b.color, 0.4), (b) => darken(b.color), (b) => b.name);
+  bands(G.emp, state.show.emp ? EMPIRES : [], L.emp.top, d.emp, (b) => hexA(b.color, 0.15), (b) => hexA(b.color, 0.4), (b) => darken(b.color), (b) => b.name);
   bands(G.era, ERAS, L.era.top, d.era, (b) => eraColor(b.hue), (b) => eraColor(b.hue, 72, 30), (b) => eraColor(b.hue, 27, 35), (b) => b.name);
   // 시대 띠를 누르면 그 시대의 당대 배경을 연다.
   G.era.selectAll("g.b").classed("era-link", true).on("click", (event, e) => books.openEra(e.id))
     .select("title").text((e) => `${e.name} · ${rangeText(e.from, e.to)} · 누르면 시대 배경`);
 
   // 성경 책: 다루는 시기
-  const bookItems = BOOK_PACK.items.filter((b) => vis(b.from, b.to));
+  const bookItems = state.show.book ? BOOK_PACK.items.filter((b) => vis(b.from, b.to)) : [];
   G.book.selectAll("g.book").data(bookItems, (b) => b.name).join((e) => {
     const g = e.append("g").attr("class", "book");
     g.append("rect").attr("rx", 3);
@@ -195,7 +209,7 @@ function render() {
   });
 
   // 인물: 이름은 막대 위에, 막대가 짧으면 옆 막대와 겹치지 않을 때만 밖으로 삐져나오게 둔다
-  const people = PEOPLE_PACK.items.filter((p) => vis(p.from, p.to));
+  const people = state.show.person ? PEOPLE_PACK.items.filter((p) => vis(p.from, p.to)) : [];
   G.person.selectAll("g.person").data(people, (p) => p.id).join((e) => {
     const g = e.append("g");
     g.append("line").attr("class", "bar");
@@ -310,7 +324,9 @@ function render() {
     const book = t.e.strength === "manuscript" && bookOf(t.e.ev.book);
     if (book) arcs.push({ key: `${t.e.key}:book`, x0: X(book.to), x1: t.pin, ev: t.e.ev, gap: `${book.name} 시대보다 ${gapText(t.e.madeYear, book.to)}`, ms: true, from: bt + 2, anchor: true });
   }
-  const arcsVis = arcs.filter((a) => Math.max(a.x0, a.x1) > -40 && Math.min(a.x0, a.x1) < W + 40);
+  // 사건과 증거를 잇는 곡선과 '약 N년 뒤'는 가운데 세로선의 사건(또는 고른 사건) 것만 그린다.
+  const focusEv = sel || state.near;
+  const arcsVis = arcs.filter((a) => a.ev === focusEv && Math.max(a.x0, a.x1) > -40 && Math.min(a.x0, a.x1) < W + 40);
   const arcPath = (a) => {
     const y0 = a.from, y1 = bb, k = (y1 - y0) * 0.75;
     return `M${a.x0},${y0} C${a.x0},${y0 + k} ${a.x1},${y1 - k} ${a.x1},${y1}`;
@@ -349,9 +365,9 @@ function renderLaneLabels() {
   const el = $("lanes");
   el.style.setProperty("--lw", `${L.d.labelW}px`);
   const rows = [
-    [L.emp, "제국"], [L.era, "시대", "누르면 배경"], [L.book, "성경 66권", "누르면 해설"], [L.person, "인물"],
+    [L.emp, "제국"], [L.era, "시대", "누르면 배경"], [L.book, "성경 책", "누르면 해설"], [L.person, "인물"],
     [L.ev, "사건"], [L.evid, "증거", "만든 때"],
-  ];
+  ].filter(([l]) => !l.hidden);
   el.innerHTML = rows.map(([l, name, sub]) => `<div style="top:${l.top + l.h / 2}px">${name}${sub ? `<small>${sub}</small>` : ""}</div>`).join("");
 }
 
@@ -671,7 +687,7 @@ function parallax(x) {
 
 function ensureMap() {
   if (gMap || gMapLoading) return;
-  gMapLoading = createMap($("gMap"), THEMES.atlas, { labels: true, pad: 0.5, reserve: (w) => [[0, 0, w, 28]] })
+  gMapLoading = createMap($("gMap"), THEMES.atlas, { labels: true, pad: 0.5, minor: false, reserve: (w) => [[0, 0, w, 28]] })
     .then((m) => { gMap = m; if (gCur >= 0) m.show(EVENTS[gCur], { instant: true }); })
     .catch(() => gMapBox.remove());
 }
@@ -852,9 +868,24 @@ $("zOut").addEventListener("click", () => zoomBy(1 / 1.6));
 const lgBtn = $("lgBtn"), lgPop = $("lgPop");
 function toggleLegend(open = lgPop.hidden) {
   lgPop.hidden = !open;
+  // 범례 창을 열면 '옆으로 넘기며…' 안내가 창을 가리지 않게 거둔다.
+  if (open) $("hint").classList.add("gone");
   lgBtn.setAttribute("aria-expanded", String(open));
 }
 lgBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleLegend(); });
+// 더 보기: 제국·성경 책·인물 차선 켜고 끄기. 단추는 줄 위(넓은 화면)와 범례 창 안 두 군데에 있다.
+function syncLayers() {
+  document.querySelectorAll("[data-layer]").forEach((b) => b.setAttribute("aria-pressed", String(state.show[b.dataset.layer])));
+}
+document.querySelectorAll("[data-layer]").forEach((b) => b.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const k = b.dataset.layer;
+  state.show[k] = !state.show[k];
+  try { localStorage.setItem(SHOW_KEY, JSON.stringify(state.show)); } catch { /* 기억하지 못해도 화면은 바뀐다 */ }
+  syncLayers();
+  onResize();
+}));
+syncLayers();
 document.addEventListener("click", (e) => { if (!lgPop.hidden && !lgPop.contains(e.target)) toggleLegend(false); });
 
 /* ---------- 크기 ---------- */
@@ -902,7 +933,7 @@ async function init() {
 
   // 왼쪽 아래의 "지도에 보이는 사건" 상자 자리에는 바탕 지명을 놓지 않는다.
   const cap = $("cap");
-  map = await createMap($("map"), THEMES.atlas, { pad: 0.4, reserve: (w, h) => [[0, h - cap.offsetHeight - 22, cap.offsetWidth + 24, cap.offsetHeight + 22]] });
+  map = await createMap($("map"), THEMES.atlas, { pad: 0.4, minor: false, reserve: (w, h) => [[0, h - cap.offsetHeight - 22, cap.offsetWidth + 24, cap.offsetHeight + 22]] });
   const first = state.near ?? nearestEvent(state.center);
   state.mapEv = first;
   map.show(first, { instant: true });

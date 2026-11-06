@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>바이블 타임라인 공유 그림</title>
+<!-- 링크를 공유할 때 보이는 그림(1200×630)의 원본. tools/og.sh가 헤드리스 크롬으로 찍어 site/og.jpg로 저장한다.
+     사진은 모두 퍼블릭 도메인이나 CC0이라 그림 안에 출처를 적지 않아도 된다(credits.json: mesha, taylor, ishtar). -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative; color: #1c1b19; font-family: "Pretendard Variable", Pretendard, sans-serif;
+    background: radial-gradient(120% 120% at 20% 10%, #fbfaf7, #f1ebe0 60%, #e8dfcf);
+  }
+  .text { position: absolute; left: 72px; top: 92px; width: 520px; }
+  .kicker { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.12em; color: #c2410c; }
+  h1 { margin: 18px 0 0; font-size: 86px; font-weight: 800; line-height: 1.08; letter-spacing: -0.035em; }
+  .lead { margin: 26px 0 0; font-size: 29px; line-height: 1.5; color: #45413a; font-weight: 500; word-break: keep-all; }
+  .chips { position: absolute; left: 72px; bottom: 70px; display: flex; gap: 10px; }
+  .chips span { padding: 8px 18px; border-radius: 999px; background: #fff; border: 1.5px solid #e3d8c6; font-size: 21px; font-weight: 600; color: #3a3732; }
+  .chips span b { color: #c2410c; }
+  .url { position: absolute; right: 64px; bottom: 30px; font-size: 18px; color: #8b867c; letter-spacing: 0.02em; }
+
+  /* 오른쪽: 연표 위의 유물 세 점 */
+  .shelf { position: absolute; left: 640px; top: 70px; width: 500px; height: 470px; }
+  .shelf svg { position: absolute; left: 0; top: 0; }
+  .item { position: absolute; width: 150px; text-align: center; }
+  .item .frame { background: #fff; padding: 7px; border-radius: 4px; box-shadow: 0 2px 4px rgba(60, 45, 25, 0.12), 0 22px 40px -22px rgba(60, 45, 25, 0.55); }
+  .item img { display: block; width: 100%; height: 252px; object-fit: cover; }
+  .item b { display: block; margin-top: 14px; font-size: 19px; font-weight: 700; }
+  .item small { display: block; margin-top: 4px; font-size: 16px; color: #c2410c; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="text">
+    <p class="kicker">성경 · 연표 · 지도 · 유물</p>
+    <h1>바이블<br>타임라인</h1>
+    <p class="lead">성경 속 사건을 옆으로 넘기며<br>구절과 지도, 실제 유물을 함께 봅니다</p>
+  </div>
+  <div class="chips"><span><b>60</b> 사건</span><span><b>66</b>권 해설</span><span>당대 배경</span></div>
+
+  <div class="shelf">
+    <svg width="500" height="470" aria-hidden="true">
+      <g>
+        <line x1="10" x2="490" y1="402" y2="402" stroke="#cbbfac" stroke-width="2"/>
+        <line x1="85" x2="85" y1="272" y2="402" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="250" x2="250" y1="272" y2="402" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="415" x2="415" y1="272" y2="402" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <circle cx="85" cy="402" r="8" fill="#c2410c" stroke="#fbfaf7" stroke-width="3"/>
+        <circle cx="250" cy="402" r="8" fill="#c2410c" stroke="#fbfaf7" stroke-width="3"/>
+        <circle cx="415" cy="402" r="8" fill="#c2410c" stroke="#fbfaf7" stroke-width="3"/>
+      </g>
+    </svg>
+    <div class="item" style="left:10px; top:0"><div class="frame"><img src="../site/img/mesha.jpg" alt=""></div></div>
+    <div class="item" style="left:175px; top:0"><div class="frame"><img src="../site/img/taylor.jpg" alt=""></div></div>
+    <div class="item" style="left:340px; top:0"><div class="frame"><img src="../site/img/ishtar.jpg" alt=""></div></div>
+    <div class="item" style="left:10px; top:416px"><b>메사 석비</b><small>기원전 840년경</small></div>
+    <div class="item" style="left:175px; top:416px"><b>산헤립 프리즘</b><small>기원전 691년</small></div>
+    <div class="item" style="left:340px; top:416px"><b>이슈타르 문</b><small>기원전 575년경</small></div>
+  </div>
+  <div class="url">hong-iron.github.io/BIBLE-TIMELINE</div>
+</body>
+</html>
