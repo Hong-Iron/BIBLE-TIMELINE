@@ -3,7 +3,7 @@
 > 성경 속 사건을 옆으로 넘기며, 그 사건의 구절과 지도, 그 사건을 뒷받침하는 실제 유물 사진을 함께 보는 웹사이트입니다.
 
 - 주소: https://hong-iron.github.io/BIBLE-TIMELINE/
-- 첫 화면은 왼쪽 지도와 오른쪽 연표, 사건을 누르면 열리는 전시실, 인물을 누르면 열리는 인물 프로필로 되어 있습니다. 대표 사건 60개와 인물 52명이 들어 있습니다. 화면 구성을 정하려고 만든 시안 세 개는 `/drafts/`에 남겨 두었습니다. 결정 기록과 남은 결정 항목은 [DESIGN.md](DESIGN.md)에 있습니다.
+- 첫 화면은 왼쪽 지도와 오른쪽 연표, 사건을 누르면 열리는 전시실, 인물을 누르면 열리는 인물 프로필로 되어 있습니다. 대표 사건 60개와 인물 52명이 들어 있습니다. 머리의 '성경 66권' 단추로 책마다 해설을 열고, 해설에서 '지도로 따라 읽기'로 넘어갑니다. 결정 기록과 남은 결정 항목은 [DESIGN.md](DESIGN.md)에 있습니다.
 - 이 저장소의 문서와 화면 문구는 [Humanize.md](Humanize.md)의 규칙으로 씁니다.
 
 ## 폴더와 담는 파일
@@ -12,12 +12,10 @@
 |---|---|
 | `site/` | GitHub Pages(저장소의 HTML 파일을 그대로 웹사이트로 띄워 주는 GitHub의 무료 호스팅)에 올라가는 파일 전체. 빌드 단계 없이 그대로 배포합니다 |
 | `site/index.html`, `site/app.js`, `site/profile.js`, `site/book.js`, `site/story.js` | 사이트 첫 화면. 왼쪽 지도와 오른쪽 연표·전시실(`app.js`), 인물 프로필(`profile.js`), 성경 66권 목록과 책 해설(`book.js`), 책의 사건을 내려 읽으면 지도가 따라 움직이는 '지도로 따라 읽기'(`story.js`) |
-| `site/drafts/` | 화면 구성을 정하려고 만든 시안 목록 |
-| `site/a/`, `site/b/`, `site/c/` | 비교했던 시안 A 두루마리, 시안 B 박물관 회랑, 시안 C 동시대 차선. 표본 사건 11개만 보여 줍니다 |
-| `site/d/` | 예전 결합안 주소. 첫 화면으로 넘겨 주며, 주소 끝의 `#사건 이름`도 그대로 넘깁니다 |
-| `site/shared/` | 모든 화면이 함께 쓰는 사건 자료(표본 11개는 `data.js`, 나머지 49개는 `events_more.js`), 인물 프로필 자료(`profiles.js`와 시대별 묶음 `profiles_g1.js`~`profiles_g4.js`), 성경 66권 목록(`books.js`)과 책 해설(`guides.js`와 갈래별 묶음 `guides_g1.js`~`guides_g7.js`), 책 해설에만 나오는 장소(`places_story.js`와 묶음 `places_g1.js`~`places_g7.js`), 사건과 프로필 장절의 개역한글 본문(`verses.js`, 스크립트가 만듦), 지도 그리기(`map.js`), 지도 모양(`geo.json`), 사진 출처(`credits.json`) |
+| `site/d/` | 예전 주소. 첫 화면으로 넘겨 주며, 주소 끝의 `#사건 이름`도 그대로 넘깁니다 |
+| `site/shared/` | 모든 화면이 함께 쓰는 사건 자료(처음 만든 11개는 `data.js`, 나머지 49개는 `events_more.js`), 인물 프로필 자료(`profiles.js`와 시대별 묶음 `profiles_g1.js`~`profiles_g4.js`), 성경 66권 목록(`books.js`)과 책 해설(`guides.js`와 갈래별 묶음 `guides_g1.js`~`guides_g7.js`), 책 해설에만 나오는 장소(`places_story.js`와 묶음 `places_g1.js`~`places_g7.js`), 사건과 프로필 장절의 개역한글 본문(`verses.js`, 스크립트가 만듦), 지도 그리기(`map.js`), 지도 모양(`geo.json`), 사진 출처(`credits.json`) |
 | `site/img/` | 유물 사진. 긴 변을 1200 px 이하로 줄인 JPEG와, 목록·연표 칸에 쓰는 320 px 판(`img/sm/`) |
-| `tools/` | 사진을 내려받는 스크립트(`fetch_images.py`), 프로필 장절의 본문을 뽑고 주장과 대조하는 스크립트(`build_verses.py`), 책 해설의 장소를 점검하는 스크립트(`check_places.mjs`), 지도 모양을 잘라 내는 스크립트(`crop_geo.mjs`), 시안 목록의 미리보기 사진을 찍는 스크립트(`thumbs.sh`), 내 컴퓨터에서 띄우는 미리보기 서버(`serve.py`) |
+| `tools/` | 사진을 내려받는 스크립트(`fetch_images.py`), 프로필 장절의 본문을 뽑고 주장과 대조하는 스크립트(`build_verses.py`), 책 해설의 장소를 점검하는 스크립트(`check_places.mjs`), 지도 모양을 잘라 내는 스크립트(`crop_geo.mjs`), 내 컴퓨터에서 띄우는 미리보기 서버(`serve.py`) |
 
 ## 내 컴퓨터에서 보기
 

@@ -1,5 +1,5 @@
-// 결합안 · 연표와 전시실: 시안 C의 실제 비율 연표 위에 제국·시대·책·인물·사건·증거를 나란히 놓고,
-// 사건이나 유물을 누르면 시안 B의 어두운 전시실을 화면 가득 연다.
+// 첫 화면 · 연표와 전시실: 실제 비율 연표 위에 제국·시대·책·인물·사건·증거를 나란히 놓고,
+// 사건이나 유물을 누르면 밝은 전시실을 화면 가득 연다.
 // 화면은 가로로 넓은 '트랙'을 스크롤하고, 그림은 화면 폭만 한 SVG 하나에 그때그때 다시 그린다.
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";

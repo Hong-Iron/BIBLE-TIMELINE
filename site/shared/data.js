@@ -1,5 +1,5 @@
 // 모든 화면이 함께 쓰는 사건·인물·책·장소 자료. 연도는 기원전을 음수로 적는다(기원전 1446년 → -1446).
-// 표본 사건 11개는 이 파일에, 나머지 49개는 events_more.js에 있다. 표본 사건에는 sample: true를 붙여 시안 A·B·C가 이 11개만 쓰게 한다.
+// 사건 60개 가운데 처음 만든 11개는 이 파일에, 나머지 49개는 events_more.js에 있다.
 // 구절은 개역한글(1961, 저작권 만료)이다. verse가 없는 사건은 verses.js(tools/build_verses.py가 뽑은 본문)로 채운다.
 import { VERSES } from "./verses.js";
 import { MORE_EVENTS, MORE_PEOPLE, MORE_PLACES } from "./events_more.js";
@@ -388,7 +388,6 @@ export function yearsBetween(a, b) {
   return hi - lo - (lo < 0 && hi > 0 ? 1 : 0);
 }
 
-for (const ev of EVENTS) ev.sample = true;
 PEOPLE.push(...MORE_PEOPLE);
 Object.assign(PLACES, MORE_PLACES);
 for (const [id, p] of Object.entries(STORY_PLACES)) PLACES[id] ??= p;

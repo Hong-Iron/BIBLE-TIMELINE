@@ -36,8 +36,6 @@ button { font: inherit; color: inherit; }
 .tag { font-size: 12px; color: var(--ink2); padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
 .books-btn { margin-left: auto; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; }
 .books-btn:hover { border-color: var(--accent); color: var(--accent); }
-.back { font-size: 13px; color: var(--ink2); text-decoration: none; white-space: nowrap; }
-.back:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 
 /* 왼쪽 지도 | 오른쪽 연표 */
 .split { display: grid; grid-template-columns: clamp(260px, 28vw, 420px) minmax(0, 1fr); min-height: 0; }
@@ -180,7 +178,6 @@ button { font: inherit; color: inherit; }
   .top { padding: 9px 14px; gap: 8px; }
   .brand { font-size: 15.5px; }
   .tag { font-size: 11px; padding: 1px 7px; }
-  .back { font-size: 12px; }
   .split { grid-template-columns: 1fr; grid-template-rows: 24vh minmax(0, 1fr); }
   .map { border-right: 0; border-bottom: 1px solid var(--line); }
   .cap { left: 10px; bottom: 10px; padding: 7px 10px 8px; max-width: calc(100% - 20px); }
@@ -749,7 +746,6 @@ button { font: inherit; color: inherit; }
 <header class="top">
   <h1 class="brand">바이블 타임라인</h1>
   <button class="books-btn" id="booksBtn" type="button">성경 66권</button>
-  <a class="back" href="drafts/">지난 시안</a>
 </header>
 
 <div class="split">
