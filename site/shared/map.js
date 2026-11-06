@@ -51,8 +51,37 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, p
       enter.append("text").attr("x", 8).attr("y", 4).attr("fill", theme.label).attr("stroke", theme.halo).attr("stroke-width", 3.5).attr("paint-order", "stroke")
         .style("font", `600 13px ${theme.font}`).text((d) => PLACES[d].name);
     }
-    enter.merge(sel).attr("transform", (d) => `translate(${proj(PLACES[d].at)})`);
+    const all = enter.merge(sel).attr("transform", (d) => `translate(${proj(PLACES[d].at)})`);
+    if (labels) placeLabels(all);
   }
+
+  // 가까운 지명끼리 글자가 겹치면 오른쪽 → 왼쪽 → 아래 → 위 순서로 빈자리를 찾아 옮긴다.
+  const SPOTS = [
+    { x: 8, y: 4, anchor: "start", box: (w) => [8, -9, w, 14] },
+    { x: -8, y: 4, anchor: "end", box: (w) => [-8 - w, -9, w, 14] },
+    { x: 0, y: 19, anchor: "middle", box: (w) => [-w / 2, 7, w, 14] },
+    { x: 0, y: -10, anchor: "middle", box: (w) => [-w / 2, -23, w, 14] },
+  ];
+  const hit = (a, b) => a[0] < b[0] + b[2] && b[0] < a[0] + a[2] && a[1] < b[1] + b[3] && b[1] < a[1] + a[3];
+  function placeLabels(groups) {
+    const taken = [];
+    groups.each(function (d) { const [x, y] = proj(PLACES[d].at); taken.push([x - 6, y - 6, 12, 12]); });
+    groups.each(function (d) {
+      const [x, y] = proj(PLACES[d].at);
+      const text = this.querySelector("text");
+      const w = text.getComputedTextLength() || PLACES[d].name.length * 13;
+      const inside = (b) => b[0] >= 0 && b[1] >= 0 && b[0] + b[2] <= w0() && b[1] + b[3] <= h0();
+      const boxes = SPOTS.map((s) => { const [bx, by, bw, bh] = s.box(w); return [x + bx, y + by, bw, bh]; });
+      let i = boxes.findIndex((b) => inside(b) && !taken.some((t) => hit(b, t)));
+      if (i < 0) i = boxes.findIndex((b) => !taken.some((t) => hit(b, t)));
+      if (i < 0) i = 0;
+      text.setAttribute("x", SPOTS[i].x);
+      text.setAttribute("y", SPOTS[i].y);
+      text.setAttribute("text-anchor", SPOTS[i].anchor);
+      taken.push(boxes[i]);
+    });
+  }
+  const w0 = () => w, h0 = () => h;
 
   function target(ev) {
     const pts = ev.route.map((id) => PLACES[id].at);

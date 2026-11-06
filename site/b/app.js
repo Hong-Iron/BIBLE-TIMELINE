@@ -65,7 +65,7 @@ function roomHTML(ev, i) {
           <p class="sdesc"></p>
           <dl class="pmeta"><dt>만든 때</dt><dd class="pmade"></dd><dt>소장</dt><dd class="pwhere"></dd><dt>발견</dt><dd class="pfound"></dd></dl>
           <div class="notes">
-            <div><h4>이 유물이 말해 주는 것</h4><p class="psays"></p></div>
+            <div><h4>이 유물이 말해 주는 내용</h4><p class="psays"></p></div>
             <div><h4>주의할 점</h4><p class="pcaveat"></p></div>
           </div>
         </div></div>
