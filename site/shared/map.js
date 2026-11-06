@@ -1,6 +1,6 @@
 // 고대 근동 지도. 사건의 장소들이 화면에 들어오도록 부드럽게 옮겨 간다.
 // 사용: const map = await createMap(el, theme); map.show(event)
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import * as d3 from "../vendor/d3-7.9.0.js";
 import { PLACES } from "./data.js";
 
 const BASE = new URL(".", import.meta.url).href;
