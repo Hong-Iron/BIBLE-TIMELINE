@@ -643,7 +643,7 @@ function parallax(x) {
 
 function ensureMap() {
   if (gMap || gMapLoading) return;
-  gMapLoading = createMap($("gMap"), THEMES.night, { labels: true, pad: 0.5 })
+  gMapLoading = createMap($("gMap"), THEMES.atlas, { labels: true, pad: 0.5 })
     .then((m) => { gMap = m; if (gCur >= 0) m.show(EVENTS[gCur], { instant: true }); })
     .catch(() => gMapBox.remove());
 }
@@ -661,7 +661,7 @@ function openGallery(ev, k = null) {
   setRoom(i);
   layoutRail();
   ensureMap();
-  $("gClose").focus({ preventScroll: true });
+  gallery.focus({ preventScroll: true }); // 방 전체에 초점을 두어 화살표 키가 바로 듣게 한다
 }
 
 function closeGallery() {

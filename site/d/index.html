@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>바이블 타임라인 · 결합안</title>
-<meta name="description" content="성경 속 사건·인물·책·제국을 실제 햇수 비율의 연표에 나란히 놓고, 사건을 누르면 그 사건의 유물을 어두운 전시실에서 크게 본다.">
+<meta name="description" content="성경 속 사건·인물·책·제국을 실제 햇수 비율의 연표에 나란히 놓고, 사건을 누르면 그 사건의 유물을 밝은 전시실에서 크게 본다.">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,6 +18,7 @@
   --ui: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --serif: "Noto Serif KR", "AppleMyungjo", serif;
   --chart-h: 460px;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
@@ -186,31 +187,34 @@ button { font: inherit; color: inherit; }
   .hint { transition: none; }
 }
 
-/* ---------- 전시실: 사건이나 유물을 누르면 화면 가득 열리는 어두운 방 ---------- */
+/* ---------- 전시실: 사건이나 유물을 누르면 화면 가득 열리는 밝은 방 ---------- */
+/* 따뜻한 흰 벽에 유물 사진을 액자처럼 걸고, 위에서 부드러운 빛이 떨어진다. 색은 연표와 같은 변수를 쓴다. */
 .gallery {
-  --g0: #0f0d0b; --g1: #16120e; --gink: #efe6d6; --gink2: #d8cdbb; --gmuted: #a3958a;
-  --gfaint: rgba(239, 230, 214, 0.12); --gold: #e8b04b; --gold-soft: rgba(232, 176, 75, 0.22);
+  --wall: #f4f0e8; --wall2: #ebe5d9; --gink: var(--ink); --gink2: #45413a; --gmuted: var(--muted);
+  --gfaint: rgba(28, 27, 25, 0.1); --frame: #ffffff;
   --rail: 70px; --map-w: 260px; --map-h: 168px;
   position: fixed; inset: 0; z-index: 50; overflow: hidden;
-  color: var(--gink); font: 14px/1.55 var(--ui); color-scheme: dark;
-  background: radial-gradient(120% 90% at 50% 18%, var(--g1), var(--g0) 70%), var(--g0);
+  color: var(--gink); font: 14px/1.55 var(--ui); color-scheme: light;
+  background: radial-gradient(130% 95% at 50% 10%, #faf8f3, var(--wall) 55%, var(--wall2));
   opacity: 0; visibility: hidden; transform: scale(0.985);
   transition: opacity 0.35s ease, transform 0.45s cubic-bezier(.2, .7, .2, 1), visibility 0s 0.45s;
 }
 .gallery.open { opacity: 1; visibility: visible; transform: none; transition: opacity 0.35s ease, transform 0.45s cubic-bezier(.2, .7, .2, 1); }
+/* 벽의 결: 아주 옅은 잡음과 가장자리의 은은한 그늘 */
 .gallery::before, .gallery::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
 .gallery::before {
-  z-index: 2; opacity: 0.05;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 .92  0 0 0 0 .8  0 0 0 .6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  z-index: 2; opacity: 0.045; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .28  0 0 0 0 .2  0 0 0 .9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
-.gallery::after { z-index: 3; background: radial-gradient(ellipse 90% 85% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55)); }
-.gallery :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.gallery::after { z-index: 3; background: radial-gradient(ellipse 95% 90% at 50% 40%, transparent 62%, rgba(120, 96, 60, 0.12)); }
+.gallery :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.gallery:focus { outline: none; }
 
 .g-top {
   position: absolute; inset: 0 0 auto 0; z-index: 30;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 16px 26px 24px;
-  background: linear-gradient(rgba(15, 13, 11, 0.9), rgba(15, 13, 11, 0));
+  background: linear-gradient(rgba(250, 248, 243, 0.94), rgba(250, 248, 243, 0));
   pointer-events: none;
 }
 .g-top > * { pointer-events: auto; }
@@ -219,10 +223,11 @@ button { font: inherit; color: inherit; }
 .g-brand span { font-size: 12.5px; color: var(--gmuted); font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }
 .g-close {
   display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
-  padding: 8px 15px; border-radius: 999px; font-size: 13px; color: var(--gold);
-  border: 1px solid rgba(232, 176, 75, 0.45); background: rgba(22, 18, 14, 0.75);
+  padding: 8px 15px; border-radius: 999px; font-size: 13px; color: var(--ink);
+  border: 1px solid #d6cfc2; background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 2px rgba(28, 27, 25, 0.06);
 }
-.g-close:hover { background: rgba(232, 176, 75, 0.14); }
+.g-close:hover { border-color: var(--accent); color: var(--accent); }
 
 .g-hall {
   position: absolute; inset: 0; z-index: 1; display: flex;
@@ -234,11 +239,11 @@ button { font: inherit; color: inherit; }
   position: relative; flex: 0 0 100vw; width: 100vw; height: 100vh; height: 100dvh;
   scroll-snap-align: start; scroll-snap-stop: always;
   overflow-x: hidden; overflow-y: auto;
-  scrollbar-width: thin; scrollbar-color: rgba(239, 230, 214, 0.18) transparent;
+  scrollbar-width: thin; scrollbar-color: rgba(28, 27, 25, 0.18) transparent;
 }
 .bgyear {
   position: absolute; z-index: 0; right: -3vw; bottom: calc(var(--rail) - 5.5vw);
-  font: 700 30vw/0.8 var(--serif); letter-spacing: -0.04em; color: rgba(239, 230, 214, 0.035);
+  font: 700 30vw/0.8 var(--serif); letter-spacing: -0.04em; color: rgba(120, 96, 60, 0.06);
   white-space: nowrap; pointer-events: none; user-select: none; will-change: transform;
 }
 .g-inner {
@@ -247,75 +252,80 @@ button { font: inherit; color: inherit; }
   min-height: 100%; padding: 80px 5.5vw calc(var(--rail) + 24px) 5vw;
 }
 
-.g-stage { position: relative; isolation: isolate; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+/* 왼쪽: 빛이 떨어지는 벽에 건 유물 사진 */
+.g-stage { position: relative; isolation: isolate; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
 .g-stage::before {
   content: ""; position: absolute; z-index: -1; pointer-events: none;
-  top: -80px; left: 50%; width: min(86%, 660px); height: 80%; transform: translateX(-50%);
-  background: linear-gradient(to bottom, rgba(255, 228, 176, 0.15), rgba(255, 228, 176, 0.035) 72%, transparent);
-  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); filter: blur(8px);
+  top: -80px; left: 50%; width: min(90%, 700px); height: 78%; transform: translateX(-50%);
+  background: linear-gradient(to bottom, rgba(255, 246, 222, 0.95), rgba(255, 246, 222, 0.35) 70%, transparent);
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); filter: blur(14px);
   opacity: 0; transition: opacity 1100ms ease;
 }
 .g-stage::after {
   content: ""; position: absolute; z-index: -1; pointer-events: none;
-  left: 50%; top: 40%; width: 100%; aspect-ratio: 1.35; transform: translate(-50%, -50%);
-  background: radial-gradient(closest-side, rgba(255, 212, 146, 0.17), rgba(255, 212, 146, 0.05) 55%, transparent);
+  left: 50%; top: 38%; width: 100%; aspect-ratio: 1.35; transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 250, 238, 0.95), rgba(255, 244, 220, 0.4) 55%, transparent);
   opacity: 0; transition: opacity 1100ms ease;
 }
 .is-current .g-stage::before, .is-current .g-stage::after { opacity: 1; }
 .photo { position: relative; margin: 0; display: flex; justify-content: center; max-width: 100%; }
 .photo img {
-  display: block; width: auto; height: auto; max-width: 100%;
-  max-height: max(200px, calc(100dvh - 480px)); border-radius: 2px;
-  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 70%, transparent 100%);
-          mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 70%, transparent 100%);
-  filter: brightness(0.32) saturate(0.55); transition: filter 1000ms ease, opacity 220ms ease;
+  display: block; width: auto; height: auto; max-width: calc(100% - 20px);
+  max-height: max(220px, calc(100dvh - 450px));
+  background: var(--frame); padding: 10px; border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(60, 45, 25, 0.12), 0 22px 44px -20px rgba(60, 45, 25, 0.5);
+  filter: grayscale(0.7) opacity(0.55);
+  transition: filter 1000ms ease, opacity 220ms ease;
 }
-.multi .photo img { max-height: max(180px, calc(100dvh - 540px)); }
+.multi .photo img { max-height: max(200px, calc(100dvh - 510px)); }
 .is-current .photo img { filter: none; }
-.photo .floor { position: absolute; left: 15%; right: 15%; bottom: -16px; height: 26px; z-index: -1; background: radial-gradient(closest-side, rgba(0, 0, 0, 0.7), transparent); }
+.photo .floor { display: none; }
 .g-stage.swap .photo img, .g-stage.swap .plate-body { opacity: 0; }
 
 .g-thumbs { display: flex; gap: 10px; }
 .g-thumb {
   width: 54px; height: 54px; padding: 0; border-radius: 6px; overflow: hidden; cursor: pointer;
-  border: 1px solid var(--gfaint); background: #1b1612; opacity: 0.5;
-  transition: opacity 200ms, border-color 200ms, transform 200ms;
+  border: 1px solid #d9d2c5; background: var(--frame); opacity: 0.6;
+  transition: opacity 200ms, border-color 200ms, transform 200ms, box-shadow 200ms;
 }
 .g-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.g-thumb:hover { opacity: 0.85; transform: translateY(-2px); }
-.g-thumb.on { opacity: 1; border-color: var(--gold); }
+.g-thumb:hover { opacity: 0.9; transform: translateY(-2px); }
+.g-thumb.on { opacity: 1; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
 
+/* 박물관 라벨 */
 .plate {
-  width: min(100%, 660px);
-  background: linear-gradient(180deg, rgba(42, 34, 26, 0.94), rgba(28, 23, 18, 0.94));
-  border: 1px solid var(--gold-soft); border-radius: 4px; padding: 16px 20px 15px;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45); transition: opacity 700ms ease;
+  width: min(100%, 660px); background: var(--frame);
+  border: 1px solid #e3dccf; border-radius: 6px; padding: 16px 20px 15px;
+  box-shadow: 0 1px 2px rgba(60, 45, 25, 0.06), 0 14px 30px -18px rgba(60, 45, 25, 0.35);
+  transition: opacity 700ms ease;
 }
 .room:not(.is-current) .plate, .room:not(.is-current) .g-thumbs, .room:not(.is-current) .g-credit { opacity: 0.35; }
 .plate-body { transition: opacity 220ms ease; }
 .plate-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .pname { margin: 0; font: 600 19px/1.35 var(--serif); letter-spacing: -0.01em; }
 .chip {
-  --c: var(--gold); flex: none; display: inline-flex; align-items: center; gap: 7px;
-  padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 12px; color: var(--c); white-space: nowrap;
-  border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); background: color-mix(in srgb, var(--c) 11%, transparent);
+  --c: var(--s-direct); flex: none; display: inline-flex; align-items: center; gap: 7px;
+  padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--c); white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); background: color-mix(in srgb, var(--c) 8%, white);
 }
-.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
-.chip[data-s="indirect"] { --c: #df9363; }
-.chip[data-s="context"] { --c: #93abbb; }
-.chip[data-s="manuscript"] { --c: #a3cc9f; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 2px; background: var(--c); }
+.chip[data-s="indirect"] { --c: var(--s-indirect); }
+.chip[data-s="context"] { --c: var(--s-context); }
+.chip[data-s="manuscript"] { --c: var(--s-manuscript); }
 .g-sdesc { margin: 4px 0 12px; font-size: 12.5px; color: var(--gmuted); }
 .pmeta { display: grid; grid-template-columns: 60px 1fr; gap: 4px 12px; margin: 0 0 13px; font-size: 13px; line-height: 1.5; }
-.pmeta dt, .notes h4, .g-meta dt { color: var(--gold); opacity: 0.85; font-size: 11.5px; font-weight: 500; letter-spacing: 0.04em; padding-top: 1px; }
+.pmeta dt, .notes h4, .g-meta dt { color: var(--gmuted); font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; padding-top: 1px; }
 .pmeta dd { margin: 0; color: var(--gink2); }
-.pmeta .pgap { color: var(--gold); }
-.notes { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; border-top: 1px solid var(--gfaint); padding-top: 12px; }
+.pmeta .pgap { color: var(--accent); font-weight: 600; }
+.notes { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; border-top: 1px solid var(--line2); padding-top: 12px; }
 .notes h4 { margin: 0 0 4px; }
 .notes p { margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--gink2); word-break: keep-all; }
+.notes > div:last-child p { color: #6a5a45; }
 .g-credit { margin: 0; font-size: 11.5px; color: var(--gmuted); text-align: center; transition: opacity 700ms; }
-.g-credit a { color: var(--gmuted); text-decoration-color: rgba(163, 149, 138, 0.4); text-underline-offset: 2px; }
-.g-credit a:hover { color: var(--gink); }
+.g-credit a { color: var(--gmuted); text-decoration-color: rgba(139, 134, 124, 0.5); text-underline-offset: 2px; }
+.g-credit a:hover { color: var(--ink); }
 
+/* 오른쪽: 사건 */
 .story { min-width: 0; max-width: 620px; display: flex; flex-direction: column; justify-content: center; padding-bottom: calc(var(--map-h) + 24px); }
 .story > * { opacity: 0; transform: translateY(14px); transition: opacity 760ms ease, transform 760ms cubic-bezier(0.2, 0.7, 0.2, 1); }
 .is-current .story > * { opacity: 1; transform: none; }
@@ -324,25 +334,26 @@ button { font: inherit; color: inherit; }
 .is-current .story > :nth-child(4) { transition-delay: 220ms; }
 .is-current .story > :nth-child(5) { transition-delay: 300ms; }
 .is-current .story > :nth-child(6) { transition-delay: 370ms; }
-.g-era { margin: 0 0 10px; display: flex; align-items: center; gap: 12px; font-size: 12.5px; letter-spacing: 0.12em; color: var(--gold); }
-.g-era::before { content: ""; width: 28px; height: 1px; background: var(--gold); opacity: 0.7; }
-.g-year { margin: 0; font: 600 clamp(38px, min(8.6vh, 5.4vw), 88px)/1.05 var(--serif); word-break: keep-all; letter-spacing: -0.02em; color: var(--gold); text-shadow: 0 0 50px rgba(232, 176, 75, 0.18); }
-.g-title { margin: 12px 0 clamp(14px, 2.6vh, 26px); font: 600 clamp(21px, 3.5vh, 33px)/1.3 var(--serif); letter-spacing: -0.015em; }
-.g-verse { margin: 0; padding: 2px 0 2px 22px; border-left: 2px solid rgba(232, 176, 75, 0.55); }
-.g-verse p { margin: 0; font: 400 clamp(16px, 2.45vh, 22px)/1.78 var(--serif); color: #f4ecdd; word-break: keep-all; }
+.g-era { margin: 0 0 10px; display: flex; align-items: center; gap: 12px; font-size: 12.5px; letter-spacing: 0.12em; color: var(--accent); font-weight: 600; }
+.g-era::before { content: ""; width: 28px; height: 1px; background: var(--accent); opacity: 0.7; }
+.g-year { margin: 0; font: 600 clamp(38px, min(8.6vh, 5.4vw), 88px)/1.05 var(--serif); word-break: keep-all; letter-spacing: -0.02em; color: var(--accent); }
+.g-title { margin: 12px 0 clamp(14px, 2.6vh, 26px); font: 600 clamp(21px, 3.5vh, 33px)/1.3 var(--serif); letter-spacing: -0.015em; color: var(--ink); }
+.g-verse { margin: 0; padding: 2px 0 2px 22px; border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); }
+.g-verse p { margin: 0; font: 400 clamp(16px, 2.45vh, 22px)/1.78 var(--serif); color: #2a2722; word-break: keep-all; }
 .g-verse cite { display: block; margin-top: 10px; font: normal 12.5px/1.4 var(--ui); color: var(--gmuted); letter-spacing: 0.02em; }
 .g-summary { margin: clamp(14px, 2.4vh, 24px) 0 0; font-size: clamp(14px, 1.9vh, 16px); line-height: 1.75; color: var(--gink2); word-break: keep-all; }
-.g-meta { display: grid; grid-template-columns: 44px 1fr; gap: 6px 12px; margin: clamp(14px, 2.4vh, 22px) 0 0; padding-top: 14px; border-top: 1px solid var(--gfaint); font-size: 13px; line-height: 1.6; }
+.g-meta { display: grid; grid-template-columns: 44px 1fr; gap: 6px 12px; margin: clamp(14px, 2.4vh, 22px) 0 0; padding-top: 14px; border-top: 1px solid #ddd5c7; font-size: 13px; line-height: 1.6; }
 .g-meta dd { margin: 0; color: var(--gink2); }
 
 /* 옆 넘김 단추 */
 .g-nav {
   position: absolute; top: 50%; z-index: 26; width: 44px; height: 44px; margin-top: -22px;
-  border-radius: 50%; border: 1px solid var(--gfaint); background: rgba(22, 18, 14, 0.6);
-  color: var(--gink2); font-size: 20px; line-height: 1; cursor: pointer;
-  transition: background 200ms, color 200ms, opacity 200ms;
+  border-radius: 50%; border: 1px solid #d9d2c5; background: rgba(255, 255, 255, 0.85);
+  color: var(--ink2); font-size: 20px; line-height: 1; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(60, 45, 25, 0.1);
+  transition: background 200ms, color 200ms, border-color 200ms, opacity 200ms;
 }
-.g-nav:hover { background: rgba(232, 176, 75, 0.16); color: var(--gold); }
+.g-nav:hover { border-color: var(--accent); color: var(--accent); background: #fff; }
 .g-nav:disabled { opacity: 0; pointer-events: none; }
 .g-prev { left: 14px; } .g-next { right: 14px; }
 
@@ -350,30 +361,30 @@ button { font: inherit; color: inherit; }
 .g-rail {
   position: absolute; inset: auto 0 0 0; z-index: 30; height: var(--rail);
   display: flex; align-items: center; gap: 26px; padding: 6px 28px 0;
-  background: linear-gradient(rgba(10, 8, 6, 0), rgba(10, 8, 6, 0.92) 45%);
+  background: linear-gradient(rgba(244, 240, 232, 0), rgba(244, 240, 232, 0.96) 45%);
 }
 .g-readout { flex: 0 0 190px; display: flex; flex-direction: column; gap: 2px; }
-.g-readout .ry { font: 600 15px/1.2 var(--serif); color: var(--gold); }
+.g-readout .ry { font: 600 15px/1.2 var(--serif); color: var(--accent); }
 .g-readout .re { font-size: 12px; color: var(--gmuted); }
 .g-track { position: relative; flex: 1; height: 42px; }
-.g-track .line { position: absolute; left: 0; right: 0; top: 17px; height: 1px; background: var(--gfaint); }
-.g-seg { position: absolute; top: 15px; height: 5px; border-radius: 1px; background: hsla(var(--h), 28%, 58%, 0.2); box-shadow: inset -1px 0 0 var(--g0); transition: background 400ms; }
-.g-seg.on { background: hsla(var(--h), 50%, 62%, 0.55); }
+.g-track .line { position: absolute; left: 0; right: 0; top: 17px; height: 1px; background: #d9d2c5; }
+.g-seg { position: absolute; top: 15px; height: 5px; border-radius: 1px; background: hsl(var(--h) 35% 80%); box-shadow: inset -1px 0 0 var(--wall); transition: background 400ms; }
+.g-seg.on { background: hsl(var(--h) 45% 60%); }
 .g-seg span { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); font-size: 10.5px; color: var(--gmuted); white-space: nowrap; visibility: hidden; }
 .g-seg.fit span { visibility: visible; }
-.g-seg.on span { color: var(--gink); }
+.g-seg.on span { color: var(--ink); font-weight: 600; }
 .g-dot { position: absolute; top: 17px; width: 22px; height: 22px; margin: -11px 0 0 -11px; padding: 0; border: 0; background: none; cursor: pointer; }
 .g-dot::before {
   content: ""; position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px;
-  border-radius: 50%; background: #7a6c5c; box-shadow: 0 0 0 2px var(--g0); transition: background 300ms, box-shadow 300ms, transform 300ms;
+  border-radius: 50%; background: #a8a094; box-shadow: 0 0 0 2px var(--wall); transition: background 300ms, box-shadow 300ms, transform 300ms;
 }
 .g-dot.up { top: 6px; }
-.g-dot:hover::before { background: var(--gink); transform: scale(1.25); }
-.g-dot.on::before { background: var(--gold); box-shadow: 0 0 0 4px rgba(232, 176, 75, 0.22), 0 0 16px rgba(232, 176, 75, 0.7); }
+.g-dot:hover::before { background: var(--ink); transform: scale(1.25); }
+.g-dot.on::before { background: var(--accent); box-shadow: 0 0 0 2px var(--wall), 0 0 0 5px var(--accent-soft); }
 .g-dot::after {
   content: attr(data-tip); position: absolute; bottom: 24px; left: 50%; transform: translate(-50%, 4px);
-  padding: 6px 10px; border-radius: 6px; white-space: nowrap; background: #231d17; border: 1px solid var(--gfaint);
-  color: var(--gink); font-size: 12px; opacity: 0; pointer-events: none; transition: opacity 160ms, transform 160ms;
+  padding: 6px 10px; border-radius: 6px; white-space: nowrap; background: var(--ink); color: #fbfaf7;
+  font-size: 12px; opacity: 0; pointer-events: none; transition: opacity 160ms, transform 160ms;
 }
 .g-dot.tip-r::after { left: auto; right: -2px; transform: translate(0, 4px); }
 .g-dot.tip-l::after { left: -2px; transform: translate(0, 4px); }
@@ -384,12 +395,13 @@ button { font: inherit; color: inherit; }
 .g-map {
   position: absolute; z-index: 25; right: 28px; bottom: calc(var(--rail) + 12px);
   width: var(--map-w); height: var(--map-h); border-radius: 10px; overflow: hidden;
-  border: 1px solid rgba(232, 176, 75, 0.2); box-shadow: 0 22px 44px rgba(0, 0, 0, 0.55); background: #0b0d10;
+  border: 1px solid #ddd5c7; background: #dfe7ec;
+  box-shadow: 0 1px 2px rgba(60, 45, 25, 0.06), 0 16px 34px -16px rgba(60, 45, 25, 0.4);
 }
 #gMap { position: absolute; inset: 0; }
 .g-mapcap {
-  position: absolute; left: 0; right: 0; top: 0; padding: 8px 12px 16px; font-size: 11.5px; color: var(--gink2);
-  background: linear-gradient(rgba(11, 13, 16, 0.9), rgba(11, 13, 16, 0)); pointer-events: none;
+  position: absolute; left: 0; right: 0; top: 0; padding: 8px 12px 16px; font-size: 11.5px; color: var(--ink2);
+  background: linear-gradient(rgba(247, 245, 239, 0.95), rgba(247, 245, 239, 0)); pointer-events: none;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .g-maptoggle { display: none; }
@@ -409,7 +421,7 @@ button { font: inherit; color: inherit; }
   .g-stage { gap: 14px; padding-bottom: 28px; }
   .g-stage::before { top: -70px; height: 60vh; width: 96%; }
   .g-stage::after { top: 22vh; }
-  .photo img, .multi .photo img { max-height: 40vh; }
+  .photo img, .multi .photo img { max-height: 40vh; padding: 7px; }
   .g-thumb { width: 48px; height: 48px; }
   .plate { padding: 14px 16px; }
   .plate-head { align-items: flex-start; flex-direction: column; gap: 8px; }
@@ -433,8 +445,8 @@ button { font: inherit; color: inherit; }
   .g-dot.up { top: 5px; }
   .g-maptoggle {
     display: block; position: absolute; z-index: 31; right: 16px; bottom: calc(var(--rail) + 10px);
-    padding: 8px 15px; border-radius: 999px; cursor: pointer; font-size: 13px; color: var(--gold);
-    border: 1px solid rgba(232, 176, 75, 0.45); background: rgba(22, 18, 14, 0.92); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+    padding: 8px 15px; border-radius: 999px; cursor: pointer; font-size: 13px; color: var(--ink);
+    border: 1px solid #d6cfc2; background: rgba(255, 255, 255, 0.95); box-shadow: 0 6px 18px rgba(60, 45, 25, 0.18);
   }
   .g-map { left: 16px; right: 16px; width: auto; height: 230px; bottom: calc(var(--rail) + 56px); opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity 300ms, transform 300ms, visibility 0s 300ms; }
   .g-map.open { opacity: 1; visibility: visible; transform: none; transition: opacity 300ms, transform 300ms; }
@@ -522,7 +534,7 @@ button { font: inherit; color: inherit; }
   <span>구절: 개역한글(1961) · 사진: Wikimedia Commons · 지도: Natural Earth</span>
 </footer>
 
-<div class="gallery" id="gallery" role="dialog" aria-modal="true" aria-label="전시실" aria-hidden="true">
+<div class="gallery" id="gallery" role="dialog" aria-modal="true" aria-label="전시실" aria-hidden="true" tabindex="-1">
   <header class="g-top">
     <div class="g-brand"><b>전시실</b><span id="gCount"></span></div>
     <button class="g-close" id="gClose" type="button">연표로 돌아가기 <span aria-hidden="true">✕</span></button>
