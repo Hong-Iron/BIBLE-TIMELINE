@@ -3,6 +3,7 @@ site/shared/verses.js(export const VERSES = {...})로 저장한다. data.js와 �
 
 실행: python3 -I tools/build_verses.py          (저장소 맨 위에서)
       python3 -I tools/build_verses.py --check  (주장과 본문을 나란히 출력해 눈으로 대조한다)
+      python3 -I tools/build_verses.py --guides genesis exodus  (책 해설의 주장과 본문을 대조한다. 책 id를 빼면 전부)
 
 개역한글 본문은 bluesaurel/Korean-Bible-1961-KRV의 JSON을 tools/.cache/에 받아 쓴다.
 장절 표기: "창 12:1-3", "왕하 9:20, 24", "출 2:21; 3:1"처럼 쓴다. 책 이름을 빼면 앞 조각의 책을, 장을 빼면 앞 조각의 장을 이어 쓴다.
@@ -60,12 +61,13 @@ def parse(ref):
 
 def collect_refs(js):
     refs = re.findall(r'\bref: "([^"]+)"', js)
-    for block in re.findall(r"quotes: \[([^\]]*)\]", js):
+    # quotes(핵심 구절)와 refs(책 해설의 주제 근거) 목록 안의 장절도 모은다
+    for block in re.findall(r"(?:quotes|refs): \[([^\]]*)\]", js):
         refs += re.findall(r'"([^"]+)"', block)
     return list(dict.fromkeys(refs))
 
 
-SOURCES = ["data.js", "events_more.js", "profiles.js", "profiles_*.js"]
+SOURCES = ["data.js", "events_more.js", "profiles.js", "profiles_*.js", "guides_*.js"]
 
 
 def read_sources():
@@ -97,6 +99,9 @@ def main():
         sys.exit(1)
     if "--check" in sys.argv:
         check(out)
+    if "--guides" in sys.argv:
+        ids = [a for a in sys.argv[sys.argv.index("--guides") + 1:] if not a.startswith("--")]
+        check_guides(out, set(ids) or None)
 
 
 def check(verses):
@@ -114,6 +119,24 @@ def check(verses):
             ref = it.get("ref")
             body = " | ".join(f"{k} {t[:90]}" for k, t in verses.get(ref, [])) if ref else f"(출처: {it.get('src')})"
             print(f"- [{label}] {it['text']}\n    {ref or ''} → {body}")
+
+
+def check_guides(verses, only=None):
+    """guides_*.js의 장절을 주장 옆에 붙여 출력한다. only가 있으면 그 책 id만."""
+    dump = subprocess.run(["node", "-e", 'import("./site/shared/guides.js").then(m=>console.log(JSON.stringify(m.GUIDES)))'],
+                          cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    for bid, g in json.loads(dump).items():
+        if only and bid not in only:
+            continue
+        print(f"\n===== 책 {bid}")
+        body = lambda ref: " | ".join(f"{k} {t[:90]}" for k, t in verses.get(ref, [])) if ref else ""
+        for a in g.get("author", []) + g.get("date", []):
+            print(f"- [쓴 사람·때 {a.get('view')}] {a['text']}\n    {a.get('ref') or ''} → {body(a.get('ref')) or '(출처: ' + str(a.get('src')) + ')'}")
+        for e in g.get("events", []):
+            print(f"- [사건] {e['text']}\n    {e.get('ref')} → {body(e.get('ref'))}")
+        for t in g.get("themes", []):
+            for r in t.get("refs", []):
+                print(f"- [주제 {t['title']}] {r} → {body(r)}")
 
 
 if __name__ == "__main__":

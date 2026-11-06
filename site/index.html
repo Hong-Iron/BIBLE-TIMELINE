@@ -34,7 +34,9 @@ button { font: inherit; color: inherit; }
 .top { display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--line); background: var(--bg); }
 .brand { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
 .tag { font-size: 12px; color: var(--ink2); padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
-.back { margin-left: auto; font-size: 13px; color: var(--ink2); text-decoration: none; white-space: nowrap; }
+.books-btn { margin-left: auto; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.books-btn:hover { border-color: var(--accent); color: var(--accent); }
+.back { font-size: 13px; color: var(--ink2); text-decoration: none; white-space: nowrap; }
 .back:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 
 /* 왼쪽 지도 | 오른쪽 연표 */
@@ -124,6 +126,9 @@ button { font: inherit; color: inherit; }
 .sep { stroke: var(--line); }
 .band-label { font-size: 11px; font-weight: 600; }
 .book rect { fill: #ece6da; stroke: #ddd5c6; }
+.book { cursor: pointer; }
+.book:hover rect { stroke: var(--accent); }
+.book:hover text { fill: var(--accent); }
 .book text { font-size: 10.5px; fill: #5b554b; }
 .book.on rect { fill: var(--accent-soft); stroke: #efc3a9; }
 .book.on text { fill: var(--accent); }
@@ -518,7 +523,7 @@ button { font: inherit; color: inherit; }
   border: 1px solid #ead7c9; background: #fdf4ee; color: #9a3a0e; font: 500 11px/1.65 var(--ui); white-space: nowrap;
 }
 .vref:hover { border-color: var(--accent); background: var(--accent-soft); }
-.src { display: inline-block; margin: 2px 2px 0 0; padding: 0 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.65; white-space: nowrap; }
+.src { display: inline-block; max-width: 100%; margin: 2px 2px 0 0; padding: 0 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.65; word-break: keep-all; overflow-wrap: anywhere; }
 .src::before { content: "출처 · "; }
 
 /* 가계도: 윗세대 → 본인과 같은 세대 → 아랫세대 */
@@ -587,7 +592,9 @@ button { font: inherit; color: inherit; }
 .rec-credit { font-size: 11px !important; color: var(--muted) !important; }
 .rec-credit a { color: inherit; }
 .books { display: flex; flex-wrap: wrap; gap: 6px; }
-.books span { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--card-line); }
+.books span, .books .book-link { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--card-line); }
+.books .book-link { cursor: pointer; font-family: inherit; color: var(--ink); }
+.books .book-link:hover { border-color: var(--accent); color: var(--accent); }
 .p-foot { margin: 0; font-size: 12px; color: var(--muted); }
 
 /* 장절을 누르면 뜨는 본문 */
@@ -607,7 +614,7 @@ button { font: inherit; color: inherit; }
 
 @media (max-width: 900px) {
   .p-scroll { padding: 62px 0 40px; }
-  .p-page { grid-template-columns: 1fr; gap: 22px; padding: 0 16px; }
+  .p-page { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 0 16px; }
   .p-side { position: static; }
   .p-hero h1 { font-size: 36px; }
   .p-summary { font-size: 17px; }
@@ -618,11 +625,61 @@ button { font: inherit; color: inherit; }
   .life p { font-size: 14.5px; }
 }
 @media (prefers-reduced-motion: reduce) { .profile { transition: none; } }
+
+/* ---------- 성경 책 해설 ---------- */
+.bookview { z-index: 56; }
+.bookview .p-page.is-lib { display: block; max-width: 1100px; }
+.b-sub { margin: 12px 0 6px; font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
+.b-sub:first-of-type { margin-top: 0; }
+.b-views { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; font-size: 13.5px; line-height: 1.6; color: #2f2c27; word-break: keep-all; }
+.b-views b { display: inline-block; margin-right: 6px; font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 0 6px; }
+.b-setting { margin: 0; font-size: 13.5px; line-height: 1.65; color: #2f2c27; word-break: keep-all; }
+.b-structure { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.b-structure li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; }
+.b-structure span { font-size: 12px; font-weight: 700; color: var(--accent); padding-top: 1px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.b-structure b { display: block; font-size: 14px; font-weight: 600; word-break: keep-all; }
+.b-structure p { margin: 2px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--ink2); word-break: keep-all; }
+.b-people { display: flex; flex-wrap: wrap; gap: 6px; }
+.b-chip { border: 1px solid var(--line); background: #fcfbf8; border-radius: 999px; padding: 3px 11px; font-size: 13px; cursor: default; }
+.b-chip.link { cursor: pointer; border-color: #e8cdbb; }
+.b-chip.link:hover { border-color: var(--accent); color: var(--accent); }
+.b-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.b-links button { border: 0; background: none; padding: 0; font: 600 13.5px var(--ui); color: var(--accent); cursor: pointer; margin-right: 6px; }
+.b-links span { color: var(--ink2); word-break: keep-all; }
+.b-ref p { margin: 0 0 8px; font-size: 12.5px; color: var(--ink2); }
+.b-ref div { display: flex; flex-direction: column; gap: 4px; }
+.b-ref a { font-size: 13px; color: var(--accent); text-decoration: none; }
+.b-ref a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.b-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.b-theme { background: #fff; border: 1px solid var(--card-line); border-radius: 10px; padding: 13px 15px 12px; }
+.b-theme h4 { margin: 0 0 6px; font: 600 16px/1.35 var(--serif); }
+.b-theme p { margin: 0 0 8px; font-size: 14px; line-height: 1.7; color: #34312c; word-break: keep-all; }
+.b-debate { background: #fff; border: 1px dashed #d8cdbb; border-radius: 10px; padding: 13px 15px; margin-bottom: 12px; }
+.b-debate h4 { margin: 0 0 6px; font: 600 16px/1.35 var(--serif); }
+.b-debate > p { margin: 0 0 8px; font-size: 14px; line-height: 1.7; color: #34312c; word-break: keep-all; }
+.b-debate ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.b-debate li { font-size: 13.5px; line-height: 1.65; color: #34312c; word-break: keep-all; padding-left: 10px; border-left: 2px solid #ead7c9; }
+.b-debate li b { margin-right: 6px; color: var(--accent); font-size: 12.5px; }
+.b-nav { display: flex; justify-content: space-between; gap: 10px; }
+.b-nav button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+.b-nav button:hover { border-color: var(--accent); color: var(--accent); }
+.lib-title { margin: 6px 0 6px; font: 600 34px/1.2 var(--serif); }
+.lib-lead { margin: 0 0 26px; font-size: 14.5px; color: var(--ink2); word-break: keep-all; }
+.lib-testament h2 { margin: 26px 0 10px; font: 600 22px var(--serif); }
+.lib-group h3 { margin: 16px 0 8px; font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
+.lib-group h3 span { font-weight: 500; margin-left: 4px; }
+.lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.lib-book { text-align: left; border: 1px solid var(--card-line); background: #fff; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.lib-book:hover { border-color: var(--accent); }
+.lib-book b { display: block; font: 600 15.5px var(--serif); }
+.lib-book small { display: block; margin-top: 2px; font-size: 11.5px; color: var(--muted); }
+.lib-book.todo { opacity: 0.55; }
 </style>
 </head>
 <body>
 <header class="top">
   <h1 class="brand">바이블 타임라인</h1>
+  <button class="books-btn" id="booksBtn" type="button">성경 66권</button>
   <a class="back" href="drafts/">지난 시안</a>
 </header>
 
@@ -714,6 +771,15 @@ button { font: inherit; color: inherit; }
     <div class="g-readout"><span class="ry" id="gRy"></span><span class="re" id="gRe"></span></div>
     <div class="g-track" id="gTrack"></div>
   </nav>
+</div>
+
+<div class="profile bookview" id="book" role="dialog" aria-modal="true" aria-label="성경 책 해설" aria-hidden="true" tabindex="-1">
+  <header class="g-top">
+    <div class="g-brand"><b>성경</b><span id="bName"></span></div>
+    <button class="g-close" id="bClose" type="button">연표로 돌아가기 <span aria-hidden="true">✕</span></button>
+  </header>
+  <div class="p-scroll" id="bScroll"><div class="p-page" id="bPage"></div></div>
+  <div class="vpop" id="bpop" hidden></div>
 </div>
 
 <div class="profile" id="profile" role="dialog" aria-modal="true" aria-label="인물 프로필" aria-hidden="true" tabindex="-1">

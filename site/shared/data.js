@@ -2,7 +2,8 @@
 // 표본 사건 11개는 이 파일에, 나머지 49개는 events_more.js에 있다. 표본 사건에는 sample: true를 붙여 시안 A·B·C가 이 11개만 쓰게 한다.
 // 구절은 개역한글(1961, 저작권 만료)이다. verse가 없는 사건은 verses.js(tools/build_verses.py가 뽑은 본문)로 채운다.
 import { VERSES } from "./verses.js";
-import { MORE_EVENTS, MORE_PEOPLE, MORE_BOOKS, MORE_PLACES } from "./events_more.js";
+import { MORE_EVENTS, MORE_PEOPLE, MORE_PLACES } from "./events_more.js";
+import { BIBLE_BOOKS } from "./books.js";
 
 export const RANGE = [-2200, 100];
 
@@ -48,18 +49,8 @@ export const PEOPLE = [
   { id: "paul", name: "바울", from: 5, to: 67, kind: "생애" },
 ];
 
-// 책이 다루는 시기(기록한 해가 아니다).
-export const BOOKS = [
-  { name: "창세기", from: -2200, to: -1805 },
-  { name: "출애굽기", from: -1526, to: -1445 },
-  { name: "사무엘하", from: -1010, to: -970 },
-  { name: "열왕기상", from: -970, to: -853 },
-  { name: "열왕기하", from: -853, to: -561 },
-  { name: "이사야", from: -740, to: -681 },
-  { name: "에스라", from: -538, to: -457 },
-  { name: "누가복음", from: -6, to: 30 },
-  { name: "사도행전", from: 30, to: 62 },
-];
+// 성경 66권(books.js). 연표의 '성경 책' 줄에 놓을 기간과 그 기간의 뜻(basis)을 함께 갖는다.
+export const BOOKS = BIBLE_BOOKS;
 
 // [경도, 위도]
 export const PLACES = {
@@ -398,7 +389,6 @@ export function yearsBetween(a, b) {
 
 for (const ev of EVENTS) ev.sample = true;
 PEOPLE.push(...MORE_PEOPLE);
-BOOKS.push(...MORE_BOOKS);
 Object.assign(PLACES, MORE_PLACES);
 EVENTS.push(...MORE_EVENTS);
 for (const ev of EVENTS) ev.verse ??= (VERSES[ev.ref] || []).map(([, t]) => t).join(" ");

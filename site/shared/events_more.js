@@ -46,22 +46,6 @@ export const MORE_PEOPLE = [
   { id: "titus", name: "티투스", from: 70, to: 81, kind: "장군·황제" },
 ];
 
-export const MORE_BOOKS = [
-  { name: "민수기", from: -1445, to: -1406 },
-  { name: "여호수아", from: -1406, to: -1380 },
-  { name: "사사기", from: -1380, to: -1050 },
-  { name: "룻기", from: -1120, to: -1090 },
-  { name: "사무엘상", from: -1105, to: -1010 },
-  { name: "요나", from: -785, to: -760 },
-  { name: "예레미야", from: -627, to: -580 },
-  { name: "다니엘", from: -605, to: -536 },
-  { name: "에스더", from: -483, to: -473 },
-  { name: "느헤미야", from: -445, to: -432 },
-  { name: "마태복음", from: -6, to: 30 },
-  { name: "요한복음", from: 27, to: 30 },
-  { name: "요한계시록", from: 95, to: 96 },
-];
-
 // [경도, 위도]
 export const MORE_PLACES = {
   sodomsite: { name: "소돔(전통 위치)", at: [35.39, 31.08] },

@@ -5,6 +5,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";
 import { createMap, THEMES } from "./shared/map.js";
 import { createProfiles } from "./profile.js";
+import { createBooks, findBook } from "./book.js";
 
 const SPAN = RANGE[1] - RANGE[0];
 const PERSON = byId(PEOPLE);
@@ -61,7 +62,7 @@ const PEOPLE_PACK = pack(PEOPLE, 8);
 
 const state = {
   ppy: 2, viewW: 1000, viewH: 400, center: EVENTS[0].year, mobile: false,
-  selected: null, near: null, mapEv: null, focusKey: null, person: null,
+  selected: null, near: null, mapEv: null, focusKey: null, person: null, book: null,
 };
 let L = {}; // 차선 위치
 let map = null, credits = {};
@@ -166,14 +167,15 @@ function render() {
   bands(G.era, ERAS, L.era.top, d.era, (b) => eraColor(b.hue), (b) => eraColor(b.hue, 72, 30), (b) => eraColor(b.hue, 27, 35), (b) => b.name);
 
   // 성경 책: 다루는 시기
-  const books = BOOK_PACK.items.filter((b) => vis(b.from, b.to));
-  G.book.selectAll("g.book").data(books, (b) => b.name).join((e) => {
+  const bookItems = BOOK_PACK.items.filter((b) => vis(b.from, b.to));
+  G.book.selectAll("g.book").data(bookItems, (b) => b.name).join((e) => {
     const g = e.append("g").attr("class", "book");
     g.append("rect").attr("rx", 3);
     g.append("text");
     g.append("title");
+    g.on("click", (event, b) => books.open(b.id));
     return g;
-  }).classed("on", (b) => sel && sel.book === b.name).each(function (b) {
+  }).classed("on", (b) => (sel && sel.book === b.name) || state.book === b.id).each(function (b) {
     const g = d3.select(this);
     const top = L.book.top + b.row * d.bookRow;
     const xa = X(b.from), xb = X(b.to);
@@ -343,7 +345,7 @@ function renderLaneLabels() {
   const el = $("lanes");
   el.style.setProperty("--lw", `${L.d.labelW}px`);
   const rows = [
-    [L.emp, "제국"], [L.era, "시대"], [L.book, "성경 책", "다루는 시기"], [L.person, "인물"],
+    [L.emp, "제국"], [L.era, "시대"], [L.book, "성경 66권", "누르면 해설"], [L.person, "인물"],
     [L.ev, "사건"], [L.evid, "증거", "만든 때"],
   ];
   el.innerHTML = rows.map(([l, name, sub]) => `<div style="top:${l.top + l.h / 2}px">${name}${sub ? `<small>${sub}</small>` : ""}</div>`).join("");
@@ -510,7 +512,7 @@ function roomHTML(ev, i) {
         <p class="g-era">${esc(ERA[ev.era]?.name)}</p>
         <p class="g-year">${esc(ev.yearLabel)}</p>
         <h2 class="g-title">${esc(ev.title)}</h2>
-        <blockquote class="g-verse"><p>${esc(ev.verse)}</p><cite>${esc(ev.ref)} · ${esc(ev.book)} · 개역한글</cite></blockquote>
+        <blockquote class="g-verse"><p>${esc(ev.verse)}</p><cite>${esc(ev.ref)} · ${findBook(ev.book) ? `<button class="g-person" type="button" data-book="${esc(findBook(ev.book).id)}" title="책 해설 보기">${esc(ev.book)}</button>` : esc(ev.book)} · 개역한글</cite></blockquote>
         <p class="g-summary">${esc(ev.summary)}</p>
         <dl class="g-meta"><dt>연대</dt><dd>${esc(ev.dateNote)}</dd>${people ? `<dt>인물</dt><dd>${people}</dd>` : ""}</dl>
       </article>
@@ -704,6 +706,8 @@ function setMapOpen(open) {
 }
 
 gallery.addEventListener("click", (e) => {
+  const bk = e.target.closest("[data-book]");
+  if (bk) { closeGallery(); books.open(bk.dataset.book); return; }
   const per = e.target.closest(".g-person");
   if (per) { closeGallery(); profiles.open(per.dataset.person); return; }
   const thumb = e.target.closest(".g-thumb");
@@ -742,11 +746,22 @@ gallery.addEventListener("wheel", (e) => {
 /* ---------- 인물 프로필 ---------- */
 const profiles = createProfiles({
   getCredits: () => credits,
+  onBook: (id) => books.open(id),
   onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
   // 프로필을 여는 동안 뒤쪽 연표를 그 인물의 생애 가운데로 옮기고 막대를 강조한다. 닫으면 그 자리에서 이어 본다.
   onOpen: (p) => { state.person = p.id; setCenter((p.from + p.to) / 2); frame(); },
   onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
 });
+
+/* ---------- 성경 책 해설 ---------- */
+const books = createBooks({
+  onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
+  onPerson: (id) => profiles.open(id),
+  // 책을 여는 동안 연표를 그 책의 시기 가운데로 옮기고 막대를 강조한다.
+  onOpen: (b) => { if (b) { state.book = b.id; setCenter((b.from + b.to) / 2); } frame(); },
+  onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
+});
+$("booksBtn").addEventListener("click", () => books.open(null));
 
 function stepEvent(dir) {
   if (isOpen()) { goRoom(here() + dir); return; }
@@ -799,6 +814,7 @@ stage.addEventListener("click", (e) => { if (swallowClick) { e.stopPropagation()
 
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input, textarea, select")) return;
+  if (books.isOpen()) { if (e.key === "Escape") books.popOpen() ? books.hidePop() : books.close(); return; }
   if (profiles.isOpen()) { if (e.key === "Escape") profiles.popOpen() ? profiles.hidePop() : profiles.close(); return; }
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); stepEvent(e.key === "ArrowRight" ? 1 : -1); }
   else if (isOpen()) { /* 전시실에서는 확대 키를 쓰지 않는다 */ }
@@ -857,6 +873,8 @@ async function init() {
   rooms.forEach(fillCredit);
   if (fromHash) openGallery(fromHash);
   else if (location.hash.startsWith("#p-")) profiles.open(location.hash.slice(3));
+  else if (location.hash.startsWith("#b-")) books.open(location.hash.slice(3));
+  else if (location.hash === "#books") books.open(null);
   document.fonts?.ready.then(frame);
 
   // 왼쪽 아래의 "지도에 보이는 사건" 상자 자리에는 바탕 지명을 놓지 않는다.

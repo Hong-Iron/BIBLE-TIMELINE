@@ -4,13 +4,14 @@ import { PEOPLE, EVENTS, STRENGTH, PLACES, byId } from "./shared/data.js";
 import { PROFILES, UPPER, LOWER } from "./shared/profiles.js";
 import { createMap, THEMES } from "./shared/map.js";
 import { VERSES } from "./shared/verses.js";
+import { findBook } from "./book.js";
 
 const PERSON = byId(PEOPLE);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const yearRange = (a, b) => (a < 0 && b < 0 ? `기원전 ${-a}~${-b}년` : a > 0 ? `기원후 ${a}~${b}년` : `기원전 ${-a}년~기원후 ${b}년`);
 const EVIDENCE = Object.fromEntries(EVENTS.flatMap((ev) => ev.evidence.filter((e) => e.img).map((e) => [e.img, { ...e, eventId: ev.id }])));
 
-export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
+export function createProfiles({ getCredits, onEvent, onBook, onOpen, onClose }) {
   const root = document.getElementById("profile");
   const page = document.getElementById("pPage");
   const scroll = document.getElementById("pScroll");
@@ -117,7 +118,7 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
         </section>
         <section class="p-sec">
           <h2>등장하는 책</h2>
-          <div class="books">${f.books.map((b) => `<span>${esc(b)}</span>`).join("")}</div>
+          <div class="books">${f.books.map((b) => findBook(b) ? `<button class="book-link" type="button" data-book="${esc(findBook(b).id)}">${esc(b)}</button>` : `<span>${esc(b)}</span>`).join("")}</div>
         </section>
         <p class="p-foot">연도는 성경에 적힌 나이와 햇수를 거슬러 더한 전통 연대이고 대부분 추정이다. 장절을 누르면 개역한글 본문이 보인다.</p>
       </div>`;
@@ -160,6 +161,8 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
     const vref = e.target.closest(".vref");
     if (vref) { e.stopPropagation(); pop.hidden || pop.dataset.ref !== vref.dataset.ref ? (showVerse(vref), (pop.dataset.ref = vref.dataset.ref)) : hidePop(); return; }
     if (!e.target.closest("#vpop")) hidePop();
+    const bk = e.target.closest("[data-book]");
+    if (bk) { close(); onBook(bk.dataset.book); return; }
     const person = e.target.closest("[data-person]");
     if (person) { open(person.dataset.person); return; }
     const ev = e.target.closest("[data-event]");

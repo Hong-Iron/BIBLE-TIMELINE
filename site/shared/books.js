@@ -1,0 +1,93 @@
+// 성경 66권 목록. 연표의 '성경 책' 줄과 책 해설 화면이 함께 쓴다.
+// from/to는 연표에 놓을 기간이고, basis가 그 기간의 뜻을 밝힌다.
+//   다루는 시기: 책이 이야기하는 사건의 시기 / 활동 시기: 선지자가 말씀을 전한 시기
+//   기록 시기: 책을 쓴 때(시가서와 서신) / 배경(전통): 기록 시기를 알 수 없어 전통이 말하는 배경 시기
+// bp: BibleProject 책 개요 영상 페이지(https://bibleproject.com/videos/<bp>/). 참고 링크로만 쓴다.
+
+export const BOOK_GROUPS = [
+  { id: "law", name: "율법서", testament: "구약" },
+  { id: "history", name: "역사서", testament: "구약" },
+  { id: "wisdom", name: "시가서", testament: "구약" },
+  { id: "major", name: "대선지서", testament: "구약" },
+  { id: "minor", name: "소선지서", testament: "구약" },
+  { id: "gospels", name: "복음서", testament: "신약" },
+  { id: "acts", name: "역사서", testament: "신약" },
+  { id: "pauline", name: "바울 서신", testament: "신약" },
+  { id: "general", name: "일반 서신", testament: "신약" },
+  { id: "prophecy", name: "예언서", testament: "신약" },
+];
+
+const B = (id, name, abbr, group, chapters, from, to, basis, bp) => ({ id, name, abbr, group, chapters, from, to, basis, bp });
+
+export const BIBLE_BOOKS = [
+  B("genesis", "창세기", "창", "law", 50, -2200, -1805, "다루는 시기", ["genesis-1-11", "genesis-12-50"]),
+  B("exodus", "출애굽기", "출", "law", 40, -1526, -1445, "다루는 시기", ["exodus-1-18", "exodus-19-40"]),
+  B("leviticus", "레위기", "레", "law", 27, -1446, -1445, "다루는 시기", ["leviticus"]),
+  B("numbers", "민수기", "민", "law", 36, -1445, -1406, "다루는 시기", ["numbers"]),
+  B("deuteronomy", "신명기", "신", "law", 34, -1407, -1406, "다루는 시기", ["deuteronomy"]),
+  B("joshua", "여호수아", "수", "history", 24, -1406, -1380, "다루는 시기", ["joshua"]),
+  B("judges", "사사기", "삿", "history", 21, -1380, -1050, "다루는 시기", ["judges"]),
+  B("ruth", "룻기", "룻", "history", 4, -1120, -1090, "다루는 시기", ["ruth"]),
+  B("1-samuel", "사무엘상", "삼상", "history", 31, -1105, -1010, "다루는 시기", ["1-samuel"]),
+  B("2-samuel", "사무엘하", "삼하", "history", 24, -1010, -970, "다루는 시기", ["2-samuel"]),
+  B("1-kings", "열왕기상", "왕상", "history", 22, -970, -853, "다루는 시기", ["kings"]),
+  B("2-kings", "열왕기하", "왕하", "history", 25, -853, -561, "다루는 시기", ["kings"]),
+  B("1-chronicles", "역대상", "대상", "history", 29, -1010, -970, "다루는 시기", ["chronicles"]),
+  B("2-chronicles", "역대하", "대하", "history", 36, -970, -538, "다루는 시기", ["chronicles"]),
+  B("ezra", "에스라", "스", "history", 10, -538, -457, "다루는 시기", ["ezra-nehemiah"]),
+  B("nehemiah", "느헤미야", "느", "history", 13, -445, -432, "다루는 시기", ["ezra-nehemiah"]),
+  B("esther", "에스더", "에", "history", 10, -483, -473, "다루는 시기", ["esther"]),
+  B("job", "욥기", "욥", "wisdom", 42, -2000, -1900, "배경(전통)", ["job"]),
+  B("psalms", "시편", "시", "wisdom", 150, -1000, -450, "기록 시기", ["psalms"]),
+  B("proverbs", "잠언", "잠", "wisdom", 31, -970, -700, "기록 시기", ["proverbs"]),
+  B("ecclesiastes", "전도서", "전", "wisdom", 12, -940, -931, "기록 시기", ["ecclesiastes"]),
+  B("song-of-songs", "아가", "아", "wisdom", 8, -965, -950, "기록 시기", ["song-songs"]),
+  B("isaiah", "이사야", "사", "major", 66, -740, -681, "활동 시기", ["isaiah-1-39", "isaiah-40-66"]),
+  B("jeremiah", "예레미야", "렘", "major", 52, -627, -580, "활동 시기", ["jeremiah"]),
+  B("lamentations", "예레미야애가", "애", "major", 5, -586, -585, "기록 시기", ["lamentations"]),
+  B("ezekiel", "에스겔", "겔", "major", 48, -593, -571, "활동 시기", ["ezekiel-1-33", "ezekiel-34-48"]),
+  B("daniel", "다니엘", "단", "major", 12, -605, -536, "다루는 시기", ["daniel"]),
+  B("hosea", "호세아", "호", "minor", 14, -755, -715, "활동 시기", ["hosea"]),
+  B("joel", "요엘", "욜", "minor", 3, -835, -796, "활동 시기", ["joel"]),
+  B("amos", "아모스", "암", "minor", 9, -765, -755, "활동 시기", ["amos"]),
+  B("obadiah", "오바댜", "옵", "minor", 1, -586, -580, "활동 시기", ["obadiah"]),
+  B("jonah", "요나", "욘", "minor", 4, -785, -760, "활동 시기", ["jonah"]),
+  B("micah", "미가", "미", "minor", 7, -740, -700, "활동 시기", ["micah"]),
+  B("nahum", "나훔", "나", "minor", 3, -663, -612, "활동 시기", ["nahum"]),
+  B("habakkuk", "하박국", "합", "minor", 3, -609, -597, "활동 시기", ["habakkuk"]),
+  B("zephaniah", "스바냐", "습", "minor", 3, -640, -622, "활동 시기", ["zephaniah"]),
+  B("haggai", "학개", "학", "minor", 2, -521, -520, "활동 시기", ["haggai"]),
+  B("zechariah", "스가랴", "슥", "minor", 14, -520, -480, "활동 시기", ["zechariah"]),
+  B("malachi", "말라기", "말", "minor", 4, -460, -430, "활동 시기", ["malachi"]),
+  B("matthew", "마태복음", "마", "gospels", 28, -6, 30, "다루는 시기", ["matthew-1-13", "matthew-14-28"]),
+  B("mark", "마가복음", "막", "gospels", 16, 27, 30, "다루는 시기", ["mark"]),
+  B("luke", "누가복음", "눅", "gospels", 24, -6, 30, "다루는 시기", ["luke-1-9", "luke-10-24"]),
+  B("john", "요한복음", "요", "gospels", 21, 27, 30, "다루는 시기", ["john-1-12", "john-13-21"]),
+  B("acts", "사도행전", "행", "acts", 28, 30, 62, "다루는 시기", ["acts-1-12", "acts-13-28"]),
+  B("romans", "로마서", "롬", "pauline", 16, 56, 57, "기록 시기", ["romans-1-4", "romans-5-16"]),
+  B("1-corinthians", "고린도전서", "고전", "pauline", 16, 54, 55, "기록 시기", ["1-corinthians"]),
+  B("2-corinthians", "고린도후서", "고후", "pauline", 13, 55, 56, "기록 시기", ["2-corinthians"]),
+  B("galatians", "갈라디아서", "갈", "pauline", 6, 48, 55, "기록 시기", ["galatians"]),
+  B("ephesians", "에베소서", "엡", "pauline", 6, 60, 62, "기록 시기", ["ephesians"]),
+  B("philippians", "빌립보서", "빌", "pauline", 4, 60, 62, "기록 시기", ["philippians"]),
+  B("colossians", "골로새서", "골", "pauline", 4, 60, 62, "기록 시기", ["colossians"]),
+  B("1-thessalonians", "데살로니가전서", "살전", "pauline", 5, 50, 51, "기록 시기", ["1-thessalonians"]),
+  B("2-thessalonians", "데살로니가후서", "살후", "pauline", 3, 51, 52, "기록 시기", ["2-thessalonians"]),
+  B("1-timothy", "디모데전서", "딤전", "pauline", 6, 62, 64, "기록 시기", ["1-timothy"]),
+  B("2-timothy", "디모데후서", "딤후", "pauline", 4, 64, 67, "기록 시기", ["2-timothy"]),
+  B("titus", "디도서", "딛", "pauline", 3, 62, 64, "기록 시기", ["titus"]),
+  B("philemon", "빌레몬서", "몬", "pauline", 1, 60, 62, "기록 시기", ["philemon"]),
+  B("hebrews", "히브리서", "히", "general", 13, 60, 69, "기록 시기", ["hebrews"]),
+  B("james", "야고보서", "약", "general", 5, 45, 62, "기록 시기", ["james"]),
+  B("1-peter", "베드로전서", "벧전", "general", 5, 62, 64, "기록 시기", ["1-peter"]),
+  B("2-peter", "베드로후서", "벧후", "general", 3, 64, 68, "기록 시기", ["2-peter"]),
+  B("1-john", "요한일서", "요일", "general", 5, 85, 95, "기록 시기", ["1-3-john"]),
+  B("2-john", "요한이서", "요이", "general", 1, 85, 95, "기록 시기", ["1-3-john"]),
+  B("3-john", "요한삼서", "요삼", "general", 1, 85, 95, "기록 시기", ["1-3-john"]),
+  B("jude", "유다서", "유", "general", 1, 65, 80, "기록 시기", ["jude"]),
+  B("revelation", "요한계시록", "계", "prophecy", 22, 95, 96, "기록 시기", ["revelation-1-11", "revelation-12-22"]),
+];
+
+export const bookByName = Object.fromEntries(BIBLE_BOOKS.map((b) => [b.name, b]));
+export const bookById = Object.fromEntries(BIBLE_BOOKS.map((b) => [b.id, b]));
+export const bpUrl = (slug) => `https://bibleproject.com/videos/${slug}/`;
