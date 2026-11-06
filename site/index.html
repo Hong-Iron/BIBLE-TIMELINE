@@ -674,6 +674,75 @@ button { font: inherit; color: inherit; }
 .lib-book b { display: block; font: 600 15.5px var(--serif); }
 .lib-book small { display: block; margin-top: 2px; font-size: 11.5px; color: var(--muted); }
 .lib-book.todo { opacity: 0.55; }
+
+/* 책 해설의 '지도로 따라 읽기' 단추 */
+.b-story { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 8px 15px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--accent); background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 600; box-shadow: 0 6px 16px -10px rgba(194, 65, 12, 0.7); }
+.b-story:hover { background: #a8380a; border-color: #a8380a; }
+.p-sec h2 .b-story-sm { margin-left: auto; border: 0; background: none; padding: 0; font: 600 12.5px var(--ui); color: var(--accent); cursor: pointer; letter-spacing: 0; }
+.p-sec h2 .b-story-sm:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- 지도로 따라 읽기: 사건을 내려 읽으면 지도가 따라 움직인다 ---------- */
+.mapread { z-index: 57; --st-split: 52%; }
+.st-map { position: absolute; left: 22px; top: 66px; bottom: 22px; width: calc(var(--st-split) - 34px); border: 1px solid var(--card-line); border-radius: 12px; overflow: hidden; background: #dfe7ec; box-shadow: 0 14px 30px -24px rgba(60, 45, 25, 0.5); }
+.st-map .cap { cursor: default; max-width: min(420px, calc(100% - 32px)); }
+.st-map .cap b { font-size: 15px; word-break: keep-all; }
+.st-progress { position: absolute; left: var(--st-split); right: 0; top: 0; height: 3px; z-index: 31; background: rgba(194, 65, 12, 0.08); }
+.st-progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.3s ease; }
+.st-scroll { position: absolute; left: var(--st-split); right: 0; top: 0; bottom: 0; overflow-y: auto; scrollbar-width: thin; overscroll-behavior: contain; }
+.st-steps { max-width: 560px; margin: 0 auto; padding: 84px 28px 0; }
+.st-intro { padding: 10px 0 18vh; }
+.st-intro h1 { margin: 6px 0 12px; font: 600 42px/1.12 var(--serif); letter-spacing: -0.02em; }
+.st-sum { margin: 0 0 16px; font: 400 16.5px/1.85 var(--serif); color: #34312c; word-break: keep-all; }
+.st-hint { margin: 0 0 10px; font-size: 13.5px; color: var(--ink2); word-break: keep-all; }
+.st-key { display: inline-block; padding: 0 6px; border: 1px solid var(--line); border-radius: 4px; background: #fff; font-size: 11.5px; }
+.st-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); }
+.st-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.st-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+.st-legend .dot { background: #1c1b19; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d6cfc2; width: 8px; height: 8px; }
+.st-legend .trail { background: rgba(194, 65, 12, 0.3); }
+.st-legend .land { width: 16px; height: 16px; background: rgba(194, 65, 12, 0.13); border: 1px dashed rgba(194, 65, 12, 0.5); }
+.st-legend .line { width: 20px; height: 0; border-radius: 0; border-top: 2px dashed var(--accent); }
+.st-step { position: relative; margin: 0 0 30vh; padding: 18px 20px 16px; background: #fff; border: 1px solid var(--card-line); border-radius: 12px; cursor: pointer;
+  opacity: 0.42; transform: scale(0.985); transition: opacity 0.35s ease, transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease; }
+.st-step.on { opacity: 1; transform: none; border-color: #e3b79c; box-shadow: 0 1px 2px rgba(60, 45, 25, 0.05), 0 18px 34px -24px rgba(194, 65, 12, 0.45); cursor: default; }
+.st-meta { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.st-no { font: 600 12px var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0.06em; }
+.st-when { font-size: 12.5px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.st-text { margin: 0 0 10px; font: 600 19px/1.5 var(--serif); color: #24221e; word-break: keep-all; }
+.st-where { margin: 0 0 10px; font-size: 13px; color: #2f2c27; word-break: keep-all; }
+.st-where b { display: inline-block; margin-right: 8px; font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 0 6px; }
+.st-where.home b { color: var(--ink2); background: #efebe3; }
+.st-where.home { color: var(--ink2); }
+.st-verse { margin: 0 0 4px; padding: 9px 13px 9px 14px; border-left: 2px solid color-mix(in srgb, var(--accent) 50%, transparent); background: #fbf9f5; border-radius: 0 8px 8px 0; cursor: pointer; }
+.st-verse p { margin: 0; font: 400 14.5px/1.75 var(--serif); color: #3a3630; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.st-verse.full p { -webkit-line-clamp: unset; display: block; }
+.st-verse cite { display: block; margin-top: 4px; font: normal 11.5px var(--ui); color: var(--muted); }
+.st-ref { margin: 0; font-size: 12px; color: var(--muted); }
+.st-step .go-ev { margin-top: 6px; }
+.st-end { padding: 4vh 0 40vh; text-align: center; }
+.st-end p { margin: 0 0 14px; font: 500 16px var(--serif); color: var(--ink2); }
+.st-end nav { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.st-end button { border: 1px solid var(--card-line); background: #fff; border-radius: 999px; padding: 7px 15px; font-size: 13px; cursor: pointer; }
+.st-end button:hover { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 900px) {
+  .mapread { --st-map-h: 38vh; }
+  .st-map { left: 10px; right: 10px; top: 56px; bottom: auto; width: auto; height: var(--st-map-h); border-radius: 10px; }
+  .st-map .cap { padding: 5px 9px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .st-map .cap small { display: inline; margin-right: 6px; }
+  .st-map .cap b { display: inline; }
+  .st-map .cap span { display: none; }
+  .st-map .cap b { font-size: 13.5px; }
+  .st-progress { left: 0; top: calc(56px + var(--st-map-h) + 4px); height: 2px; }
+  .st-scroll { left: 0; top: calc(56px + var(--st-map-h) + 6px); }
+  .st-steps { padding: 18px 16px 0; }
+  .st-intro { padding-bottom: 12vh; }
+  .st-intro h1 { font-size: 32px; }
+  .st-sum { font-size: 15px; }
+  .st-step { margin-bottom: 22vh; padding: 14px 15px 13px; }
+  .st-text { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) { .st-step, .st-progress span { transition: none; } }
 </style>
 </head>
 <body>
@@ -780,6 +849,16 @@ button { font: inherit; color: inherit; }
   </header>
   <div class="p-scroll" id="bScroll"><div class="p-page" id="bPage"></div></div>
   <div class="vpop" id="bpop" hidden></div>
+</div>
+
+<div class="profile mapread" id="story" role="dialog" aria-modal="true" aria-label="지도로 따라 읽기" aria-hidden="true" tabindex="-1">
+  <header class="g-top">
+    <div class="g-brand"><b>지도로 따라 읽기</b><span id="sName"></span></div>
+    <button class="g-close" id="sClose" type="button">해설로 돌아가기 <span aria-hidden="true">✕</span></button>
+  </header>
+  <div class="st-map"><div class="map-el" id="sMap"></div><div class="cap" id="sCap" aria-live="polite"></div></div>
+  <div class="st-progress"><span id="sBar"></span></div>
+  <div class="st-scroll" id="sScroll"><div class="st-steps" id="sSteps"></div></div>
 </div>
 
 <div class="profile" id="profile" role="dialog" aria-modal="true" aria-label="인물 프로필" aria-hidden="true" tabindex="-1">

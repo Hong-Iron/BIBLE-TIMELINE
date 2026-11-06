@@ -1,0 +1,20 @@
+// 책 해설(guides_g6.js)의 사건 장소 가운데 data.js·events_more.js에 없던 곳. places_story.js가 합친다.
+export const PLACES_G6 = {
+  nabataea: { name: "나바테아 왕국(아라비아)", at: [36.2, 30.6], region: true },
+  galatia: { name: "갈라디아", at: [32.8, 39.6], region: true },
+  pisidianantioch: { name: "비시디아 안디옥", at: [31.19, 38.31] },
+  iconium: { name: "이고니온", at: [32.48, 37.87] },
+  lystra: { name: "루스드라", at: [32.28, 37.6] },
+  miletus: { name: "밀레도", at: [27.28, 37.53] },
+  troas: { name: "드로아", at: [26.16, 39.75] },
+  neapolis: { name: "네압볼리", at: [24.41, 40.94] },
+  philippi: { name: "빌립보", at: [24.29, 41.01] },
+  thessalonica: { name: "데살로니가", at: [22.94, 40.64] },
+  berea: { name: "베뢰아", at: [22.2, 40.52] },
+  athens: { name: "아덴", at: [23.73, 37.97] },
+  macedonia: { name: "마게도냐", at: [22.6, 40.9], region: true },
+  colossae: { name: "골로새", at: [29.25, 37.79] },
+  laodicea: { name: "라오디게아", at: [29.11, 37.84] },
+  crete: { name: "그레데", at: [24.9, 35.2], region: true },
+  nicopolis: { name: "니고볼리(추정)", at: [20.73, 39.01] },
+};

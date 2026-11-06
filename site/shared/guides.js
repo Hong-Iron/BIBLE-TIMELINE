@@ -8,7 +8,10 @@
 //   date: [{ view, text, ref?, src? }],                               // 쓴 때
 //   setting: "배경이 되는 때와 곳, 처음 읽은 사람들",
 //   structure: [{ range: "1~11장", title, text }],                    // 책의 짜임
-//   events: [{ when?, text, ref, event? }],                            // 주요 사건(event는 data.js 사건 id)
+//   events: [{ when?, text, ref, event?, at?, move? }],                // 주요 사건(event는 data.js 사건 id)
+//                                                                     // at: 장소 id 목록(지도로 따라 읽기). 일어난 차례대로.
+//                                                                     // move: true면 at을 차례로 잇는 길을 그린다(여행·행군·포로로 끌려감).
+//   home: { at: [장소 id...], label },                                 // at이 없는 사건(가르침·환상·시)에 지도가 보여 줄 책의 배경
 //   themes: [{ title, text, refs: [장절...] }],                        // 중심 주제와 해석
 //   debates: [{ title, text, views: [{ who, text, src? }] }],         // 해석이 갈리는 대목
 //   quotes: [장절...],                                                 // 핵심 구절

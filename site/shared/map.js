@@ -58,8 +58,9 @@ const baseName = (id) => SHORT_NAME[id] ?? PLACES[id].name.replace(/\(.*\)/, "")
 // 글자 폭 어림: 한글은 글자 크기만큼, 나머지는 절반 남짓
 const textW = (t, size, spacing = 0) => 4 + [...t].reduce((n, c) => n + (/[\u3131-\uD79D]/.test(c) ? size * 1.06 : size * 0.6) + spacing, 0);
 
+// minSpan: 장소가 한 곳뿐일 때도 화면 짧은 변에 이만큼(경도, 도)은 보이게 한다.
 // reserve(w, h): 지도 위에 겹쳐 놓은 설명 상자처럼 바탕 지명을 놓지 않을 자리 [[x, y, 너비, 높이], ...]
-export async function createMap(el, theme = THEMES.parchment, { labels = true, base = true, pad = 0.35, reserve = null } = {}) {
+export async function createMap(el, theme = THEMES.parchment, { labels = true, base = true, pad = 0.35, reserve = null, minSpan = 3.2 } = {}) {
   const geo = await loadGeo();
   const svg = d3.select(el).append("svg").attr("class", "bt-map").style("display", "block").style("width", "100%").style("height", "100%");
   const sea = svg.append("rect").attr("fill", theme.sea);
@@ -68,6 +69,7 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
   const lakes = g.append("path").attr("fill", theme.lake).attr("stroke", theme.coast).attr("stroke-width", 0.4);
   const rivers = g.append("path").attr("fill", "none").attr("stroke", theme.river).attr("stroke-width", 1.1).attr("stroke-linecap", "round");
   const baseG = g.append("g").attr("class", "base").style("pointer-events", "none");
+  const trail = g.append("g").style("pointer-events", "none");
   const route = g.append("path").attr("fill", "none").attr("stroke", theme.route).attr("stroke-width", 2.2).attr("stroke-dasharray", "5 4").attr("stroke-linecap", "round");
   const marks = g.append("g");
 
@@ -89,13 +91,20 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
 
   function drawMarks() {
     const ids = current ? current.route : [];
+    // trail: 앞에서 지나온 장소. 이름 없이 옅은 점으로만 남긴다(지도로 따라 읽기).
+    const onNow = new Set(ids);
+    trail.selectAll("circle").data((current?.trail || []).filter((id) => !onNow.has(id) && PLACES[id]), (d) => d)
+      .join((e) => e.append("circle").attr("r", 3.2).attr("fill", theme.route).attr("fill-opacity", 0.28).attr("stroke", theme.halo).attr("stroke-width", 1))
+      .attr("transform", (d) => `translate(${proj(PLACES[d].at)})`);
     const pts = ids.map((id) => proj(PLACES[id].at));
     // noLine이면 점만 찍는다(인물 프로필처럼 순서 없는 장소 모음).
     route.attr("d", pts.length > 1 && !current?.noLine ? d3.line().curve(d3.curveCatmullRom.alpha(0.5))(pts) : null);
     const sel = marks.selectAll("g.pl").data(ids, (d) => d);
     sel.exit().remove();
     const enter = sel.enter().append("g").attr("class", "pl");
-    enter.append("circle").attr("r", 4.5).attr("fill", theme.dot).attr("stroke", theme.halo).attr("stroke-width", 2);
+    // 도시는 검은 점, 땅·지방(region)은 그 땅 가운데에 옅은 원을 그린다.
+    enter.filter((d) => PLACES[d].region).append("circle").attr("r", 16).attr("fill", theme.route).attr("fill-opacity", 0.13).attr("stroke", theme.route).attr("stroke-opacity", 0.35).attr("stroke-dasharray", "3 3");
+    enter.append("circle").attr("r", (d) => (PLACES[d].region ? 2.5 : 4.5)).attr("fill", theme.dot).attr("stroke", theme.halo).attr("stroke-width", 2);
     if (labels) {
       enter.append("text").attr("x", 8).attr("y", 4).attr("fill", theme.label).attr("stroke", theme.halo).attr("stroke-width", 3.5).attr("paint-order", "stroke")
         .style("font", `600 13px ${theme.font}`).text((d) => PLACES[d].name);
@@ -114,11 +123,14 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
   };
   function drawBase(taken) {
     const onRoute = new Set(current ? current.route : []);
+    // 사건 장소로 이름이 이미 떠 있는 바다·지역은 바탕에 다시 쓰지 않는다. 장소와 바탕 지명이 같은 이름이면 바탕 지명을 쓴다.
+    const routeNames = new Set([...onRoute].map(baseName));
+    const featNames = new Set(FEATURES.map((f) => f.name));
     const cands = [
-      ...FEATURES,
-      ...Object.keys(PLACES).filter((id) => !onRoute.has(id)).map((id) => {
+      ...FEATURES.filter((f) => !routeNames.has(f.name)),
+      ...Object.keys(PLACES).filter((id) => !onRoute.has(id) && !featNames.has(baseName(id))).map((id) => {
         const i = MAJOR.indexOf(id);
-        return { name: baseName(id), at: PLACES[id].at, kind: "place", pri: i < 0 ? 200 : i < 8 ? 2 + i * 0.1 : 50 + i };
+        return { name: baseName(id), at: PLACES[id].at, kind: PLACES[id].region ? "region" : "place", pri: i < 0 ? (PLACES[id].region ? 150 : 200) : i < 8 ? 2 + i * 0.1 : 50 + i };
       }),
     ].sort((a, b) => a.pri - b.pri);
     const shown = [];
@@ -185,7 +197,7 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
     // 가로세로 중 더 빡빡한 쪽에 맞춘다. 위도 1도는 이 지역(북위 30도 안팎)에서 경도 1도보다 약 1.15배 길게 그려진다.
     const needLon = (x1 - x0) / Math.max(aspect, 1);
     const needLat = ((y1 - y0) * 1.15) / Math.max(1 / aspect, 1);
-    const span = Math.max(3.2, Math.max(needLon, needLat) * (1 + pad * 2));
+    const span = Math.max(minSpan, Math.max(needLon, needLat) * (1 + pad * 2));
     return { lon: (x0 + x1) / 2, lat: (y0 + y1) / 2, span };
   }
 

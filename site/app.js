@@ -6,6 +6,7 @@ import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, ye
 import { createMap, THEMES } from "./shared/map.js";
 import { createProfiles } from "./profile.js";
 import { createBooks, findBook } from "./book.js";
+import { createStory } from "./story.js";
 
 const SPAN = RANGE[1] - RANGE[0];
 const PERSON = byId(PEOPLE);
@@ -757,11 +758,22 @@ const profiles = createProfiles({
 const books = createBooks({
   onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
   onPerson: (id) => profiles.open(id),
+  onStory: (id) => story.open(id),
   // 책을 여는 동안 연표를 그 책의 시기 가운데로 옮기고 막대를 강조한다.
   onOpen: (b) => { if (b) { state.book = b.id; setCenter((b.from + b.to) / 2); } frame(); },
   onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
 });
 $("booksBtn").addEventListener("click", () => books.open(null));
+// 지도로 따라 읽기는 책 해설 위에 열리고, 닫으면 그 해설로 돌아간다. 전시실로 갈 때는 해설도 닫는다.
+const story = createStory({
+  onEvent: (id) => { books.close(); openGallery(EVENTS.find((ev) => ev.id === id)); },
+  onClose: (b, back) => {
+    if (!back) return;
+    // 같은 책의 해설이 열려 있으면 읽던 자리 그대로 돌아가고, 다음 책으로 넘어왔으면 그 책의 해설을 연다.
+    if (books.isOpen() && books.currentId() === b.id) { history.replaceState(null, "", `#b-${b.id}`); $("book").focus({ preventScroll: true }); }
+    else books.open(b.id);
+  },
+});
 
 function stepEvent(dir) {
   if (isOpen()) { goRoom(here() + dir); return; }
@@ -814,6 +826,11 @@ stage.addEventListener("click", (e) => { if (swallowClick) { e.stopPropagation()
 
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input, textarea, select")) return;
+  if (story.isOpen()) {
+    if (e.key === "Escape") story.close();
+    else if (["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(e.key)) { e.preventDefault(); story.step(e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1); }
+    return;
+  }
   if (books.isOpen()) { if (e.key === "Escape") books.popOpen() ? books.hidePop() : books.close(); return; }
   if (profiles.isOpen()) { if (e.key === "Escape") profiles.popOpen() ? profiles.hidePop() : profiles.close(); return; }
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); stepEvent(e.key === "ArrowRight" ? 1 : -1); }
@@ -874,6 +891,7 @@ async function init() {
   if (fromHash) openGallery(fromHash);
   else if (location.hash.startsWith("#p-")) profiles.open(location.hash.slice(3));
   else if (location.hash.startsWith("#b-")) books.open(location.hash.slice(3));
+  else if (location.hash.startsWith("#s-")) { const id = location.hash.slice(3); books.open(id); story.open(id); }
   else if (location.hash === "#books") books.open(null);
   document.fonts?.ready.then(frame);
 

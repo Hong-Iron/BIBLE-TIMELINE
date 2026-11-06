@@ -4,6 +4,7 @@
 import { VERSES } from "./verses.js";
 import { MORE_EVENTS, MORE_PEOPLE, MORE_PLACES } from "./events_more.js";
 import { BIBLE_BOOKS } from "./books.js";
+import { STORY_PLACES } from "./places_story.js";
 
 export const RANGE = [-2200, 100];
 
@@ -390,6 +391,7 @@ export function yearsBetween(a, b) {
 for (const ev of EVENTS) ev.sample = true;
 PEOPLE.push(...MORE_PEOPLE);
 Object.assign(PLACES, MORE_PLACES);
+for (const [id, p] of Object.entries(STORY_PLACES)) PLACES[id] ??= p;
 EVENTS.push(...MORE_EVENTS);
 for (const ev of EVENTS) ev.verse ??= (VERSES[ev.ref] || []).map(([, t]) => t).join(" ");
 // 같은 해의 사건은 적은 순서를 지킨다(Array.prototype.sort는 안정 정렬).

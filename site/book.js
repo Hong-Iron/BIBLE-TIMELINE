@@ -5,6 +5,7 @@ import { BIBLE_BOOKS, BOOK_GROUPS, bookById, bpUrl } from "./shared/books.js";
 import { GUIDES } from "./shared/guides.js";
 import { PROFILES } from "./shared/profiles.js";
 import { VERSES } from "./shared/verses.js";
+import { hasStory } from "./story.js";
 
 const PERSON = byId(PEOPLE);
 const EVENT = byId(EVENTS);
@@ -16,7 +17,7 @@ const groupOf = (b) => BOOK_GROUPS.find((g) => g.id === b.group);
 const BY_LEN = [...BIBLE_BOOKS].sort((a, b) => b.name.length - a.name.length);
 export const findBook = (text) => BY_LEN.find((b) => String(text).startsWith(b.name)) || null;
 
-export function createBooks({ onEvent, onPerson, onOpen, onClose }) {
+export function createBooks({ onEvent, onPerson, onStory, onOpen, onClose }) {
   const root = document.getElementById("book");
   const page = document.getElementById("bPage");
   const scroll = document.getElementById("bScroll");
@@ -52,6 +53,7 @@ export function createBooks({ onEvent, onPerson, onOpen, onClose }) {
     const bp = (b.bp || []).map((slug, i) => `<a href="${bpUrl(slug)}" target="_blank" rel="noopener">BibleProject 개요 영상${b.bp.length > 1 ? ` ${i + 1}` : ""} ↗</a>`).join("");
     const idx = BIBLE_BOOKS.indexOf(b);
     const prev = BIBLE_BOOKS[idx - 1], next = BIBLE_BOOKS[idx + 1];
+    const story = hasStory(b.id);
     return `
       <aside class="p-side">
         <div class="p-hero">
@@ -59,6 +61,7 @@ export function createBooks({ onEvent, onPerson, onOpen, onClose }) {
           <h1>${esc(b.name)}</h1>
           <p class="p-alias">${b.chapters}장 · 약칭 '${esc(b.abbr)}'</p>
           <p class="p-years"><span>${esc(b.basis)}</span>${esc(range(b))} <em>추정</em></p>
+          ${story ? `<button class="b-story" type="button" data-story="${esc(b.id)}">지도로 따라 읽기 →</button>` : ""}
         </div>
         ${g.author || g.date || g.setting ? `<section class="p-card">
           <h3>기본 정보</h3>
@@ -76,7 +79,7 @@ export function createBooks({ onEvent, onPerson, onOpen, onClose }) {
       </aside>
       <div class="p-main">
         ${g.summary ? `<section class="p-sec"><p class="p-summary">${esc(g.summary)}</p></section>` : `<section class="p-sec"><p class="p-note">이 책의 해설은 아직 준비 중입니다.</p></section>`}
-        ${g.events?.length ? `<section class="p-sec"><h2>주요 사건</h2><ol class="life">${g.events.map((e) => `
+        ${g.events?.length ? `<section class="p-sec"><h2>주요 사건${story ? `<button class="b-story-sm" type="button" data-story="${esc(b.id)}">지도로 따라 읽기 →</button>` : ""}</h2><ol class="life">${g.events.map((e) => `
           <li class="${e.event ? "has-ev" : ""}"><span class="when">${esc(e.when || "")}</span>
           <div><p>${esc(e.text)}</p><span class="lref">${refBtn(e.ref)}${e.event && EVENT[e.event] ? `<button class="go-ev small" type="button" data-event="${esc(e.event)}">전시실 →</button>` : ""}</span></div></li>`).join("")}</ol></section>` : ""}
         ${g.themes?.length ? `<section class="p-sec"><h2>주제와 해석</h2><div class="b-themes">${g.themes.map((t) => `
@@ -108,6 +111,8 @@ export function createBooks({ onEvent, onPerson, onOpen, onClose }) {
     const vref = e.target.closest(".vref");
     if (vref) { e.stopPropagation(); pop.hidden || pop.dataset.ref !== vref.dataset.ref ? showVerse(vref) : hidePop(); return; }
     if (!e.target.closest("#bpop")) hidePop();
+    const st = e.target.closest("[data-story]");
+    if (st) { onStory(st.dataset.story); return; }
     const bk = e.target.closest("[data-book]");
     if (bk) { open(bk.dataset.book); return; }
     if (e.target.closest("[data-library]")) { open(null); return; }
@@ -144,5 +149,5 @@ export function createBooks({ onEvent, onPerson, onOpen, onClose }) {
     onClose();
   }
 
-  return { open, close, hidePop, isOpen: () => root.classList.contains("open"), popOpen: () => !pop.hidden };
+  return { open, close, hidePop, isOpen: () => root.classList.contains("open"), popOpen: () => !pop.hidden, currentId: () => current?.id ?? null };
 }

@@ -1,0 +1,20 @@
+// 책 해설(guides_g5.js)의 사건 장소 가운데 data.js·events_more.js에 없던 곳. places_story.js가 합친다.
+export const PLACES_G5 = {
+  galilee: { name: "갈릴리", at: [35.35, 32.9], region: true },
+  seaofgalilee: { name: "갈릴리 바다", at: [35.59, 32.83], region: true },
+  judeanwilderness: { name: "유대 광야", at: [35.33, 31.6], region: true },
+  caesareaphilippi: { name: "가이사랴 빌립보", at: [35.69, 33.25] },
+  cana: { name: "가나(추정)", at: [35.29, 32.79] },
+  sychar: { name: "수가", at: [35.29, 32.22] },
+  bethany: { name: "베다니", at: [35.26, 31.77] },
+  emmaus: { name: "엠마오(추정)", at: [34.99, 31.84] },
+  gaza: { name: "가사", at: [34.46, 31.52] },
+  cyprus: { name: "구브로", at: [33.4, 35.1], region: true },
+  philippi: { name: "빌립보", at: [24.28, 41.01] },
+  athens: { name: "아덴", at: [23.73, 37.97] },
+  troas: { name: "드로아", at: [26.16, 39.76] },
+  cenchreae: { name: "겐그레아", at: [22.99, 37.88] },
+  macedonia: { name: "마게도냐", at: [22.6, 40.9], region: true },
+  achaia: { name: "아가야", at: [21.9, 37.6], region: true },
+  asia: { name: "아시아", at: [28.6, 38.9], region: true },
+};
