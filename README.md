@@ -11,11 +11,12 @@
 | 폴더 | 담는 파일 |
 |---|---|
 | `site/` | GitHub Pages(저장소의 HTML 파일을 그대로 웹사이트로 띄워 주는 GitHub의 무료 호스팅)에 올라가는 파일 전체. 빌드 단계 없이 그대로 배포합니다 |
-| `site/index.html`, `site/app.js`, `site/profile.js`, `site/book.js`, `site/story.js` | 사이트 첫 화면. 왼쪽 지도와 오른쪽 연표·전시실(`app.js`), 인물 프로필(`profile.js`), 성경 66권 목록과 책 해설(`book.js`), 책의 사건을 내려 읽으면 지도가 따라 움직이는 '지도로 따라 읽기'(`story.js`) |
+| `site/index.html`, `site/app.js`, `site/profile.js`, `site/book.js`, `site/story.js`, `site/nav.js` | 사이트 첫 화면. 왼쪽 지도와 오른쪽 연표·전시실(`app.js`), 인물 프로필(`profile.js`), 성경 66권 목록과 책 해설(`book.js`), 책의 사건을 내려 읽으면 지도가 따라 움직이는 '지도로 따라 읽기'(`story.js`), 화면 이동 기록(`nav.js`, 돌아가기가 바로 앞 화면으로 가게 함) |
 | `site/d/` | 예전 주소. 첫 화면으로 넘겨 주며, 주소 끝의 `#사건 이름`도 그대로 넘깁니다 |
-| `site/shared/` | 모든 화면이 함께 쓰는 사건 자료(처음 만든 11개는 `data.js`, 나머지 49개는 `events_more.js`), 인물 프로필 자료(`profiles.js`와 시대별 묶음 `profiles_g1.js`~`profiles_g4.js`), 성경 66권 목록(`books.js`)과 책 해설(`guides.js`와 갈래별 묶음 `guides_g1.js`~`guides_g7.js`), 책 해설에만 나오는 장소(`places_story.js`와 묶음 `places_g1.js`~`places_g7.js`), 당대 배경(`backgrounds.js`와 시대 묶음 `bg_e1.js`·`bg_e2.js`, 책 묶음 `bg_g1.js`~`bg_g7.js`), 배경의 출처 목록(`sources.js`), 사건과 프로필 장절의 개역한글 본문(`verses.js`, 스크립트가 만듦), 지도 그리기(`map.js`), 지도 모양(`geo.json`), 사진 출처(`credits.json`) |
+| `site/shared/` | 모든 화면이 함께 쓰는 사건 자료(처음 만든 11개는 `data.js`, 나머지 49개는 `events_more.js`), 인물 프로필 자료(`profiles.js`와 시대별 묶음 `profiles_g1.js`~`profiles_g4.js`), 성경 66권 목록(`books.js`)과 책 해설(`guides.js`와 갈래별 묶음 `guides_g1.js`~`guides_g7.js`), 책 해설에만 나오는 장소(`places_story.js`와 묶음 `places_g1.js`~`places_g7.js`), 당대 배경(`backgrounds.js`와 시대 묶음 `bg_e1.js`·`bg_e2.js`, 책 묶음 `bg_g1.js`~`bg_g7.js`), 배경의 출처 목록(`sources.js`), 사건과 프로필 장절의 개역한글 본문(`verses.js`, 스크립트가 만듦. 연표 사건 것만 따로 `verses_events.js`), 지도 그리기(`map.js`), 지도 모양(`geo.json`), 사진 출처(`credits.json`) |
 | `site/img/` | 유물 사진. 긴 변을 1200 px 이하로 줄인 JPEG와, 목록·연표 칸에 쓰는 320 px 판(`img/sm/`) |
-| `tools/` | 사진을 내려받는 스크립트(`fetch_images.py`), 프로필 장절의 본문을 뽑고 주장과 대조하는 스크립트(`build_verses.py`), 책 해설의 장소를 점검하는 스크립트(`check_places.mjs`), 당대 배경을 점검하는 스크립트(`check_bg.mjs`), 지도 모양을 잘라 내는 스크립트(`crop_geo.mjs`), 헤드리스 크롬으로 화면을 열어 검사하고 찍는 스크립트(`headless.mjs`), 내 컴퓨터에서 띄우는 미리보기 서버(`serve.py`), 링크 공유 그림(`og.html`을 `og.sh`가 찍어 `site/og.jpg`로 저장) |
+| `promo/` | 카톡·SNS에 올릴 소개 그림 8장(한눈에 보기, 기능 6가지, 휴대폰 화면). `tools/promo.mjs`가 만듦. 사이트에는 올라가지 않습니다 |
+| `tools/` | 사진을 내려받는 스크립트(`fetch_images.py`), 프로필 장절의 본문을 뽑고 주장과 대조하는 스크립트(`build_verses.py`), 책 해설의 장소를 점검하는 스크립트(`check_places.mjs`), 당대 배경을 점검하는 스크립트(`check_bg.mjs`), 지도 모양을 잘라 내는 스크립트(`crop_geo.mjs`), 헤드리스 크롬으로 화면을 열어 검사하고 찍는 스크립트(`headless.mjs`, `CPU=4`로 휴대폰 속도, `PROFILE`로 함수별 시간, `SCALE=2`로 2배 해상도), 카톡·SNS 소개 그림을 `promo/`에 만드는 스크립트(`promo.mjs`), 내 컴퓨터에서 띄우는 미리보기 서버(`serve.py`), 링크 공유 그림(`og.html`을 `og.sh`가 찍어 `site/og.jpg`로 저장) |
 
 ## 내 컴퓨터에서 보기
 

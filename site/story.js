@@ -5,6 +5,7 @@ import { BIBLE_BOOKS, BOOK_GROUPS, bookById } from "./shared/books.js";
 import { GUIDES } from "./shared/guides.js";
 import { VERSES } from "./shared/verses.js";
 import { createMap, THEMES } from "./shared/map.js";
+import { nav } from "./nav.js";
 
 const EVENT = byId(EVENTS);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -22,7 +23,7 @@ function placesOf(e, g) {
 // 이 책을 지도로 따라 읽을 수 있는가: 장소가 있는 사건이 하나라도 있어야 한다.
 export const hasStory = (id) => (GUIDES[id]?.events || []).some((e) => placesOf(e, GUIDES[id]).ids.length);
 
-export function createStory({ onEvent, onClose }) {
+export function createStory({ onEvent, onBack, onClose }) {
   const root = document.getElementById("story");
   const scroll = document.getElementById("sScroll");
   const list = document.getElementById("sSteps");
@@ -67,7 +68,7 @@ export function createStory({ onEvent, onClose }) {
       ${steps.map(stepHTML).join("")}
       <footer class="st-end">
         <p>${esc(book.name)}의 주요 사건을 모두 따라왔습니다.</p>
-        <nav>${prev ? `<button type="button" data-story="${esc(prev.id)}">← ${esc(prev.name)}</button>` : "<span></span>"}<button type="button" data-back="1">해설로 돌아가기</button>${next ? `<button type="button" data-story="${esc(next.id)}">${esc(next.name)} →</button>` : "<span></span>"}</nav>
+        <nav>${prev ? `<button type="button" data-story="${esc(prev.id)}">← ${esc(prev.name)}</button>` : "<span></span>"}<button type="button" data-back="1">돌아가기</button>${next ? `<button type="button" data-story="${esc(next.id)}">${esc(next.name)} →</button>` : "<span></span>"}</nav>
       </footer>`;
   }
 
@@ -112,31 +113,36 @@ export function createStory({ onEvent, onClose }) {
   scroll.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(pick); } }, { passive: true });
   root.addEventListener("click", (e) => {
     const ev = e.target.closest("[data-event]");
-    if (ev) { const id = ev.dataset.event; close({ back: false }); onEvent(id); return; }
+    if (ev) { const id = ev.dataset.event; close(); onEvent(id); return; }
     const st = e.target.closest("[data-story]");
     if (st) { open(st.dataset.story); return; }
-    if (e.target.closest("[data-back]")) { close(); return; }
+    if (e.target.closest("[data-back]")) { onBack(); return; }
     const card = e.target.closest(".st-step");
     if (card && !e.target.closest(".st-verse")) go(+card.dataset.i);
     const q = e.target.closest(".st-verse");
     if (q) q.classList.toggle("full");
   });
-  document.getElementById("sClose").addEventListener("click", () => close());
+  document.getElementById("sClose").addEventListener("click", () => onBack());
 
   async function open(id) {
     const b = bookById[id];
     if (!b || !hasStory(id)) return false;
+    // 같은 책으로 돌아오면(전시실에 갔다가 돌아온 경우) 읽던 사건과 지도를 그대로 둔다.
+    const same = book === b && list.childElementCount;
     book = b;
-    const g = GUIDES[id];
-    steps = (g.events || []).map((e) => ({ e, p: placesOf(e, g) }));
-    active = -1;
-    render();
+    if (!same) {
+      const g = GUIDES[id];
+      steps = (g.events || []).map((e) => ({ e, p: placesOf(e, g) }));
+      active = -1;
+      render();
+      scroll.scrollTop = 0;
+    }
     document.getElementById("sName").textContent = b.name;
     root.classList.add("open");
     root.setAttribute("aria-hidden", "false");
     root.focus({ preventScroll: true });
-    scroll.scrollTop = 0;
-    history.replaceState(null, "", `#s-${b.id}`);
+    nav.push(`#s-${b.id}`);
+    if (same) return true;
     // 지도는 처음 열 때 한 번 만든다. 아래 왼쪽 설명 상자 자리에는 바탕 지명을 놓지 않는다.
     mapLoading ??= createMap(document.getElementById("sMap"), THEMES.atlas, {
       labels: true, pad: 0.55, minSpan: 6.5, reserve: (w, h) => [[0, h - cap.offsetHeight - 22, cap.offsetWidth + 24, cap.offsetHeight + 22]],
@@ -150,12 +156,11 @@ export function createStory({ onEvent, onClose }) {
     return true;
   }
 
-  // back: 닫은 뒤 책 해설로 돌아가는지. 전시실로 갈 때는 false.
-  function close({ back = true } = {}) {
+  function close() {
     if (!root.classList.contains("open")) return;
     root.classList.remove("open");
     root.setAttribute("aria-hidden", "true");
-    onClose(book, back);
+    onClose(book);
   }
 
   const step = (d) => go(Math.max(0, Math.min(steps.length - 1, (active < 0 ? 0 : active) + d)));

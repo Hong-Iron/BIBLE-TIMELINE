@@ -95,6 +95,13 @@ def main():
         "// tools/build_verses.py가 만든 파일이다. 손으로 고치지 않는다. 장절 → [[\"책 장:절\", 개역한글 본문], ...]\n"
         f"export const VERSES = {body};\n")
     print(f"장절 {len(out)}개, 절 {sum(len(p) for p in out.values())}개를 verses.js에 저장했다.")
+    # 첫 화면(연표·전시실)은 사건 60개의 장절만 쓴다. 큰 verses.js를 첫 화면에서 받지 않도록 따로 저장한다.
+    shared = ROOT / "site" / "shared"
+    ev_refs = collect_refs((shared / "data.js").read_text() + (shared / "events_more.js").read_text())
+    ev_out = {r: out[r] for r in ev_refs if r in out}
+    (shared / "verses_events.js").write_text(
+        "// tools/build_verses.py가 만든 파일이다. 손으로 고치지 않는다. 연표 사건의 장절만 담는다(전체는 verses.js).\n"
+        f"export const EVENT_VERSES = {json.dumps(ev_out, ensure_ascii=False, separators=(',', ':'))};\n")
     if missing:
         print("찾지 못한 절:", *missing, sep="\n  ")
         sys.exit(1)

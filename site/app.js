@@ -4,9 +4,9 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";
 import { createMap, THEMES } from "./shared/map.js";
-import { createProfiles } from "./profile.js";
-import { createBooks, findBook } from "./book.js";
-import { createStory } from "./story.js";
+import { findBook } from "./shared/books.js";
+import { nav } from "./nav.js";
+// 인물 프로필·책 해설·지도로 따라 읽기는 처음 열 때 불러온다(아래 lazy).
 
 const SPAN = RANGE[1] - RANGE[0];
 const PERSON = byId(PEOPLE);
@@ -651,7 +651,7 @@ function setRoom(i) {
   state.selected = ev;
   state.focusKey = ev.evidence.length ? `${ev.id}:${+rooms[i].dataset.k || 0}` : null;
   setCenter(ev.year);
-  history.replaceState(null, "", `#${ev.id}`);
+  nav.replace(`#${ev.id}`);
 }
 
 function goRoom(i) {
@@ -698,6 +698,8 @@ function openGallery(ev, k = null) {
   $("hint").classList.add("gone");
   toggleLegend(false);
   if (isOpen()) { goRoom(i); return; }
+  nav.push(`#${ev.id}`);
+  gallery.classList.remove("parked");
   gallery.classList.add("open");
   gallery.setAttribute("aria-hidden", "false");
   hall.scrollLeft = i * hall.clientWidth;
@@ -712,9 +714,10 @@ function closeGallery() {
   if (!isOpen()) return;
   gallery.classList.remove("open");
   gallery.setAttribute("aria-hidden", "true");
+  // 닫히는 흐림 효과(0.45초)가 끝난 뒤 방들을 화면 계산에서 뺀다.
+  setTimeout(() => { if (!isOpen()) gallery.classList.add("parked"); }, 480);
   setMapOpen(false);
   state.focusKey = null;
-  history.replaceState(null, "", location.pathname + location.search);
   frame();
   scroller.focus({ preventScroll: true });
 }
@@ -739,7 +742,7 @@ gallery.addEventListener("click", (e) => {
   const dot = e.target.closest(".g-dot");
   if (dot) goRoom(+dot.dataset.room);
 });
-$("gClose").addEventListener("click", closeGallery);
+$("gClose").addEventListener("click", () => back());
 $("gPrev").addEventListener("click", () => goRoom(here() - 1));
 $("gNext").addEventListener("click", () => goRoom(here() + 1));
 $("gMapToggle").addEventListener("click", () => setMapOpen(!gMapBox.classList.contains("open")));
@@ -764,36 +767,90 @@ gallery.addEventListener("wheel", (e) => {
 }, { passive: false });
 
 /* ---------- 인물 프로필 ---------- */
-const profiles = createProfiles({
+/* ---------- 덮개 화면은 처음 열 때 불러온다 ---------- */
+// 책 해설·인물 프로필·지도로 따라 읽기는 성경 본문(약 1MB)과 해설·배경 자료를 쓴다. 이것까지 처음에 받으면
+// 휴대폰에서 첫 화면이 1초 넘게 멈추므로, 처음 열 때 불러온다. 불러오기 전에는 '열려 있나' 같은 물음에
+// '아니오'로 답하고, 여는 함수는 불러온 뒤에 부른다.
+function lazy(load) {
+  let mod = null, loading = null;
+  const ready = () => (loading ??= load().then((m) => (mod = m)));
+  const idle = { isOpen: () => false, popOpen: () => false, currentId: () => null, close() {}, hidePop() {}, step() {} };
+  return new Proxy({}, {
+    get(_, name) {
+      if (name === "ready") return ready;
+      if (mod) return mod[name];
+      if (name in idle) return idle[name];
+      return (...args) => ready().then((m) => m[name](...args));
+    },
+  });
+}
+
+const profiles = lazy(() => import("./profile.js").then((m) => m.createProfiles({
   getCredits: () => credits,
+  onBack: () => back(),
   onBook: (id) => books.open(id),
   onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
   // 프로필을 여는 동안 뒤쪽 연표를 그 인물의 생애 가운데로 옮기고 막대를 강조한다. 닫으면 그 자리에서 이어 본다.
   onOpen: (p) => { state.person = p.id; setCenter((p.from + p.to) / 2); frame(); },
   onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
-});
+})));
 
 /* ---------- 성경 책 해설 ---------- */
-const books = createBooks({
+const books = lazy(() => import("./book.js").then((m) => m.createBooks({
   onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
   onPerson: (id) => profiles.open(id),
   onStory: (id) => story.open(id),
+  onBack: () => back(),
   // 책을 여는 동안 연표를 그 책의 시기 가운데로 옮기고 막대를 강조한다.
   // 시대 배경을 열면 연표를 그 시대 가운데로 옮긴다.
   onOpen: (b, era) => { state.book = b?.id ?? null; const at = b || era; if (at) setCenter((at.from + at.to) / 2); frame(); },
   onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
-});
+})));
 $("booksBtn").addEventListener("click", () => books.open(null));
-// 지도로 따라 읽기는 책 해설 위에 열리고, 닫으면 그 해설로 돌아간다. 전시실로 갈 때는 해설도 닫는다.
-const story = createStory({
+// 지도로 따라 읽기는 책 해설 위에 열린다. 전시실로 갈 때는 해설도 닫는다(돌아오면 둘 다 다시 열린다).
+const story = lazy(() => import("./story.js").then((m) => m.createStory({
   onEvent: (id) => { books.close(); openGallery(EVENTS.find((ev) => ev.id === id)); },
-  onClose: (b, back) => {
-    if (!back) return;
-    // 같은 책의 해설이 열려 있으면 읽던 자리 그대로 돌아가고, 다음 책으로 넘어왔으면 그 책의 해설을 연다.
-    if (books.isOpen() && books.currentId() === b.id) { history.replaceState(null, "", `#b-${b.id}`); $("book").focus({ preventScroll: true }); }
-    else books.open(b.id);
-  },
-});
+  onBack: () => back(),
+  onClose: () => {},
+})));
+// 넓은 화면(대개 PC)은 첫 화면을 그린 뒤 쉬는 틈에 미리 불러 둔다. 휴대폰은 처음 열 때 불러온다.
+if (matchMedia("(min-width: 900px) and (pointer: fine)").matches) {
+  const warm = () => { books.ready(); profiles.ready(); story.ready(); };
+  window.requestIdleCallback ? requestIdleCallback(warm, { timeout: 5000 }) : setTimeout(warm, 2500);
+}
+
+/* ---------- 화면 이동: 주소(#…)가 곧 화면이다 ---------- */
+// 닫기 단추, Esc, 휴대폰의 '뒤로'는 모두 바로 앞 화면으로 간다. 앞 화면이 이 사이트 밖이면 연표로 간다.
+function back() {
+  nav.back(() => { nav.replace(""); route(); });
+}
+// 지금 주소에 맞는 화면 하나만 열고 나머지 덮개는 닫는다. 방문 기록은 건드리지 않는다.
+async function route() {
+  const h = location.hash;
+  const ev = EVENTS.find((e) => `#${e.id}` === h);
+  const want = ev ? "gallery" : h.startsWith("#p-") ? "profile" : h.startsWith("#s-") ? "story"
+    : h.startsWith("#b-") || h.startsWith("#e-") || h === "#books" ? "book" : "timeline";
+  // 열 화면의 코드를 먼저 불러온 뒤, 방문 기록을 건드리지 않고 한꺼번에 바꾼다.
+  if (want === "profile") await profiles.ready();
+  if (want === "book" || want === "story") await books.ready();
+  if (want === "story") await story.ready();
+  if (location.hash !== h) return; // 불러오는 사이에 다른 화면으로 넘어갔다
+  nav.quietly(() => {
+    if (want !== "story") story.close();
+    if (want !== "profile") profiles.close();
+    if (want !== "book" && want !== "story") books.close();
+    if (want !== "gallery") closeGallery();
+    if (want === "gallery") openGallery(ev);
+    else if (want === "profile") profiles.open(h.slice(3));
+    else if (want === "book") h === "#books" ? books.open(null) : h.startsWith("#e-") ? books.openEra(h.slice(3)) : books.open(h.slice(3));
+    else if (want === "story") {
+      const id = h.slice(3);
+      if (!books.isOpen() || books.currentId() !== id) books.open(id);
+      story.open(id);
+    }
+  });
+}
+addEventListener("popstate", route);
 
 function stepEvent(dir) {
   if (isOpen()) { goRoom(here() + dir); return; }
@@ -847,17 +904,17 @@ stage.addEventListener("click", (e) => { if (swallowClick) { e.stopPropagation()
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input, textarea, select")) return;
   if (story.isOpen()) {
-    if (e.key === "Escape") story.close();
+    if (e.key === "Escape") back();
     else if (["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(e.key)) { e.preventDefault(); story.step(e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1); }
     return;
   }
-  if (books.isOpen()) { if (e.key === "Escape") books.popOpen() ? books.hidePop() : books.close(); return; }
-  if (profiles.isOpen()) { if (e.key === "Escape") profiles.popOpen() ? profiles.hidePop() : profiles.close(); return; }
+  if (books.isOpen()) { if (e.key === "Escape") books.popOpen() ? books.hidePop() : back(); return; }
+  if (profiles.isOpen()) { if (e.key === "Escape") profiles.popOpen() ? profiles.hidePop() : back(); return; }
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); stepEvent(e.key === "ArrowRight" ? 1 : -1); }
   else if (isOpen()) { /* 전시실에서는 확대 키를 쓰지 않는다 */ }
   else if (e.key === "+" || e.key === "=") zoomBy(1.5);
   else if (e.key === "-" || e.key === "_") zoomBy(1 / 1.5);
-  else if (e.key === "Escape") { closeGallery(); toggleLegend(false); }
+  else if (e.key === "Escape") { if (isOpen()) back(); toggleLegend(false); }
   else if (isOpen() && e.key === "Home") { e.preventDefault(); goRoom(0); }
   else if (isOpen() && e.key === "End") { e.preventDefault(); goRoom(rooms.length - 1); }
 });
@@ -924,12 +981,7 @@ async function init() {
 
   credits = await fetch("shared/credits.json").then((r) => r.json()).catch(() => ({}));
   rooms.forEach(fillCredit);
-  if (fromHash) openGallery(fromHash);
-  else if (location.hash.startsWith("#p-")) profiles.open(location.hash.slice(3));
-  else if (location.hash.startsWith("#b-")) books.open(location.hash.slice(3));
-  else if (location.hash.startsWith("#e-")) books.openEra(location.hash.slice(3));
-  else if (location.hash.startsWith("#s-")) { const id = location.hash.slice(3); books.open(id); story.open(id); }
-  else if (location.hash === "#books") books.open(null);
+  route();
   document.fonts?.ready.then(frame);
 
   // 왼쪽 아래의 "지도에 보이는 사건" 상자 자리에는 바탕 지명을 놓지 않는다.

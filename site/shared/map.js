@@ -66,28 +66,39 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
   const svg = d3.select(el).append("svg").attr("class", "bt-map").style("display", "block").style("width", "100%").style("height", "100%");
   const sea = svg.append("rect").attr("fill", theme.sea);
   const g = svg.append("g");
-  const land = g.append("path").attr("fill", theme.land).attr("stroke", theme.coast).attr("stroke-width", 0.8).attr("stroke-linejoin", "round");
-  const lakes = g.append("path").attr("fill", theme.lake).attr("stroke", theme.coast).attr("stroke-width", 0.4);
-  const rivers = g.append("path").attr("fill", "none").attr("stroke", theme.river).attr("stroke-width", 1.1).attr("stroke-linecap", "round");
+  // 땅·호수·강은 기준 투영(REF)으로 한 번만 그리고, 화면을 옮길 때는 묶음 전체를 옮기고 키운다.
+  // 메르카토르는 중심과 배율이 바뀌어도 투영한 평면이 이동·확대만 하므로 결과가 똑같다. 선 굵기는 그대로 둔다.
+  const shapes = g.append("g");
+  const land = shapes.append("path").attr("fill", theme.land).attr("stroke", theme.coast).attr("stroke-width", 0.8).attr("stroke-linejoin", "round");
+  const lakes = shapes.append("path").attr("fill", theme.lake).attr("stroke", theme.coast).attr("stroke-width", 0.4);
+  const rivers = shapes.append("path").attr("fill", "none").attr("stroke", theme.river).attr("stroke-width", 1.1).attr("stroke-linecap", "round");
+  shapes.selectAll("path").attr("vector-effect", "non-scaling-stroke");
+  const REF = 8000;
+  const refProj = d3.geoMercator().scale(REF).translate([0, 0]).center([0, 0]);
+  const refPath = d3.geoPath(refProj);
+  land.attr("d", refPath(geo.land));
+  lakes.attr("d", refPath(geo.lakes));
+  rivers.attr("d", refPath(geo.rivers));
   const baseG = g.append("g").attr("class", "base").style("pointer-events", "none");
   const trail = g.append("g").style("pointer-events", "none");
   const route = g.append("path").attr("fill", "none").attr("stroke", theme.route).attr("stroke-width", 2.2).attr("stroke-dasharray", "5 4").attr("stroke-linecap", "round");
   const marks = g.append("g");
 
   const proj = d3.geoMercator();
-  const path = d3.geoPath(proj);
   let w = 0, h = 0, view = { lon: 38, lat: 32, span: 22 }, current = null, raf = 0;
 
-  function apply(v) {
+  // full이 아니면(지도가 움직이는 중) 바탕 지명의 자리를 다시 고르지 않고 지금 이름들을 따라 옮기기만 한다.
+  function apply(v, full = true) {
     proj.scale(1).translate([0, 0]).center([v.lon, v.lat]);
     // span = 화면 짧은 변에 들어가야 하는 경도 폭(도). 메르카토르는 경도 1도가 위도와 무관하게 같은 너비다.
     const k = Math.min(w, h) / ((v.span * Math.PI) / 180);
     proj.scale(k).translate([w / 2, h / 2]);
-    land.attr("d", path(geo.land));
-    lakes.attr("d", path(geo.lakes));
-    rivers.attr("d", path(geo.rivers));
+    const sc = k / REF, [cx, cy] = refProj([v.lon, v.lat]);
+    shapes.attr("transform", `translate(${w / 2 - sc * cx},${h / 2 - sc * cy}) scale(${sc})`);
     const taken = drawMarks();
-    if (base) drawBase(reserve ? taken.concat(reserve(w, h)) : taken);
+    if (!base) return;
+    if (full) drawBase(reserve ? taken.concat(reserve(w, h)) : taken);
+    else baseG.selectAll("g.bl").attr("transform", (d) => `translate(${proj(d.geo)})`);
   }
 
   function drawMarks() {
@@ -139,14 +150,14 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
       const st = STYLE[c.kind], tw = textW(c.name, st.size, st.spacing), th = st.size + 3;
       // 도시는 점의 오른쪽·왼쪽, 바다·강·지역은 후보 자리(at, alts) 가운데 화면 안에서 빈 곳에 놓는다.
       const spots = c.kind === "place"
-        ? (([x, y]) => [{ x, y, dx: 6, anchor: "start", box: [x + 5, y - th / 2 - 1, tw + 2, th] }, { x, y, dx: -6, anchor: "end", box: [x - 7 - tw, y - th / 2 - 1, tw + 2, th] }])(proj(c.at))
-        : [c.at, ...(c.alts || [])].map(proj).map(([x, y]) => ({ x, y, dx: 0, anchor: "middle", box: [x - tw / 2, y - th / 2, tw, th] }));
+        ? (([x, y]) => [{ x, y, geo: c.at, dx: 6, anchor: "start", box: [x + 5, y - th / 2 - 1, tw + 2, th] }, { x, y, geo: c.at, dx: -6, anchor: "end", box: [x - 7 - tw, y - th / 2 - 1, tw + 2, th] }])(proj(c.at))
+        : [c.at, ...(c.alts || [])].map((geo) => { const [x, y] = proj(geo); return { x, y, geo, dx: 0, anchor: "middle", box: [x - tw / 2, y - th / 2, tw, th] }; });
       const ok = spots.find((sp) => sp.box[0] >= 4 && sp.box[1] >= 2 && sp.box[0] + sp.box[2] <= w - 6 && sp.box[1] + sp.box[3] <= h - 2 && !taken.some((t) => hit(sp.box, t)));
       if (!ok) continue;
       const { x, y } = ok;
       taken.push(ok.box);
       if (c.kind === "place") taken.push([x - 3, y - 3, 6, 6]);
-      shown.push({ ...c, x, y, dx: ok.dx, anchor: ok.anchor, st });
+      shown.push({ ...c, x, y, geo: ok.geo, dx: ok.dx, anchor: ok.anchor, st });
     }
     baseG.selectAll("g.bl").data(shown, (d) => d.kind + d.name).join((e) => {
       const gg = e.append("g").attr("class", "bl");
@@ -175,7 +186,8 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
     groups.each(function (d) {
       const [x, y] = proj(PLACES[d].at);
       const text = this.querySelector("text");
-      const w = text.getComputedTextLength() || PLACES[d].name.length * 13;
+      // 글자 폭은 처음 한 번만 잰다(움직이는 동안 매 프레임 재면 느리다).
+      const w = (this.__w ||= text.getComputedTextLength() || PLACES[d].name.length * 13);
       const inside = (b) => b[0] >= 0 && b[1] >= 0 && b[0] + b[2] <= w0() && b[1] + b[3] <= h0();
       const boxes = SPOTS.map((s) => { const [bx, by, bw, bh] = s.box(w); return [x + bx, y + by, bw, bh]; });
       let i = boxes.findIndex((b) => inside(b) && !taken.some((t) => hit(b, t)));
@@ -226,7 +238,7 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
       const t = Math.min(1, (now - t0) / dur);
       const [lon, lat, span] = zi(d3.easeCubicInOut(t));
       view = { lon, lat, span };
-      apply(view);
+      apply(view, t >= 1);
       if (t < 1) raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);

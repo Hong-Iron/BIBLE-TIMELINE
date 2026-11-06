@@ -1,7 +1,7 @@
 // 모든 화면이 함께 쓰는 사건·인물·책·장소 자료. 연도는 기원전을 음수로 적는다(기원전 1446년 → -1446).
 // 사건 60개 가운데 처음 만든 11개는 이 파일에, 나머지 49개는 events_more.js에 있다.
 // 구절은 개역한글(1961, 저작권 만료)이다. verse가 없는 사건은 verses.js(tools/build_verses.py가 뽑은 본문)로 채운다.
-import { VERSES } from "./verses.js";
+import { EVENT_VERSES } from "./verses_events.js";
 import { MORE_EVENTS, MORE_PEOPLE, MORE_PLACES } from "./events_more.js";
 import { BIBLE_BOOKS } from "./books.js";
 import { STORY_PLACES } from "./places_story.js";
@@ -392,7 +392,7 @@ PEOPLE.push(...MORE_PEOPLE);
 Object.assign(PLACES, MORE_PLACES);
 for (const [id, p] of Object.entries(STORY_PLACES)) PLACES[id] ??= p;
 EVENTS.push(...MORE_EVENTS);
-for (const ev of EVENTS) ev.verse ??= (VERSES[ev.ref] || []).map(([, t]) => t).join(" ");
+for (const ev of EVENTS) ev.verse ??= (EVENT_VERSES[ev.ref] || []).map(([, t]) => t).join(" ");
 // 같은 해의 사건은 적은 순서를 지킨다(Array.prototype.sort는 안정 정렬).
 EVENTS.sort((a, b) => a.year - b.year);
 

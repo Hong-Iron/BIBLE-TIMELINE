@@ -60,9 +60,8 @@ button { font: inherit; color: inherit; }
 .map-el { position: absolute; inset: 0; }
 .cap {
   position: absolute; left: 16px; bottom: 14px; max-width: min(360px, calc(100% - 32px));
-  background: rgba(251, 250, 247, 0.94); border: 1px solid var(--line); border-radius: 8px;
+  background: rgba(251, 250, 247, 0.96); border: 1px solid var(--line); border-radius: 8px;
   padding: 9px 12px 10px; cursor: pointer; text-align: left; box-shadow: 0 1px 2px rgba(28, 27, 25, 0.05);
-  backdrop-filter: blur(4px);
 }
 .cap:hover { border-color: #cfc8bb; }
 .cap small { display: block; font-size: 11px; color: var(--muted); letter-spacing: 0.02em; }
@@ -274,6 +273,8 @@ button { font: inherit; color: inherit; }
 }
 .g-close:hover { border-color: var(--accent); color: var(--accent); }
 
+/* 닫혀 있는 전시실(parked)은 방 60개를 화면 계산에서 뺀다. 첫 화면이 늦게 뜨던 큰 원인이었다. */
+.gallery.parked .g-hall { display: none; }
 .g-hall {
   position: absolute; inset: 0; z-index: 1; display: flex;
   overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory;
@@ -285,6 +286,8 @@ button { font: inherit; color: inherit; }
   scroll-snap-align: start; scroll-snap-stop: always;
   overflow-x: hidden; overflow-y: auto;
   scrollbar-width: thin; scrollbar-color: rgba(28, 27, 25, 0.18) transparent;
+  /* 화면에서 먼 방은 그리지 않는다. 방마다 크기가 정해져 있어 넘기는 자리는 그대로다. */
+  content-visibility: auto; contain-intrinsic-size: 100vw 100vh;
 }
 .bgyear {
   position: absolute; z-index: 0; right: -3vw; bottom: calc(var(--rail) - 5.5vw);
@@ -920,10 +923,10 @@ button { font: inherit; color: inherit; }
 </div>
 </div>
 
-<div class="gallery" id="gallery" role="dialog" aria-modal="true" aria-label="전시실" aria-hidden="true" tabindex="-1">
+<div class="gallery parked" id="gallery" role="dialog" aria-modal="true" aria-label="전시실" aria-hidden="true" tabindex="-1">
   <header class="g-top">
     <div class="g-brand"><b>전시실</b><span id="gCount"></span></div>
-    <button class="g-close" id="gClose" type="button">연표로 돌아가기 <span aria-hidden="true">✕</span></button>
+    <button class="g-close" id="gClose" type="button">돌아가기 <span aria-hidden="true">✕</span></button>
   </header>
   <main class="g-hall" id="hall" aria-label="사건 전시실. 옆으로 넘기면 다음 사건으로 간다"></main>
   <button class="g-nav g-prev" id="gPrev" type="button" aria-label="앞 사건">‹</button>
@@ -939,7 +942,7 @@ button { font: inherit; color: inherit; }
 <div class="profile bookview" id="book" role="dialog" aria-modal="true" aria-label="성경 책 해설" aria-hidden="true" tabindex="-1">
   <header class="g-top">
     <div class="g-brand"><b>성경</b><span id="bName"></span></div>
-    <button class="g-close" id="bClose" type="button">연표로 돌아가기 <span aria-hidden="true">✕</span></button>
+    <button class="g-close" id="bClose" type="button">돌아가기 <span aria-hidden="true">✕</span></button>
   </header>
   <div class="p-scroll" id="bScroll"><div class="p-page" id="bPage"></div></div>
   <div class="vpop" id="bpop" hidden></div>
@@ -948,7 +951,7 @@ button { font: inherit; color: inherit; }
 <div class="profile mapread" id="story" role="dialog" aria-modal="true" aria-label="지도로 따라 읽기" aria-hidden="true" tabindex="-1">
   <header class="g-top">
     <div class="g-brand"><b>지도로 따라 읽기</b><span id="sName"></span></div>
-    <button class="g-close" id="sClose" type="button">해설로 돌아가기 <span aria-hidden="true">✕</span></button>
+    <button class="g-close" id="sClose" type="button">돌아가기 <span aria-hidden="true">✕</span></button>
   </header>
   <div class="st-map"><div class="map-el" id="sMap"></div><div class="cap" id="sCap" aria-live="polite"></div></div>
   <div class="st-progress"><span id="sBar"></span></div>
@@ -958,7 +961,7 @@ button { font: inherit; color: inherit; }
 <div class="profile" id="profile" role="dialog" aria-modal="true" aria-label="인물 프로필" aria-hidden="true" tabindex="-1">
   <header class="g-top">
     <div class="g-brand"><b>인물</b><span id="pName"></span></div>
-    <button class="g-close" id="pClose" type="button">연표로 돌아가기 <span aria-hidden="true">✕</span></button>
+    <button class="g-close" id="pClose" type="button">돌아가기 <span aria-hidden="true">✕</span></button>
   </header>
   <div class="p-scroll" id="pScroll"><div class="p-page" id="pPage"></div></div>
   <div class="vpop" id="vpop" hidden></div>

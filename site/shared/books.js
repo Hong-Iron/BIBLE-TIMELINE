@@ -91,3 +91,6 @@ export const BIBLE_BOOKS = [
 export const bookByName = Object.fromEntries(BIBLE_BOOKS.map((b) => [b.name, b]));
 export const bookById = Object.fromEntries(BIBLE_BOOKS.map((b) => [b.id, b]));
 export const bpUrl = (slug) => `https://bibleproject.com/videos/${slug}/`;
+// '열왕기하 18~20장' 같은 글에서 책을 찾는다. 이름이 긴 책부터 맞춰 '요한복음'이 '요한'에 먼저 걸리지 않게 한다.
+const BY_LEN = [...BIBLE_BOOKS].sort((a, b) => b.name.length - a.name.length);
+export const findBook = (text) => BY_LEN.find((b) => String(text).startsWith(b.name)) || null;

@@ -4,6 +4,7 @@
 // 검사.js는 값을 돌려주는 식 하나다(예: `(async () => ({ hash: location.hash }))()`).
 // Emulation으로 크기를 정하므로 창이 500px 아래로 안 줄어드는 --window-size의 한계 없이 휴대폰 폭을 잴 수 있다.
 // 끝에 페이지 오류(EXC/ERR), 실패한 요청(FAIL), 끝나지 않은 요청(pending)을 함께 찍는다.
+// 환경 변수 SCALE=2면 2배 해상도로 찍는다(소개 그림용). CPU=4면 CPU를 4배 느리게 해 휴대폰처럼 잰다.
 import { spawn } from "node:child_process";
 import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -42,7 +43,10 @@ const send = (method, params = {}) => new Promise((r) => { const i = ++id; wait.
 
 await send("Runtime.enable");
 await send("Network.enable");
-await send("Emulation.setDeviceMetricsOverride", { width: +W, height: +H, deviceScaleFactor: 1, mobile: +W < 600 });
+await send("Emulation.setDeviceMetricsOverride", { width: +W, height: +H, deviceScaleFactor: +(process.env.SCALE || 1), mobile: +W < 600 });
+if (process.env.CPU) await send("Emulation.setCPUThrottlingRate", { rate: +process.env.CPU });
+// PROFILE_LOAD=1이면 페이지를 여는 순간부터 프로파일을 뜬다(첫 화면이 왜 느린지 볼 때).
+if (process.env.PROFILE && process.env.PROFILE_LOAD) { await send("Profiler.enable"); await send("Profiler.setSamplingInterval", { interval: 200 }); await send("Profiler.start"); }
 await send("Page.enable");
 await send("Page.navigate", { url });
 // d3를 jsDelivr에서 받으므로 망이 느리면 그리기 시작이 늦다. 연표 SVG에 무언가 그려질 때까지 30초까지 기다린다.
@@ -52,7 +56,10 @@ for (let i = 0; i < 60; i++) {
   if (v.result?.result?.value > 0) break;
 }
 await sleep(1500);
+// PROFILE=파일이면 검사 스크립트가 도는 동안 CPU 프로파일을 떠서 함수별 시간을 남긴다(.cpuprofile).
+if (process.env.PROFILE && !process.env.PROFILE_LOAD) { await send("Profiler.enable"); await send("Profiler.setSamplingInterval", { interval: 200 }); await send("Profiler.start"); }
 const r = await send("Runtime.evaluate", { expression: readFileSync(jsFile, "utf8"), awaitPromise: true, returnByValue: true });
+if (process.env.PROFILE) { const { result } = await send("Profiler.stop"); writeFileSync(process.env.PROFILE, JSON.stringify(result.profile)); }
 console.log(JSON.stringify(r.result?.result?.value ?? r.result, null, 1));
 if (shot) { const s = await send("Page.captureScreenshot", { format: "png" }); writeFileSync(shot, Buffer.from(s.result.data, "base64")); }
 console.log("logs:", logs.filter((l) => !l.includes("favicon")));

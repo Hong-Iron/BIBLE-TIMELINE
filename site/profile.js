@@ -1,17 +1,18 @@
 // 인물 프로필 화면. 연표의 인물 막대나 전시실의 인물 이름을 누르면 화면 가득 열린다.
 // 왼쪽 열(고정): 이름·기본 정보·가계도·관련 장소 지도 / 오른쪽 열(스크롤): 요약·생애·핵심 구절·성경 밖 기록·등장하는 책
+import { nav } from "./nav.js";
 import { PEOPLE, EVENTS, STRENGTH, PLACES, byId } from "./shared/data.js";
 import { PROFILES, UPPER, LOWER } from "./shared/profiles.js";
 import { createMap, THEMES } from "./shared/map.js";
 import { VERSES } from "./shared/verses.js";
-import { findBook } from "./book.js";
+import { findBook } from "./shared/books.js";
 
 const PERSON = byId(PEOPLE);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const yearRange = (a, b) => (a < 0 && b < 0 ? `기원전 ${-a}~${-b}년` : a > 0 ? `기원후 ${a}~${b}년` : `기원전 ${-a}년~기원후 ${b}년`);
 const EVIDENCE = Object.fromEntries(EVENTS.flatMap((ev) => ev.evidence.filter((e) => e.img).map((e) => [e.img, { ...e, eventId: ev.id }])));
 
-export function createProfiles({ getCredits, onEvent, onBook, onOpen, onClose }) {
+export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, onClose }) {
   const root = document.getElementById("profile");
   const page = document.getElementById("pPage");
   const scroll = document.getElementById("pScroll");
@@ -169,19 +170,19 @@ export function createProfiles({ getCredits, onEvent, onBook, onOpen, onClose })
     if (ev) { close(); onEvent(ev.dataset.event); }
   });
   scroll.addEventListener("scroll", hidePop, { passive: true });
-  document.getElementById("pClose").addEventListener("click", () => close());
+  // 닫기는 바로 앞 화면으로 돌아간다.
+  document.getElementById("pClose").addEventListener("click", () => onBack());
 
   async function open(id) {
     if (!PROFILES[id] || !PERSON[id]) return;
-    current = id;
     hidePop();
-    render(id);
-    scroll.scrollTop = 0;
+    // 같은 인물로 돌아오면 다시 그리지 않아 읽던 자리가 그대로 남는다.
+    if (current !== id || !document.getElementById("pPage").childElementCount) { current = id; render(id); scroll.scrollTop = 0; }
     document.getElementById("pName").textContent = PERSON[id].name;
     root.classList.add("open");
     root.setAttribute("aria-hidden", "false");
     root.focus({ preventScroll: true });
-    history.replaceState(null, "", `#p-${id}`);
+    nav.push(`#p-${id}`);
     onOpen(PERSON[id]);
   }
 
@@ -190,7 +191,6 @@ export function createProfiles({ getCredits, onEvent, onBook, onOpen, onClose })
     hidePop();
     root.classList.remove("open");
     root.setAttribute("aria-hidden", "true");
-    history.replaceState(null, "", location.pathname + location.search);
     onClose();
   }
 

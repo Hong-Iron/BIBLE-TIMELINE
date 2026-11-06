@@ -9,6 +9,7 @@ import { GUIDES } from "./shared/guides.js";
 import { PROFILES } from "./shared/profiles.js";
 import { VERSES } from "./shared/verses.js";
 import { hasStory } from "./story.js";
+import { nav } from "./nav.js";
 
 const PERSON = byId(PEOPLE);
 const EVENT = byId(EVENTS);
@@ -31,11 +32,8 @@ const srcHTML = (s) => {
 };
 // 배경 글에 쓰인 출처 id(중복 없이, 처음 나온 차례)
 const usedSources = (bgs) => [...new Set(bgs.flatMap((bg) => BG_KINDS.flatMap((k) => (bg?.[k.key] || []).flatMap((it) => [...(it.src || []), it.quote?.src].filter(Boolean).map((s) => splitSrc(s)[0])))))].filter((id) => SOURCES[id]);
-// '열왕기하 18~20장' 같은 글에서 책을 찾는다. 이름이 긴 책부터 맞춰 '요한복음'이 '요한'에 먼저 걸리지 않게 한다.
-const BY_LEN = [...BIBLE_BOOKS].sort((a, b) => b.name.length - a.name.length);
-export const findBook = (text) => BY_LEN.find((b) => String(text).startsWith(b.name)) || null;
 
-export function createBooks({ onEvent, onPerson, onStory, onOpen, onClose }) {
+export function createBooks({ onEvent, onPerson, onStory, onBack, onOpen, onClose }) {
   const root = document.getElementById("book");
   const page = document.getElementById("bPage");
   const scroll = document.getElementById("bScroll");
@@ -212,16 +210,19 @@ export function createBooks({ onEvent, onPerson, onStory, onOpen, onClose }) {
     if (ev) { close(); onEvent(ev.dataset.event); }
   });
   scroll.addEventListener("scroll", hidePop, { passive: true });
-  document.getElementById("bClose").addEventListener("click", () => close());
+  // 닫기는 바로 앞 화면으로 돌아간다(앞 화면이 이 사이트 밖이면 연표로).
+  document.getElementById("bClose").addEventListener("click", () => onBack());
 
   // id 끝에 ".bg"를 붙이면 '당대 배경' 탭으로 연다(예: "genesis.bg").
   function open(id) {
     const [bid, tab] = String(id ?? "").split(".");
     const b = bid ? bookById[bid] : null;
     if (bid && !b) return;
+    const nextTab = tab === "bg" ? "bg" : "guide";
+    const key = b ? `b:${b.id}:${nextTab}` : "lib";
     current = b;
-    currentTab = tab === "bg" ? "bg" : "guide";
-    show(b ? bookHTML(b, currentTab) : libraryHTML(), b ? b.name : "66권 목록", b ? `#b-${b.id}${currentTab === "bg" ? ".bg" : ""}` : "#books", !b);
+    currentTab = nextTab;
+    show(key, () => (b ? bookHTML(b, currentTab) : libraryHTML()), b ? b.name : "66권 목록", b ? `#b-${b.id}${currentTab === "bg" ? ".bg" : ""}` : "#books", !b);
     // 휴대폰처럼 왼쪽 열이 위로 올라가는 폭에서는 배경 탭으로 열 때 탭 자리까지 내려 준다.
     if (b && currentTab === "bg" && matchMedia("(max-width: 900px)").matches) {
       const tabs = page.querySelector(".b-tabs");
@@ -234,20 +235,25 @@ export function createBooks({ onEvent, onPerson, onStory, onOpen, onClose }) {
     const e = ERA[id];
     if (!e) return;
     current = null;
-    show(eraHTML(e), `시대 배경 · ${e.name}`, `#e-${e.id}`, false);
+    show(`e:${e.id}`, () => eraHTML(e), `시대 배경 · ${e.name}`, `#e-${e.id}`, false);
     onOpen(null, e);
   }
 
-  function show(html, name, hash, isLib) {
+  // key가 지금 그려 둔 화면과 같으면(앞 화면으로 돌아온 경우) 다시 그리지 않아 읽던 자리가 남는다.
+  let shown = null;
+  function show(key, html, name, hash, isLib) {
     hidePop();
-    page.classList.toggle("is-lib", isLib);
-    page.innerHTML = html;
-    scroll.scrollTop = 0;
+    if (key !== shown) {
+      shown = key;
+      page.classList.toggle("is-lib", isLib);
+      page.innerHTML = html();
+      scroll.scrollTop = 0;
+    }
     document.getElementById("bName").textContent = name;
     root.classList.add("open");
     root.setAttribute("aria-hidden", "false");
     root.focus({ preventScroll: true });
-    history.replaceState(null, "", hash);
+    nav.push(hash);
   }
 
   // 오른쪽 열만 바꾼다. 탭이 화면 위로 지나갔으면 탭이 보이는 자리로 올린다.
@@ -259,7 +265,8 @@ export function createBooks({ onEvent, onPerson, onStory, onOpen, onClose }) {
     page.querySelectorAll("[data-tab]").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === tab)));
     const tabs = page.querySelector(".b-tabs");
     if (tabs.getBoundingClientRect().top < scroll.getBoundingClientRect().top + 60) scroll.scrollTop += tabs.getBoundingClientRect().top - scroll.getBoundingClientRect().top - 66;
-    history.replaceState(null, "", `#b-${current.id}${tab === "bg" ? ".bg" : ""}`);
+    shown = `b:${current.id}:${tab}`;
+    nav.replace(`#b-${current.id}${tab === "bg" ? ".bg" : ""}`);
   }
 
   function close() {
@@ -267,7 +274,6 @@ export function createBooks({ onEvent, onPerson, onStory, onOpen, onClose }) {
     hidePop();
     root.classList.remove("open");
     root.setAttribute("aria-hidden", "true");
-    history.replaceState(null, "", location.pathname + location.search);
     onClose();
   }
 
