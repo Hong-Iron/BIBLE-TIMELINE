@@ -357,10 +357,10 @@ button { font: inherit; color: inherit; }
 .g-meta dd { margin: 0; color: var(--gink2); }
 
 
-/* 빈 진열장, 글로만 남은 기록 */
-.g-empty { width: min(100%, 560px); margin: auto 0; padding: 34px 30px; border: 1.5px dashed #cfc5b3; border-radius: 10px; background: rgba(255, 255, 255, 0.55); text-align: center; }
-.g-empty b { display: block; font: 600 20px/1.3 var(--serif); color: var(--ink2); }
-.g-empty p { margin: 10px 0 0; font-size: 14px; line-height: 1.7; color: var(--muted); word-break: keep-all; }
+/* 유물·장소 사진이 없는 사건, 글로만 남은 기록 */
+.g-only-text { margin: auto 0; display: flex; align-items: center; gap: 14px; font: 500 15px/1.4 var(--serif); letter-spacing: 0.08em; color: var(--muted); }
+.g-only-text::before, .g-only-text::after { content: ""; width: 36px; border-top: 1px solid #cfc5b3; }
+.no-ev .g-stage::before, .no-ev .g-stage::after { opacity: 0.3 !important; }
 .photo .g-textcard { display: none; }
 .photo.noimg img { display: none; }
 .photo.noimg .g-textcard {

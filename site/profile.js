@@ -95,7 +95,7 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
         </section>
         ${events.length ? `<section class="p-sec"><h2>연표의 사건</h2><div class="p-events">${events.map((ev) => `
           <button class="p-event" type="button" data-event="${esc(ev.id)}">
-            ${ev.evidence[0]?.img ? `<img src="img/sm/${esc(ev.evidence[0].img)}.jpg" alt="" loading="lazy">` : `<span class="p-noimg">글</span>`}
+            ${ev.evidence[0]?.img ? `<img src="img/sm/${esc(ev.evidence[0].img)}.jpg" alt="" loading="lazy">` : `<span class="p-noimg">${ev.evidence.length ? "글" : "성경"}</span>`}
             <span><small>${esc(ev.yearLabel)}</small><b>${esc(ev.title)}</b><em>전시실에서 보기 →</em></span>
           </button>`).join("")}</div></section>` : ""}
         <section class="p-sec">

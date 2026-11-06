@@ -488,7 +488,7 @@ function roomHTML(ev, i) {
     : "";
   const people = ev.people.map((id) => PERSON[id]).filter(Boolean)
     .map((p) => `<button class="g-person" type="button" data-person="${esc(p.id)}" title="인물 프로필 보기">${esc(p.name)}</button>(${esc(p.kind)} ${esc(rangeText(p.from, p.to))})`).join(" · ");
-  const empty = `<div class="g-empty"><b>빈 진열장</b><p>이 사건을 직접 보여 주는 유물이나 장소 사진은 아직 싣지 않았다. 사건은 성경 본문으로만 전해진다.</p></div>`;
+  const empty = `<p class="g-only-text">성경 본문에만 기록됨</p>`;
   return `<section class="room${multi ? " multi" : ""}${ev.evidence.length ? "" : " no-ev"}" data-i="${i}" aria-label="${esc(ev.yearLabel)}, ${esc(ev.title)}">
     <div class="bgyear" aria-hidden="true">${Math.abs(ev.year)}</div>
     <div class="g-inner">
