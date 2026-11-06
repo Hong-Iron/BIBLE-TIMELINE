@@ -1,4 +1,4 @@
-// 당대 배경. 시대 9개(ERA_BG, 열쇠는 data.js의 ERAS id)와 책 66권(BOOK_BG, 열쇠는 books.js의 책 id).
+// 당대 배경. 시대 15개(ERA_BG, 열쇠는 data.js의 ERAS id. 교회사 시대 6개는 bg_c1·c2.js)와 책 66권(BOOK_BG, 열쇠는 books.js의 책 id).
 // 시대 배경은 그 시대 공통의 세계(제국, 종교, 법, 일상, 글 갈래)를, 책 배경은 그 책에만 맞는 비교를 쓴다.
 // 같은 내용을 시대와 책에 되풀이하지 않는다.
 //
@@ -17,6 +17,8 @@
 import { SOURCES as BASE } from "./sources.js";
 import { ERA_BG_E1, SRC_E1 } from "./bg_e1.js";
 import { ERA_BG_E2, SRC_E2 } from "./bg_e2.js";
+import { ERA_BG_C1, SRC_C1 } from "./bg_c1.js";
+import { ERA_BG_C2, SRC_C2 } from "./bg_c2.js";
 import { BOOK_BG_G1, SRC_G1 } from "./bg_g1.js";
 import { BOOK_BG_G2, SRC_G2 } from "./bg_g2.js";
 import { BOOK_BG_G3, SRC_G3 } from "./bg_g3.js";
@@ -25,10 +27,10 @@ import { BOOK_BG_G5, SRC_G5 } from "./bg_g5.js";
 import { BOOK_BG_G6, SRC_G6 } from "./bg_g6.js";
 import { BOOK_BG_G7, SRC_G7 } from "./bg_g7.js";
 
-export const ERA_BG = Object.assign({}, ERA_BG_E1, ERA_BG_E2);
+export const ERA_BG = Object.assign({}, ERA_BG_E1, ERA_BG_E2, ERA_BG_C1, ERA_BG_C2);
 export const BOOK_BG = Object.assign({}, BOOK_BG_G1, BOOK_BG_G2, BOOK_BG_G3, BOOK_BG_G4, BOOK_BG_G5, BOOK_BG_G6, BOOK_BG_G7);
 // 기본 출처 목록이 먼저다. 묶음 파일은 없는 id만 더한다.
-export const SOURCES = { ...SRC_E1, ...SRC_E2, ...SRC_G1, ...SRC_G2, ...SRC_G3, ...SRC_G4, ...SRC_G5, ...SRC_G6, ...SRC_G7, ...BASE };
+export const SOURCES = { ...SRC_E1, ...SRC_E2, ...SRC_C1, ...SRC_C2, ...SRC_G1, ...SRC_G2, ...SRC_G3, ...SRC_G4, ...SRC_G5, ...SRC_G6, ...SRC_G7, ...BASE };
 export const BG_KINDS = [
   { key: "events", name: "사건" },
   { key: "culture", name: "문화" },

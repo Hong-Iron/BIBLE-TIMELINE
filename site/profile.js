@@ -6,7 +6,10 @@ import { PROFILES, UPPER, LOWER } from "./shared/profiles.js";
 import { createMap, THEMES } from "./shared/map.js";
 import { VERSES } from "./shared/verses.js";
 import { findBook } from "./shared/books.js";
+import { SOURCES as BG_SOURCES } from "./shared/backgrounds.js";
+import { CH_SOURCES } from "./shared/church_events.js";
 
+const SRC_NAME = { ...CH_SOURCES, ...BG_SOURCES };
 const PERSON = byId(PEOPLE);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const yearRange = (a, b) => (a < 0 && b < 0 ? `기원전 ${-a}~${-b}년` : a > 0 ? `기원후 ${a}~${b}년` : `기원전 ${-a}년~기원후 ${b}년`);
@@ -21,7 +24,13 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
   let map = null, mapLoading = null, current = null;
 
   const refBtn = (ref) => (ref ? `<button class="vref" type="button" data-ref="${esc(ref)}">${esc(ref)}</button>` : "");
-  const srcTag = (src) => (src ? `<span class="src">${esc(src)}</span>` : "");
+  // 출처가 "id: 위치"이고 id가 출처 목록에 있으면 자료 이름으로 보인다. 아니면(옛 프로필의 글 출처) 그대로 쓴다.
+  const srcTag = (src) => {
+    if (!src) return "";
+    const s = String(src), i = s.indexOf(":"), id = i < 0 ? s.trim() : s.slice(0, i).trim(), loc = i < 0 ? "" : s.slice(i + 1).trim();
+    const known = SRC_NAME[id];
+    return `<span class="src">${esc(known ? `${known.name}${loc ? ` · ${loc}` : ""}` : s)}</span>`;
+  };
 
   function familyTree(p, f) {
     const chip = (m) => {
@@ -59,15 +68,22 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
     </article>`;
   }
 
+  // 성경 장절(문자열) 또는 교회사 인물이 남긴 글 { text, src }
   function quoteBlock(ref) {
+    if (ref && typeof ref === "object") {
+      const [id, loc] = (() => { const s = String(ref.src || ""), i = s.indexOf(":"); return i < 0 ? [s.trim(), ""] : [s.slice(0, i).trim(), s.slice(i + 1).trim()]; })();
+      const src = SRC_NAME[id];
+      return `<blockquote class="pq"><p>${esc(ref.text)}</p><cite>${src ? esc(src.name) : esc(id)}${loc ? ` · ${esc(loc)}` : ""}</cite></blockquote>`;
+    }
     const parts = verses[ref] || [];
     const text = parts.map(([, t]) => t).join(" ");
     return `<blockquote class="pq"><p>${esc(text || "…")}</p><cite>${esc(ref)} · 개역한글</cite></blockquote>`;
   }
 
   function render(id) {
-    const p = PERSON[id], f = PROFILES[id];
-    const events = EVENTS.filter((ev) => ev.people.includes(id));
+    // 교회사 인물처럼 칸이 빠진 프로필도 그릴 수 있게 빈 목록으로 채운다.
+    const p = PERSON[id], f = { aliases: [], facts: [], family: [], places: [], life: [], quotes: [], records: [], books: [], ...PROFILES[id] };
+    const events = EVENTS.filter((ev) => (ev.people || []).includes(id));
     page.innerHTML = `
       <aside class="p-side">
         <div class="p-hero">
@@ -100,28 +116,28 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
             ${ev.evidence[0]?.img ? `<img src="img/sm/${esc(ev.evidence[0].img)}.jpg" alt="" loading="lazy">` : `<span class="p-noimg">${ev.evidence.length ? "글" : "성경"}</span>`}
             <span><small>${esc(ev.yearLabel)}</small><b>${esc(ev.title)}</b><em>전시실에서 보기 →</em></span>
           </button>`).join("")}</div></section>` : ""}
-        <section class="p-sec">
+        ${f.life.length ? `<section class="p-sec">
           <h2>생애</h2>
           <ol class="life">${f.life.map((l) => `
             <li class="${l.event ? "has-ev" : ""}">
               <span class="when">${esc(l.when || "")}</span>
               <div><p>${esc(l.text)}</p><span class="lref">${refBtn(l.ref)}${srcTag(l.src)}${l.event ? `<button class="go-ev small" type="button" data-event="${esc(l.event)}">전시실 →</button>` : ""}</span></div>
             </li>`).join("")}</ol>
-        </section>
-        <section class="p-sec">
-          <h2>핵심 구절</h2>
+        </section>` : ""}
+        ${f.quotes.length ? `<section class="p-sec">
+          <h2>${f.quotes.some((q) => typeof q === "object") ? "남긴 글과 구절" : "핵심 구절"}</h2>
           ${f.quotes.map(quoteBlock).join("")}
-        </section>
-        <section class="p-sec">
+        </section>` : ""}
+        ${f.records.length || f.recordNote ? `<section class="p-sec">
           <h2>성경 밖 기록과 유물</h2>
           ${f.recordNote ? `<p class="p-note">${esc(f.recordNote)}</p>` : ""}
           <div class="recs">${f.records.map(recordCard).join("")}</div>
-        </section>
-        <section class="p-sec">
+        </section>` : ""}
+        ${f.books.length ? `<section class="p-sec">
           <h2>등장하는 책</h2>
           <div class="books">${f.books.map((b) => findBook(b) ? `<button class="book-link" type="button" data-book="${esc(findBook(b).id)}">${esc(b)}</button>` : `<span>${esc(b)}</span>`).join("")}</div>
-        </section>
-        <p class="p-foot">연도는 성경에 적힌 나이와 햇수를 거슬러 더한 전통 연대이고 대부분 추정이다. 장절을 누르면 개역한글 본문이 보인다.</p>
+        </section>` : ""}
+        <p class="p-foot">${p.from >= 100 ? "연도는 사료에 따른 것이고 일부는 추정이다. 같은 사람을 교회마다 다르게 보는 경우 함께 적었다." : "연도는 성경에 적힌 나이와 햇수를 거슬러 더한 전통 연대이고 대부분 추정이다."} 장절을 누르면 개역한글 본문이 보인다.</p>
       </div>`;
     showMap(f.places);
   }

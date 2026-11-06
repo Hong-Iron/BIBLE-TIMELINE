@@ -192,5 +192,28 @@ export const SOURCES = {
   rudwick1958: S("M. J. S. Rudwick & E. M. B. Green, \"The Laodicean Lukewarmness\", 『Expository Times』 69(1958)", null, "인용만"),
 };
 
+// 교회사(100~1648년) 기본 자료. 묶음마다 더 필요한 자료는 열어서 확인한 뒤 이 아래에 더한다.
+Object.assign(SOURCES, {
+  npnf1: S("『Nicene and Post-Nicene Fathers』 1집(P. Schaff 편, 1886~89)", "https://ccel.org/fathers", "공유"),
+  npnf2: S("『Nicene and Post-Nicene Fathers』 2집(P. Schaff & H. Wace 편, 1890~1900)", "https://ccel.org/fathers", "공유"),
+  councils: S("H. R. Percival 편, 『The Seven Ecumenical Councils』(NPNF 2집 14권, 1900)", "https://ccel.org/ccel/schaff/npnf214", "공유"),
+  schaffhcc: S("P. Schaff, 『History of the Christian Church』(1858~1910)", "https://ccel.org/ccel/schaff/hcc1", "공유"),
+  schaffcreeds: S("P. Schaff, 『The Creeds of Christendom』(1877)", "https://ccel.org/ccel/schaff/creeds1", "공유"),
+  calvininst: S("칼뱅 『기독교 강요』(H. Beveridge 번역, 1845)", "https://ccel.org/ccel/calvin/institutes", "공유"),
+  kelly1977: S("J. N. D. Kelly, 『Early Christian Doctrines』(5판, A&C Black, 1977)", null, "인용만"),
+  pelikan: S("J. Pelikan, 『The Christian Tradition』 1~4권(Chicago UP, 1971~84)", null, "인용만"),
+  chadwick1967: S("H. Chadwick, 『The Early Church』(Penguin, 1967)", null, "인용만"),
+  frend1972: S("W. H. C. Frend, 『The Rise of the Monophysite Movement』(Cambridge UP, 1972)", null, "인용만"),
+  meyendorff1989: S("J. Meyendorff, 『Imperial Unity and Christian Divisions』(SVS Press, 1989)", null, "인용만"),
+  ware2015: S("T.(칼리스토스) Ware, 『The Orthodox Church』(개정판, Penguin, 2015)", null, "인용만"),
+  baumwinkler2003: S("W. Baum & D. Winkler, 『The Church of the East: A Concise History』(Routledge, 2003)", null, "인용만"),
+  brock1996: S("S. Brock, 「The 'Nestorian' Church: A Lamentable Misnomer」, 『Bulletin of the John Rylands Library』 78(1996)", null, "인용만"),
+  macculloch2003: S("D. MacCulloch, 『Reformation: Europe's House Divided 1490–1700』(Allen Lane, 2003)", null, "인용만"),
+  vatican: S("교황청 누리집(공동 선언과 공의회 문헌)", "https://www.vatican.va/", "링크만"),
+  wcc: S("세계교회협의회(WCC)", "https://www.oikoumene.org/", "링크만"),
+  hus1999: S("요한 바오로 2세, 「얀 후스 국제 학술 모임에 한 연설」(1999년 12월 17일)", "https://www.vatican.va/content/john-paul-ii/en/speeches/1999/december/documents/hf_jp-ii_spe_17121999_jan-hus.html", "링크만"),
+  oca: S("미국 정교회(OCA) 누리집, 『Lives of the Saints』", "https://www.oca.org/saints/id/lives/100228", "링크만"),
+});
+
 // 인용(quote)을 옮겨 올 수 있는 이용 조건
 export const QUOTABLE = new Set(["공유", "CC0", "CC BY"]);

@@ -46,9 +46,22 @@ const FEATURES = [
   { name: "마게도냐", at: [22.6, 40.9], kind: "region", pri: 44 },
   { name: "아가야", at: [21.9, 37.6], kind: "region", pri: 45 },
   { name: "이탈리아", at: [15.0, 41.2], kind: "region", pri: 46 },
+  // 교회사(유럽) 쪽. 로마 시대와 중세 모두에 쓰는 이름으로 적는다.
+  { name: "대서양", at: [-8.0, 46.0], kind: "water", pri: 16, alts: [[-9.5, 41.5], [-8.5, 50.0]] },
+  { name: "북해", at: [3.0, 55.5], kind: "water", pri: 17, alts: [[2.0, 53.5]] },
+  { name: "아드리아해", at: [15.5, 43.0], kind: "water", pri: 33 },
+  { name: "라인강", at: [7.2, 50.6], kind: "river", pri: 52, alts: [[8.3, 49.2]] },
+  { name: "도나우강", at: [18.8, 46.4], kind: "river", pri: 53, alts: [[12.5, 48.6]] },
+  { name: "갈리아", at: [2.5, 46.8], kind: "region", pri: 47 },
+  { name: "히스파니아", at: [-4.0, 40.0], kind: "region", pri: 48 },
+  { name: "브리타니아", at: [-1.8, 52.8], kind: "region", pri: 49 },
+  { name: "게르마니아", at: [10.5, 51.5], kind: "region", pri: 50 },
 ];
 // 도시 우선순위. 목록에 없는 장소는 맨 뒤에 놓는다.
 const MAJOR = ["jerusalem", "babylon", "nineveh", "memphis", "damascus", "rome", "susa", "samaria", "ur", "haran", "antioch",
+  "constantinople", "alexandria", "carthage", "paris", "wittenberg", "geneva",
+  "nicaea", "milan", "lyon", "hippo", "edessa", "ctesiphon", "athos", "ravenna", "aachen", "cluny", "avignon", "florence", "prague",
+  "constance", "worms", "augsburg", "zurich", "trent", "oxford", "london", "canterbury", "dordrecht",
   "ephesus", "corinth", "tarsus", "caesarea", "thebes", "carchemish", "bethlehem", "nazareth", "capernaum", "hebron", "beersheba",
   "jericho", "shechem", "bethel", "dan", "lachish", "dibon", "megiddo", "joppa", "patmos", "persepolis", "pasargadae", "ecbatana"];
 // 바탕 지명으로 쓸 때 괄호 설명을 줄인 이름

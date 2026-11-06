@@ -5,6 +5,9 @@ import * as d3 from "./vendor/d3-7.9.0.js";
 import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";
 import { createMap, THEMES } from "./shared/map.js";
 import { findBook } from "./shared/books.js";
+import { SOURCES as BASE_SOURCES } from "./shared/sources.js";
+import { CH_SOURCES } from "./shared/church_events.js";
+import { CONTROVERSY_INDEX } from "./shared/controversy_index.js";
 import { nav } from "./nav.js";
 // 인물 프로필·책 해설·지도로 따라 읽기는 처음 열 때 불러온다(아래 lazy).
 
@@ -59,13 +62,16 @@ function pack(items, gapYears) {
   return { rows: ends.length, items: out };
 }
 const BOOK_PACK = pack(BOOKS, 0);
+// 교회사 논쟁 막대(controversy_index.js). '+ 논쟁'을 켜면 보인다.
+const DEBATE_PACK = pack(CONTROVERSY_INDEX, 0);
+const SRC_NAME = { ...CH_SOURCES, ...BASE_SOURCES };
 const PEOPLE_PACK = pack(PEOPLE, 8);
 
 const state = {
   ppy: 2, viewW: 1000, viewH: 400, center: EVENTS[0].year, mobile: false,
   selected: null, near: null, mapEv: null, focusKey: null, person: null, book: null,
   // 처음에는 시대·사건·증거 차선만 보인다. 제국·성경 책·인물 차선은 '더 보기'에서 켠다(이 브라우저에만 기억).
-  show: { emp: false, book: false, person: false },
+  show: { emp: false, book: false, person: false, debate: false },
 };
 const SHOW_KEY = "bt-show";
 try { Object.assign(state.show, JSON.parse(localStorage.getItem(SHOW_KEY)) || {}); } catch { /* 저장소를 못 쓰면 기본값 */ }
@@ -92,6 +98,7 @@ function layout() {
   L = { d };
   L.emp = sh.emp ? lane("제국", d.emp) : off();
   L.era = lane("시대", d.era);
+  L.debate = sh.debate && DEBATE_PACK.rows ? lane("논쟁", DEBATE_PACK.rows * d.bookRow) : off();
   L.book = sh.book ? lane("성경 책", BOOK_PACK.rows * d.bookRow) : off();
   L.person = sh.person ? lane("인물", PEOPLE_PACK.rows * d.personRow) : off();
   L.ev = lane("사건", d.evRows * d.evRow + 12);
@@ -113,7 +120,7 @@ const leftEdge = () => L.d.labelW + 6;
 /* ---------- 그리기 ---------- */
 const svg = d3.select("#svg");
 const G = {};
-["grid", "axis", "seps", "emp", "era", "book", "person", "arcs", "pins", "ev", "gaps", "thumbs"].forEach((k) => (G[k] = svg.append("g").attr("class", k)));
+["grid", "axis", "seps", "emp", "era", "debate", "book", "person", "arcs", "pins", "ev", "gaps", "thumbs"].forEach((k) => (G[k] = svg.append("g").attr("class", k)));
 
 function niceStep() {
   const steps = [5, 10, 25, 50, 100, 250, 500];
@@ -155,7 +162,7 @@ function render() {
     return g;
   }).attr("transform", (t) => `translate(${X(t)},0)`).select("text").text(tickLabel);
 
-  const seps = [d.axis, (L.emp.hidden ? L.era : L.emp).top - d.gap / 2, ...[L.book, L.person].filter((l) => !l.hidden).map((l) => l.top - d.gap / 2), L.ev.top - d.gap / 2, L.evid.top];
+  const seps = [d.axis, (L.emp.hidden ? L.era : L.emp).top - d.gap / 2, ...[L.debate, L.book, L.person].filter((l) => !l.hidden).map((l) => l.top - d.gap / 2), L.ev.top - d.gap / 2, L.evid.top];
   G.seps.selectAll("line").data(seps).join("line").attr("class", "sep").attr("x1", 0).attr("x2", W).attr("y1", (y) => Math.round(y) + 0.5).attr("y2", (y) => Math.round(y) + 0.5);
 
   // 제국 띠와 시대 띠
@@ -183,6 +190,30 @@ function render() {
   // 시대 띠를 누르면 그 시대의 당대 배경을 연다.
   G.era.selectAll("g.b").classed("era-link", true).on("click", (event, e) => books.openEra(e.id))
     .select("title").text((e) => `${e.name} · ${rangeText(e.from, e.to)} · 누르면 시대 배경`);
+
+  // 교회사 논쟁: 논쟁이 이어진 기간
+  const debateItems = state.show.debate ? DEBATE_PACK.items.filter((c) => vis(c.from, c.to)) : [];
+  G.debate.selectAll("g.debate").data(debateItems, (c) => c.id).join((e) => {
+    const g = e.append("g").attr("class", "debate");
+    g.append("rect").attr("rx", 3);
+    g.append("text");
+    g.append("title");
+    g.on("click", (event, c) => debates.open(c.id));
+    return g;
+  }).each(function (c) {
+    const g = d3.select(this);
+    const top = L.debate.top + c.row * d.bookRow;
+    const xa = X(c.from), xb = X(c.to);
+    g.select("rect").attr("x", xa).attr("y", top + 1.5).attr("width", Math.max(3, xb - xa)).attr("height", d.bookRow - 3);
+    const w = tw(c.title, 10.5, 500);
+    let lx = stickyLabelX(xa, xb, w, 6);
+    if (lx == null) {
+      const next = DEBATE_PACK.items.filter((o) => o.row === c.row && o.from >= c.to).sort((p, q) => p.from - q.from)[0];
+      lx = !next || X(next.from) - xb > w + 10 ? xb + 4 : null;
+    }
+    g.select("text").attr("x", lx ?? 0).attr("y", top + d.bookRow / 2 + 3.5).style("display", lx == null ? "none" : null).text(c.title);
+    g.select("title").text(`${c.title} · ${rangeText(c.from, c.to)} · 누르면 논쟁 문서`);
+  });
 
   // 성경 책: 다루는 시기
   const bookItems = state.show.book ? BOOK_PACK.items.filter((b) => vis(b.from, b.to)) : [];
@@ -278,6 +309,8 @@ function render() {
   });
 
   // 증거: 만든 해에 핀을 꽂고, 사진은 겹치지 않게 두 줄로 옆으로 비켜 놓는다
+  // 제자리(만든 해)에서 사진 한 장 반 넘게 밀려나야 하는 사진은 이 배율에서는 숨긴다. 확대하면 자리가 생겨 다시 보인다.
+  // (사진이 몰린 1세기 사진들이 수백 년 뒤 자리까지 밀려나 엉뚱한 시대에 보이던 문제)
   const T = d.thumb, rowRight = [-Infinity, -Infinity];
   const thumbs = EVID.map((e) => {
     const pin = X(e.at);
@@ -287,9 +320,10 @@ function render() {
       const shift = left - (pin - T / 2);
       if (!best || shift < best.shift - 0.5) best = { r, left, shift };
     }
+    if (best.shift > T * 1.5) return null;
     rowRight[best.r] = best.left + T;
     return { e, pin, left: best.left, top: L.evid.top + 8 + best.r * (T + 8) };
-  });
+  }).filter(Boolean);
   const thumbsVis = thumbs.filter((t) => t.left < W + 40 && t.left + T > -40);
   G.pins.selectAll("path").data(thumbsVis, (t) => t.e.key).join("path").attr("class", "pin").attr("fill", "none")
     .attr("d", (t) => {
@@ -365,7 +399,7 @@ function renderLaneLabels() {
   const el = $("lanes");
   el.style.setProperty("--lw", `${L.d.labelW}px`);
   const rows = [
-    [L.emp, "제국"], [L.era, "시대", "누르면 배경"], [L.book, "성경 책", "누르면 해설"], [L.person, "인물"],
+    [L.emp, "제국"], [L.era, "시대", "누르면 배경"], [L.debate, "논쟁", "누르면 문서"], [L.book, "성경 책", "누르면 해설"], [L.person, "인물"],
     [L.ev, "사건"], [L.evid, "증거", "만든 때"],
   ].filter(([l]) => !l.hidden);
   el.innerHTML = rows.map(([l, name, sub]) => `<div style="top:${l.top + l.h / 2}px">${name}${sub ? `<small>${sub}</small>` : ""}</div>`).join("");
@@ -435,10 +469,12 @@ function updateReadout() {
   const step = state.ppy >= 6 ? 1 : state.ppy >= 1.5 ? 5 : 10;
   let y = Math.round(c / step) * step;
   if (y === 0) y = c < 0 ? -1 : 1;
-  $("yr").textContent = Math.abs(on.year - c) * state.ppy < 4 ? on.yearLabel : `${yearText(y)}${step > 1 ? "경" : ""}`;
-  const era = ERAS.find((e) => c >= e.from && c < e.to);
+  const snapped = Math.abs(on.year - c) * state.ppy < 4;
+  $("yr").textContent = snapped ? on.yearLabel : `${yearText(y)}${step > 1 ? "경" : ""}`;
+  // 사건에 붙어 있으면 그 사건의 시대를 쓴다(시대 경계의 해, 예: 1517년은 종교개혁).
+  const era = (snapped && ERA[on.era]) || ERAS.find((e) => c >= e.from && c < e.to);
   const emp = EMPIRES.filter((e) => c >= e.from && c < e.to).map((e) => e.name);
-  const eraName = era ? era.name : c < ERAS[0].from ? "아브라함 이전" : "초대 교회 이후";
+  const eraName = era ? era.name : c < ERAS[0].from ? "아브라함 이전" : "베스트팔렌 조약 이후";
   $("ctx").textContent = [eraName, emp.length ? `${emp.join("·")} 시대` : null].filter(Boolean).join(" · ");
 }
 
@@ -501,6 +537,14 @@ const pct = (y) => ((y - RANGE[0]) / SPAN) * 100;
 const isOpen = () => gallery.classList.contains("open");
 let gMap = null, gMapLoading = null, gCur = -1, gTarget = null;
 
+// 교회사 사건: 성경 구절 대신 그 사건을 전하는 옛 문헌 한두 줄과 출처
+function sourceHTML(ev) {
+  const [id, loc] = (() => { const s = ev.source.src || "", i = s.indexOf(":"); return i < 0 ? [s.trim(), ""] : [s.slice(0, i).trim(), s.slice(i + 1).trim()]; })();
+  const src = SRC_NAME[id];
+  const name = src ? (src.url ? `<a href="${esc(src.url)}" target="_blank" rel="noopener">${esc(src.name)}</a>` : esc(src.name)) : esc(id);
+  return `<blockquote class="g-verse"><p>${esc(ev.source.text)}</p><cite>${name}${loc ? ` · ${esc(loc)}` : ""}</cite></blockquote>`;
+}
+
 function roomHTML(ev, i) {
   const multi = ev.evidence.length > 1;
   const thumbs = multi
@@ -510,7 +554,7 @@ function roomHTML(ev, i) {
     : "";
   const people = ev.people.map((id) => PERSON[id]).filter(Boolean)
     .map((p) => `<button class="g-person" type="button" data-person="${esc(p.id)}" title="인물 프로필 보기">${esc(p.name)}</button>(${esc(p.kind)} ${esc(rangeText(p.from, p.to))})`).join(" · ");
-  const empty = `<p class="g-only-text">성경 본문에만 기록됨</p>`;
+  const empty = `<p class="g-only-text">${ev.source ? "옛 문헌에만 기록됨" : "성경 본문에만 기록됨"}</p>`;
   return `<section class="room${multi ? " multi" : ""}${ev.evidence.length ? "" : " no-ev"}" data-i="${i}" aria-label="${esc(ev.yearLabel)}, ${esc(ev.title)}">
     <div class="bgyear" aria-hidden="true">${Math.abs(ev.year)}</div>
     <div class="g-inner">
@@ -532,9 +576,10 @@ function roomHTML(ev, i) {
         <p class="g-era">${esc(ERA[ev.era]?.name)}</p>
         <p class="g-year">${esc(ev.yearLabel)}</p>
         <h2 class="g-title">${esc(ev.title)}</h2>
-        <blockquote class="g-verse"><p>${esc(ev.verse)}</p><cite>${esc(ev.ref)} · ${findBook(ev.book) ? `<button class="g-person" type="button" data-book="${esc(findBook(ev.book).id)}" title="책 해설 보기">${esc(ev.book)}</button>` : esc(ev.book)} · 개역한글</cite></blockquote>
+        ${ev.controversy ? `<button class="g-debate" type="button" data-debate="${esc(ev.controversy)}">이 사건을 둘러싼 논쟁 보기 →</button>` : ""}
+        ${ev.source ? sourceHTML(ev) : `<blockquote class="g-verse"><p>${esc(ev.verse)}</p><cite>${esc(ev.ref)} · ${findBook(ev.book) ? `<button class="g-person" type="button" data-book="${esc(findBook(ev.book).id)}" title="책 해설 보기">${esc(ev.book)}</button>` : esc(ev.book)} · 개역한글</cite></blockquote>`}
         <p class="g-summary">${esc(ev.summary)}</p>
-        <dl class="g-meta"><dt>연대</dt><dd>${esc(ev.dateNote)}</dd>${people ? `<dt>인물</dt><dd>${people}</dd>` : ""}</dl>
+        <dl class="g-meta">${ev.dateNote ? `<dt>연대</dt><dd>${esc(ev.dateNote)}</dd>` : ""}${people ? `<dt>인물</dt><dd>${people}</dd>` : ""}</dl>
       </article>
     </div>
   </section>`;
@@ -731,6 +776,8 @@ function setMapOpen(open) {
 gallery.addEventListener("click", (e) => {
   const bk = e.target.closest("[data-book]");
   if (bk) { closeGallery(); books.open(bk.dataset.book); return; }
+  const db = e.target.closest("[data-debate]");
+  if (db) { closeGallery(); debates.open(db.dataset.debate); return; }
   const per = e.target.closest(".g-person");
   if (per) { closeGallery(); profiles.open(per.dataset.person); return; }
   const thumb = e.target.closest(".g-thumb");
@@ -800,6 +847,7 @@ const books = lazy(() => import("./book.js").then((m) => m.createBooks({
   onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
   onPerson: (id) => profiles.open(id),
   onStory: (id) => story.open(id),
+  onDebate: (id) => debates.open(id),
   onBack: () => back(),
   // 책을 여는 동안 연표를 그 책의 시기 가운데로 옮기고 막대를 강조한다.
   // 시대 배경을 열면 연표를 그 시대 가운데로 옮긴다.
@@ -813,9 +861,20 @@ const story = lazy(() => import("./story.js").then((m) => m.createStory({
   onBack: () => back(),
   onClose: () => {},
 })));
+/* ---------- 교회사: 목록·논쟁·교리의 줄기 ---------- */
+const debates = lazy(() => import("./debate.js").then((m) => m.createDebates({
+  onEvent: (id) => openGallery(EVENTS.find((ev) => ev.id === id)),
+  onPerson: (id) => profiles.open(id),
+  onEra: (id) => books.openEra(id),
+  onBack: () => back(),
+  // 논쟁을 여는 동안 연표를 그 논쟁의 기간 가운데로 옮긴다.
+  onOpen: (c) => { if (c) setCenter((c.from + c.to) / 2); frame(); },
+  onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
+})));
+$("churchBtn").addEventListener("click", () => debates.open(null));
 // 넓은 화면(대개 PC)은 첫 화면을 그린 뒤 쉬는 틈에 미리 불러 둔다. 휴대폰은 처음 열 때 불러온다.
 if (matchMedia("(min-width: 900px) and (pointer: fine)").matches) {
-  const warm = () => { books.ready(); profiles.ready(); story.ready(); };
+  const warm = () => { books.ready(); profiles.ready(); story.ready(); debates.ready(); };
   window.requestIdleCallback ? requestIdleCallback(warm, { timeout: 5000 }) : setTimeout(warm, 2500);
 }
 
@@ -829,20 +888,24 @@ async function route() {
   const h = location.hash;
   const ev = EVENTS.find((e) => `#${e.id}` === h);
   const want = ev ? "gallery" : h.startsWith("#p-") ? "profile" : h.startsWith("#s-") ? "story"
-    : h.startsWith("#b-") || h.startsWith("#e-") || h === "#books" ? "book" : "timeline";
+    : h.startsWith("#b-") || h.startsWith("#e-") || h === "#books" ? "book"
+    : h.startsWith("#c-") || h.startsWith("#d-") || h === "#church" ? "debate" : "timeline";
   // 열 화면의 코드를 먼저 불러온 뒤, 방문 기록을 건드리지 않고 한꺼번에 바꾼다.
   if (want === "profile") await profiles.ready();
   if (want === "book" || want === "story") await books.ready();
   if (want === "story") await story.ready();
+  if (want === "debate") await debates.ready();
   if (location.hash !== h) return; // 불러오는 사이에 다른 화면으로 넘어갔다
   nav.quietly(() => {
     if (want !== "story") story.close();
     if (want !== "profile") profiles.close();
     if (want !== "book" && want !== "story") books.close();
+    if (want !== "debate") debates.close();
     if (want !== "gallery") closeGallery();
     if (want === "gallery") openGallery(ev);
     else if (want === "profile") profiles.open(h.slice(3));
     else if (want === "book") h === "#books" ? books.open(null) : h.startsWith("#e-") ? books.openEra(h.slice(3)) : books.open(h.slice(3));
+    else if (want === "debate") h === "#church" ? debates.open(null) : h.startsWith("#d-") ? debates.openTheme(h.slice(3)) : debates.open(h.slice(3));
     else if (want === "story") {
       const id = h.slice(3);
       if (!books.isOpen() || books.currentId() !== id) books.open(id);
@@ -908,6 +971,7 @@ addEventListener("keydown", (e) => {
     else if (["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(e.key)) { e.preventDefault(); story.step(e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1); }
     return;
   }
+  if (debates.isOpen()) { if (e.key === "Escape") debates.popOpen() ? debates.hidePop() : back(); return; }
   if (books.isOpen()) { if (e.key === "Escape") books.popOpen() ? books.hidePop() : back(); return; }
   if (profiles.isOpen()) { if (e.key === "Escape") profiles.popOpen() ? profiles.hidePop() : back(); return; }
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); stepEvent(e.key === "ArrowRight" ? 1 : -1); }
@@ -986,7 +1050,7 @@ async function init() {
 
   // 왼쪽 아래의 "지도에 보이는 사건" 상자 자리에는 바탕 지명을 놓지 않는다.
   const cap = $("cap");
-  map = await createMap($("map"), THEMES.atlas, { pad: 0.4, minor: false, reserve: (w, h) => [[0, h - cap.offsetHeight - 22, cap.offsetWidth + 24, cap.offsetHeight + 22]] });
+  map = await createMap($("map"), THEMES.atlas, { pad: 0.4, minor: false, minSpan: 7, reserve: (w, h) => [[0, h - cap.offsetHeight - 22, cap.offsetWidth + 24, cap.offsetHeight + 22]] });
   const first = state.near ?? nearestEvent(state.center);
   state.mapEv = first;
   map.show(first, { instant: true });

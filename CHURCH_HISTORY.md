@@ -1,6 +1,6 @@
 # 교회사와 신학 논쟁 확장 계획
 
-> 성경 시대 뒤의 교회사, 신학이 자라 온 길, 그 사이의 논쟁과 각 교회의 주장을 사이트에 더하는 계획입니다. 이 계획을 확인받은 뒤에 쓰기 시작합니다.
+> 성경 시대 뒤의 교회사, 신학이 자라 온 길, 그 사이의 논쟁과 각 교회의 주장을 사이트에 더하는 계획입니다. 2026-11-07에 1·2단계(1648년까지)를 만들어 올렸습니다. 화면과 점검 방법은 [DESIGN.md](DESIGN.md)의 '교회사' 절에 있습니다.
 
 ## 범위와 단계
 
@@ -10,7 +10,7 @@
 | 2단계 | 451~1648년 | 칼케돈 뒤의 공의회들, 성상 논쟁, 동서 분열(1054년), 중세 신학, 종교개혁과 신앙고백들 |
 | 3단계(선택) | 1648년~오늘 | 근대 신학, 교회 일치 운동과 교회 사이의 공동 선언, 한국 교회사 |
 
-1단계를 먼저 만들어 보여 드리고, 마음에 드시면 2단계로 이어 갑니다.
+사용자가 1단계와 2단계를 한 번에(종교개혁과 신앙고백까지, 1648년) 만들기로 정했습니다.
 
 ## 입장을 적는 교회 전통
 
@@ -64,6 +64,55 @@
 - 결정: 공의회나 교회의 결정과 그 원문 한두 줄
 - 오늘의 입장: 위 전통마다
 - 학계의 시각
+
+## 2단계 시대 나눔
+
+| 시대 id | 시대 | 기간 | 시대 배경에 쓸 것 |
+|---|---|---|---|
+| byzantine | 칼케돈 이후 | 451~843년 | 서로마 멸망, 유스티니아누스, 칼케돈을 둘러싼 동방의 분열과 오리엔트 정교회의 따로 선 위계, 이슬람의 등장(7세기)과 그 아래의 교회들, 동방 교회의 중국 선교(781년 대진경교유행중국비), 성상 논쟁, 베네딕투스 수도 규칙, 그레고리우스 1세 |
+| eastwest | 동서의 갈림 | 843~1204년 | 카롤루스 왕조와 서방 신학, 포티오스와 필리오케, 1054년 분열, 클뤼니 개혁과 교황권, 십자군, 스콜라 신학의 시작(안셀무스, 아벨라르) |
+| latemedieval | 중세 후기 | 1204~1517년 | 4차 십자군의 콘스탄티노플 약탈, 제4차 라테란 공의회, 탁발 수도회, 아퀴나스, 팔라마스와 헤시카즘, 아비뇽 교황청과 서방 대분열, 위클리프와 후스, 피렌체 공의회, 콘스탄티노플 함락(1453), 인쇄술, 인문주의 |
+| reformation | 종교개혁 | 1517~1648년 | 루터, 츠빙글리, 재세례파, 칼뱅, 잉글랜드 종교개혁, 트리엔트 공의회와 가톨릭 개혁, 신앙고백들, 도르트 회의, 30년 전쟁과 베스트팔렌 조약, 동방 정교회와 개혁 신학의 만남(키릴로스 루카리스) |
+
+1단계 시대 id는 fathers(사도 이후와 박해, 100~313년)와 councils(제국 교회와 공의회, 313~451년)입니다.
+
+## 2단계 논쟁 목록
+
+| 논쟁 id | 논쟁 | 때 | 쟁점 |
+|---|---|---|---|
+| three-chapters | 삼장서 논쟁과 제2차 콘스탄티노플 공의회 | 543~553년 | 칼케돈을 거부한 쪽과 화해하려고 안디옥 신학자 세 사람의 글을 정죄해야 하는가 |
+| monothelitism | 그리스도의 의지 논쟁 | 633~681년 | 그리스도에게 의지가 하나인가 둘인가(제3차 콘스탄티노플 공의회) |
+| iconoclasm | 성상 논쟁 | 726~843년 | 그림과 상으로 그리스도와 성인을 그려도 되는가(제2차 니케아 공의회, 정교의 승리) |
+| filioque | 필리오케 논쟁 | 589~1054년 이후 | 성령은 성부에게서만 나오는가, 성부와 성자에게서 나오는가. 신경에 낱말을 더할 권한은 누구에게 있는가 |
+| predestination-gottschalk | 고트샬크의 예정 논쟁 | 840~860년대 | 하나님은 구원받을 사람과 멸망할 사람을 둘 다 미리 정하셨는가(이중 예정) |
+| eucharist-medieval | 중세 성찬 논쟁 | 831~1215년 | 빵과 포도주는 어떤 뜻에서 그리스도의 몸과 피인가(파스카시우스와 라트람누스, 베렝가리우스, 화체설) |
+| schism-1054 | 동서 분열 | 1054년 | 교황의 권한, 필리오케, 누룩 없는 빵 등. 서로 내린 파문 |
+| atonement | 속죄론 논쟁 | 1090~1140년대 | 그리스도의 죽음은 어떻게 구원하는가(안셀무스의 만족설, 아벨라르의 감화설, 동방의 신화(테오시스)와 비교) |
+
+| 논쟁 id | 논쟁 | 때 | 쟁점 |
+|---|---|---|---|
+| hesychasm | 헤시카즘 논쟁 | 1337~1351년 | 사람은 하나님의 빛을 직접 볼 수 있는가, 하나님의 본질과 활동은 구별되는가(팔라마스와 바를라암) |
+| conciliarism | 서방 대분열과 공의회주의 | 1378~1449년 | 교황이 둘·셋일 때 누가 교회의 최고 권위인가, 공의회인가 교황인가 |
+| wycliffe-hus | 위클리프와 후스 | 1370~1415년 | 성경의 권위, 교회는 누구인가, 성찬, 평신도의 잔 |
+| florence-union | 피렌체 공의회의 일치 시도 | 1438~1484년 | 동서 교회가 필리오케·연옥·교황권에 합의할 수 있는가. 동방에서 거부된 까닭 |
+| justification | 칭의 논쟁 | 1517~1547년 | 사람은 믿음으로만 의롭게 되는가(루터, 트리엔트 공의회 칭의 교령) |
+| free-will | 자유의지 논쟁 | 1524~1525년 | 사람의 의지는 구원에 무엇을 할 수 있는가(에라스무스와 루터) |
+| lords-supper | 종교개혁기 성찬 논쟁 | 1524~1562년 | 그리스도는 성찬에 어떻게 계시는가(루터, 츠빙글리, 칼뱅, 트리엔트) |
+| baptism | 세례 논쟁 | 1525~1527년 | 갓난아이에게 세례를 주어야 하는가(재세례파, 슐라이트하임 신앙고백) |
+| scripture-tradition | 성경과 전통 | 1517~1546년 | 신앙의 최종 권위는 성경만인가, 성경과 전통인가(트리엔트 1546년 교령) |
+| predestination-dort | 도르트 회의와 예정 논쟁 | 1610~1619년 | 하나님의 선택은 조건이 없는가, 은혜는 거부할 수 있는가(아르미니우스파와 도르트 신조) |
+
+1단계 논쟁 id: gnosticism, marcionism, montanism, quartodeciman, lapsi-donatism, modalism, arianism, pneumatomachi, apollinarianism, nestorius, pelagianism, chalcedon.
+
+## 공통 id 명단
+
+여러 묶음이 같은 사람과 사건을 가리키도록 id를 먼저 정합니다. 사건과 인물을 쓰는 묶음은 이 id로 만들고, 논쟁을 쓰는 묶음은 이 id로 가리킵니다. 목록에 없는 것을 더할 수는 있지만, 다른 묶음은 그것을 가리키지 않습니다.
+
+| 기간 | 사건 id | 인물 id |
+|---|---|---|
+| 100~451년 | marcion-expelled(144), polycarp-martyr(155), decian-persecution(250), great-persecution(303), edict-milan(313), nicaea-325, athanasius-canon(367), constantinople-381, carthage-418, ephesus-431, ephesus-449, chalcedon-451 | ignatius, polycarp, justin, irenaeus, tertullian, origen, cyprian, marcion, montanus, sabellius, arius, athanasius, basil, gregorynazianzus, gregorynyssa, ephrem, apollinaris, augustine, pelagius, cyrilalexandria, nestorius, leo1, dioscorus, eutyches, constantine, theodosius |
+| 451~1204년 | constantinople-553, constantinople-681, iconoclasm-726, nicaea-787, triumph-843, xian-stele-781, charlemagne-800, photius-867, schism-1054, crusade-1095, sack-1204 | justinian, severus, maximus, johndamascene, gregory1, photius, charlemagne, gottschalk, paschasius, ratramnus, berengar, cerularius, humbert, anselm, abelard, bernard |
+| 1204~1648년 | lateran-1215, palamas-1351, schism-1378, constance-1415, florence-1439, fall-1453, theses-1517, worms-1521, schleitheim-1527, marburg-1529, augsburg-1530, supremacy-1534, institutes-1536, trent-1545, heidelberg-1563, dort-1618, lucaris-1629, westphalia-1648 | innocent3, francis, aquinas, palamas, barlaam, wycliffe, hus, markephesus, erasmus, luther, zwingli, melanchthon, grebel, calvin, cranmer, loyola, arminius, lucaris |
 
 ## 사건, 인물, 유물 후보
 

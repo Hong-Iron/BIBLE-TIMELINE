@@ -3,7 +3,7 @@
 > 성경 속 사건을 옆으로 넘기며, 그 사건의 구절과 지도, 그 사건을 뒷받침하는 실제 유물 사진을 함께 보는 웹사이트입니다.
 
 - 주소: https://hong-iron.github.io/BIBLE-TIMELINE/
-- 첫 화면은 왼쪽 지도와 오른쪽 연표, 사건을 누르면 열리는 전시실, 인물을 누르면 열리는 인물 프로필로 되어 있습니다. 대표 사건 60개와 인물 52명이 들어 있습니다. 머리의 '성경으로 보기' 단추로 책마다 해설을 열고, 해설에서 '지도로 따라 읽기'와 '당대 배경'으로 넘어갑니다. 연표의 시대 띠를 누르면 그 시대의 배경이 열립니다. 결정 기록과 남은 결정 항목은 [DESIGN.md](DESIGN.md)에, 교회사·신학 논쟁 확장 계획은 [CHURCH_HISTORY.md](CHURCH_HISTORY.md)에, 당대 배경(사건, 문화, 문학, 수사학)을 쓸 때 근거로 삼을 자료와 이용 조건은 [SOURCES.md](SOURCES.md)에 있습니다.
+- 첫 화면은 왼쪽 지도와 오른쪽 연표, 사건을 누르면 열리는 전시실, 인물을 누르면 열리는 인물 프로필로 되어 있습니다. 연표는 기원전 2200년부터 1648년(종교개혁)까지이고, 성경 사건 60개와 교회사 사건 47개, 인물 116명이 들어 있습니다. 머리의 '교회사로 보기'로 교회사 논쟁 30개와 교리의 줄기를 엽니다. 머리의 '성경으로 보기' 단추로 책마다 해설을 열고, 해설에서 '지도로 따라 읽기'와 '당대 배경'으로 넘어갑니다. 연표의 시대 띠를 누르면 그 시대의 배경이 열립니다. 결정 기록과 남은 결정 항목은 [DESIGN.md](DESIGN.md)에, 교회사·신학 논쟁 확장 계획은 [CHURCH_HISTORY.md](CHURCH_HISTORY.md)에, 당대 배경(사건, 문화, 문학, 수사학)을 쓸 때 근거로 삼을 자료와 이용 조건은 [SOURCES.md](SOURCES.md)에 있습니다.
 - 이 저장소의 문서와 화면 문구는 [Humanize.md](Humanize.md)의 규칙으로 씁니다.
 
 ## 폴더와 담는 파일
@@ -11,12 +11,12 @@
 | 폴더 | 담는 파일 |
 |---|---|
 | `site/` | GitHub Pages(저장소의 HTML 파일을 그대로 웹사이트로 띄워 주는 GitHub의 무료 호스팅)에 올라가는 파일 전체. 빌드 단계 없이 그대로 배포합니다 |
-| `site/index.html`, `site/app.js`, `site/profile.js`, `site/book.js`, `site/story.js`, `site/nav.js` | 사이트 첫 화면. 왼쪽 지도와 오른쪽 연표·전시실(`app.js`), 인물 프로필(`profile.js`), 성경 66권 목록과 책 해설(`book.js`), 책의 사건을 내려 읽으면 지도가 따라 움직이는 '지도로 따라 읽기'(`story.js`), 화면 이동 기록(`nav.js`, 돌아가기가 바로 앞 화면으로 가게 함) |
+| `site/index.html`, `site/app.js`, `site/profile.js`, `site/book.js`, `site/story.js`, `site/debate.js`, `site/nav.js` | 사이트 첫 화면. 왼쪽 지도와 오른쪽 연표·전시실(`app.js`), 인물 프로필(`profile.js`), 성경 66권 목록과 책 해설(`book.js`), 책의 사건을 내려 읽으면 지도가 따라 움직이는 '지도로 따라 읽기'(`story.js`), 교회사 목록·논쟁·교리의 줄기(`debate.js`), 화면 이동 기록(`nav.js`, 돌아가기가 바로 앞 화면으로 가게 함) |
 | `site/d/` | 예전 주소. 첫 화면으로 넘겨 주며, 주소 끝의 `#사건 이름`도 그대로 넘깁니다 |
-| `site/shared/` | 모든 화면이 함께 쓰는 사건 자료(처음 만든 11개는 `data.js`, 나머지 49개는 `events_more.js`), 인물 프로필 자료(`profiles.js`와 시대별 묶음 `profiles_g1.js`~`profiles_g4.js`), 성경 66권 목록(`books.js`)과 책 해설(`guides.js`와 갈래별 묶음 `guides_g1.js`~`guides_g7.js`), 책 해설에만 나오는 장소(`places_story.js`와 묶음 `places_g1.js`~`places_g7.js`), 당대 배경(`backgrounds.js`와 시대 묶음 `bg_e1.js`·`bg_e2.js`, 책 묶음 `bg_g1.js`~`bg_g7.js`), 배경의 출처 목록(`sources.js`), 사건과 프로필 장절의 개역한글 본문(`verses.js`, 스크립트가 만듦. 연표 사건 것만 따로 `verses_events.js`), 지도 그리기(`map.js`), 지도 모양(`geo.json`), 사진 출처(`credits.json`) |
+| `site/shared/` | 모든 화면이 함께 쓰는 사건 자료(처음 만든 11개는 `data.js`, 나머지 49개는 `events_more.js`), 인물 프로필 자료(`profiles.js`와 시대별 묶음 `profiles_g1.js`~`profiles_g4.js`), 성경 66권 목록(`books.js`)과 책 해설(`guides.js`와 갈래별 묶음 `guides_g1.js`~`guides_g7.js`), 책 해설에만 나오는 장소(`places_story.js`와 묶음 `places_g1.js`~`places_g7.js`), 교회사 시대·사건·인물·장소(`church_events.js`와 묶음 `church_ev1.js`~`church_ev3.js`, 프로필 `profiles_c1.js`~`profiles_c3.js`), 교회사 논쟁(`controversies.js`와 묶음 `controversies_1.js`~`controversies_3.js`, 연표용 색인 `controversy_index.js`), 당대 배경(`backgrounds.js`와 시대 묶음 `bg_e1.js`·`bg_e2.js`·교회사 `bg_c1.js`·`bg_c2.js`, 책 묶음 `bg_g1.js`~`bg_g7.js`), 배경의 출처 목록(`sources.js`), 사건과 프로필 장절의 개역한글 본문(`verses.js`, 스크립트가 만듦. 연표 사건 것만 따로 `verses_events.js`), 지도 그리기(`map.js`), 지도 모양(`geo.json`), 사진 출처(`credits.json`) |
 | `site/img/` | 유물 사진. 긴 변을 1200 px 이하로 줄인 JPEG와, 목록·연표 칸에 쓰는 320 px 판(`img/sm/`) |
 | `promo/` | 카톡·SNS에 올릴 소개 그림 8장(한눈에 보기, 기능 6가지, 휴대폰 화면). `tools/promo.mjs`가 만듦. 사이트에는 올라가지 않습니다 |
-| `tools/` | 사진을 내려받는 스크립트(`fetch_images.py`), 프로필 장절의 본문을 뽑고 주장과 대조하는 스크립트(`build_verses.py`), 책 해설의 장소를 점검하는 스크립트(`check_places.mjs`), 당대 배경을 점검하는 스크립트(`check_bg.mjs`), 지도 모양을 잘라 내는 스크립트(`crop_geo.mjs`), 헤드리스 크롬으로 화면을 열어 검사하고 찍는 스크립트(`headless.mjs`, `CPU=4`로 휴대폰 속도, `PROFILE`로 함수별 시간, `SCALE=2`로 2배 해상도), 카톡·SNS 소개 그림을 `promo/`에 만드는 스크립트(`promo.mjs`), 내 컴퓨터에서 띄우는 미리보기 서버(`serve.py`), 링크 공유 그림(`og.html`을 `og.sh`가 찍어 `site/og.jpg`로 저장) |
+| `tools/` | 사진을 내려받는 스크립트(`fetch_images.py`), 프로필 장절의 본문을 뽑고 주장과 대조하는 스크립트(`build_verses.py`), 책 해설의 장소를 점검하는 스크립트(`check_places.mjs`), 당대 배경을 점검하는 스크립트(`check_bg.mjs`), 교회사 자료를 점검하는 스크립트(`check_church.mjs`), 지도 모양을 잘라 내는 스크립트(`crop_geo.mjs`), 헤드리스 크롬으로 화면을 열어 검사하고 찍는 스크립트(`headless.mjs`, `CPU=4`로 휴대폰 속도, `PROFILE`로 함수별 시간, `SCALE=2`로 2배 해상도), 카톡·SNS 소개 그림을 `promo/`에 만드는 스크립트(`promo.mjs`), 내 컴퓨터에서 띄우는 미리보기 서버(`serve.py`), 링크 공유 그림(`og.html`을 `og.sh`가 찍어 `site/og.jpg`로 저장) |
 
 ## 내 컴퓨터에서 보기
 

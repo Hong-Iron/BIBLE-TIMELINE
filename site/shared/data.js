@@ -5,8 +5,10 @@ import { EVENT_VERSES } from "./verses_events.js";
 import { MORE_EVENTS, MORE_PEOPLE, MORE_PLACES } from "./events_more.js";
 import { BIBLE_BOOKS } from "./books.js";
 import { STORY_PLACES } from "./places_story.js";
+import { CH_ERAS, CH_EMPIRES, CH_PLACES, CH_MORE_PLACES, CH_EVENTS, CH_PEOPLE } from "./church_events.js";
 
-export const RANGE = [-2200, 100];
+// 성경 시대(기원전 2200년~)에서 교회사의 종교개혁과 베스트팔렌 조약(1648년)까지
+export const RANGE = [-2200, 1650];
 
 // 연대는 전통 연대(열왕기상 6:1 등 성경 숫자로 거슬러 센 값)를 기본으로 둔다. 학계 연대는 각 사건의 dateNote에 적는다.
 export const ERAS = [
@@ -27,7 +29,7 @@ export const EMPIRES = [
   { name: "바벨론", from: -626, to: -539, color: "#3d5a99" },
   { name: "페르시아", from: -550, to: -330, color: "#7a4b8c" },
   { name: "헬라", from: -336, to: -63, color: "#2f7f86" },
-  { name: "로마", from: -63, to: 100, color: "#a33a3a" },
+  { name: "로마", from: -63, to: 476, color: "#a33a3a" },
 ];
 
 // kind: 생애 | 재위 | 활동. 고대 인물의 해는 대부분 추정이다.
@@ -392,6 +394,12 @@ PEOPLE.push(...MORE_PEOPLE);
 Object.assign(PLACES, MORE_PLACES);
 for (const [id, p] of Object.entries(STORY_PLACES)) PLACES[id] ??= p;
 EVENTS.push(...MORE_EVENTS);
+// 교회사(church_events.js): 시대·제국·장소·사건·인물. 이미 있는 장소 id는 그대로 둔다.
+ERAS.push(...CH_ERAS);
+EMPIRES.push(...CH_EMPIRES);
+for (const [id, p] of Object.entries({ ...CH_PLACES, ...CH_MORE_PLACES })) PLACES[id] ??= p;
+PEOPLE.push(...CH_PEOPLE);
+EVENTS.push(...CH_EVENTS);
 for (const ev of EVENTS) ev.verse ??= (EVENT_VERSES[ev.ref] || []).map(([, t]) => t).join(" ");
 // 같은 해의 사건은 적은 순서를 지킨다(Array.prototype.sort는 안정 정렬).
 EVENTS.sort((a, b) => a.year - b.year);

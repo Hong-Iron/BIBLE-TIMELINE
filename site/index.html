@@ -50,6 +50,7 @@ button { font: inherit; color: inherit; }
 .tag { font-size: 12px; color: var(--ink2); padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
 .books-btn { margin-left: auto; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; }
 .books-btn:hover { border-color: var(--accent); color: var(--accent); }
+.books-btn.church-btn { margin-left: 0; }
 
 /* 왼쪽 지도 | 오른쪽 연표 */
 .split { display: grid; grid-template-columns: clamp(260px, 28vw, 420px) minmax(0, 1fr); min-height: 0; }
@@ -144,6 +145,12 @@ button { font: inherit; color: inherit; }
 .sep { stroke: var(--line); }
 .band-label { font-size: 11px; font-weight: 600; }
 .book rect { fill: #ece6da; stroke: #ddd5c6; }
+/* 교회사 논쟁 막대 */
+.debate { cursor: pointer; }
+.debate rect { fill: #e9e4f1; stroke: #cfc5e0; }
+.debate text { font-size: 10.5px; fill: #4f4566; }
+.debate:hover rect { stroke: var(--accent); }
+.debate:hover text { fill: var(--accent); }
 .book { cursor: pointer; }
 .book:hover rect { stroke: var(--accent); }
 .book:hover text { fill: var(--accent); }
@@ -660,7 +667,47 @@ button { font: inherit; color: inherit; }
 
 /* ---------- 성경 책 해설 ---------- */
 .bookview { z-index: 56; }
-.bookview .p-page.is-lib { display: block; max-width: 1100px; }
+.debateview { z-index: 58; }
+.bookview .p-page.is-lib, .debateview .p-page.is-lib { display: block; max-width: 1100px; }
+/* 교회사: 논쟁 목록, 주장, 결정, 각 교회의 입장 */
+.db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.db-card { text-align: left; border: 1px solid var(--card-line); background: #fff; border-radius: 10px; padding: 11px 13px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
+.db-card:hover { border-color: var(--accent); }
+.db-card b { font: 600 15.5px var(--serif); }
+.db-card small { font-size: 11.5px; color: var(--accent); font-weight: 600; }
+.db-card span { font-size: 12.5px; line-height: 1.55; color: var(--ink2); word-break: keep-all; }
+.lib-testament h2 small { font: 500 13px var(--ui); color: var(--muted); margin-left: 6px; }
+.db-trads { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 18px; font-size: 13px; }
+.db-trads li { display: flex; flex-direction: column; }
+.db-trads span { font-size: 12px; color: var(--ink2); word-break: keep-all; }
+.db-themes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.db-theme { border: 1px solid #cfc5e0; background: #f5f2fa; border-radius: 999px; padding: 3px 11px; font: 600 12px var(--ui); color: #4f4566; cursor: pointer; }
+.db-theme:hover { border-color: var(--accent); color: var(--accent); }
+.db-q { margin: 0; font: 500 15px/1.65 var(--serif); color: #2f2c27; word-break: keep-all; }
+.db-sides { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.db-side { background: #fff; border: 1px solid var(--card-line); border-radius: 10px; padding: 13px 15px 12px; }
+.db-side h4 { margin: 0 0 6px; font: 600 16px/1.35 var(--serif); }
+.db-side > p { margin: 0 0 8px; font-size: 14px; line-height: 1.7; color: #34312c; word-break: keep-all; }
+.db-side .b-people { margin-bottom: 8px; }
+.db-decision { background: #fffaf6; border: 1px solid #ecd3c1; border-radius: 10px; padding: 13px 15px; }
+.db-decision > p { margin: 0 0 8px; font-size: 14.5px; line-height: 1.7; color: #2f2c27; word-break: keep-all; }
+.db-pos { display: flex; flex-direction: column; gap: 10px; }
+.db-pos-item { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 16px; padding: 10px 0; border-bottom: 1px solid #e6dfd2; }
+.db-pos-item h4 { margin: 0; grid-row: span 3; font: 600 14px/1.4 var(--serif); color: #4f4566; }
+.db-pos-item > p { margin: 0; font-size: 14px; line-height: 1.7; color: #34312c; word-break: keep-all; }
+.db-pos-item ul { margin: 4px 0 0; padding-left: 16px; font-size: 13.5px; line-height: 1.65; color: #34312c; }
+.db-pos-item li b { margin-right: 6px; color: #4f4566; }
+.db-pos-item .bg-src { border-top: 0; padding-top: 0; }
+.db-dec { margin: 2px 0 0 !important; font-size: 13px !important; color: var(--ink2) !important; }
+.g-debate { align-self: flex-start; margin: 2px 0 14px; border: 1px solid #cfc5e0; background: #f5f2fa; border-radius: 999px; padding: 6px 14px; font: 600 13px var(--ui); color: #4f4566; cursor: pointer; }
+.g-debate:hover { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 900px) {
+  .db-pos-item { grid-template-columns: minmax(0, 1fr); }
+  .db-pos-item h4 { grid-row: auto; }
+}
+@media (max-width: 700px) {
+  .books-btn { padding: 5px 10px; font-size: 12.5px; }
+}
 .b-sub { margin: 12px 0 6px; font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
 .b-sub:first-of-type { margin-top: 0; }
 .b-views { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; font-size: 13.5px; line-height: 1.6; color: #2f2c27; word-break: keep-all; }
@@ -835,6 +882,7 @@ button { font: inherit; color: inherit; }
 <header class="top">
   <h1 class="brand">바이블 타임라인</h1>
   <button class="books-btn" id="booksBtn" type="button">성경으로 보기</button>
+  <button class="books-btn church-btn" id="churchBtn" type="button">교회사로 보기</button>
 </header>
 
 <div class="split">
@@ -853,6 +901,7 @@ button { font: inherit; color: inherit; }
     <button class="lg-btn" id="lgBtn" type="button" aria-expanded="false" aria-controls="lgPop">범례</button>
     <div class="layers" role="group" aria-label="차선 더 보기">
       <span>더 보기</span>
+      <button type="button" data-layer="debate" aria-pressed="false">논쟁</button>
       <button type="button" data-layer="book" aria-pressed="false">성경 책</button>
       <button type="button" data-layer="person" aria-pressed="false">인물</button>
       <button type="button" data-layer="emp" aria-pressed="false">제국</button>
@@ -860,6 +909,7 @@ button { font: inherit; color: inherit; }
     <div class="lg-pop" id="lgPop" hidden>
       <h4>차선 더 보기</h4>
       <div class="layers in-pop" role="group" aria-label="차선 더 보기">
+        <button type="button" data-layer="debate" aria-pressed="false">논쟁</button>
         <button type="button" data-layer="book" aria-pressed="false">성경 책</button>
         <button type="button" data-layer="person" aria-pressed="false">인물</button>
         <button type="button" data-layer="emp" aria-pressed="false">제국</button>
@@ -937,6 +987,15 @@ button { font: inherit; color: inherit; }
     <div class="g-readout"><span class="ry" id="gRy"></span><span class="re" id="gRe"></span></div>
     <div class="g-track" id="gTrack"></div>
   </nav>
+</div>
+
+<div class="profile bookview debateview" id="debate" role="dialog" aria-modal="true" aria-label="교회사" aria-hidden="true" tabindex="-1">
+  <header class="g-top">
+    <div class="g-brand"><b>교회사</b><span id="dName"></span></div>
+    <button class="g-close" id="dClose" type="button">돌아가기 <span aria-hidden="true">✕</span></button>
+  </header>
+  <div class="p-scroll" id="dScroll"><div class="p-page" id="dPage"></div></div>
+  <div class="vpop" id="dpop" hidden></div>
 </div>
 
 <div class="profile bookview" id="book" role="dialog" aria-modal="true" aria-label="성경 책 해설" aria-hidden="true" tabindex="-1">

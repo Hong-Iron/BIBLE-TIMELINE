@@ -4,6 +4,7 @@
 // 시대 배경(#e-<시대>)도 이 화면에 연다. 연표의 시대 띠, 책의 '당대 배경' 탭, 66권 목록에서 연다.
 import { PEOPLE, EVENTS, ERAS, EMPIRES, byId } from "./shared/data.js";
 import { ERA_BG, BOOK_BG, SOURCES, BG_KINDS } from "./shared/backgrounds.js";
+import { CONTROVERSY_INDEX } from "./shared/controversy_index.js";
 import { BIBLE_BOOKS, BOOK_GROUPS, bookById, bpUrl } from "./shared/books.js";
 import { GUIDES } from "./shared/guides.js";
 import { PROFILES } from "./shared/profiles.js";
@@ -21,6 +22,7 @@ const groupOf = (b) => BOOK_GROUPS.find((g) => g.id === b.group);
 const overlaps = (a, b) => a.from < b.to && b.from < a.to;
 const erasOf = (b) => ERAS.filter((e) => overlaps(e, b));
 const ERA = byId(ERAS);
+const debatesOf = (e) => CONTROVERSY_INDEX.filter((c) => c.era === e.id);
 const bgCount = (bg) => (bg ? BG_KINDS.reduce((n, k) => n + (bg[k.key]?.length || 0), 0) : 0);
 // "rinap: Sennacherib 22" → 출처 이름(링크)과 위치
 const splitSrc = (s) => { const i = s.indexOf(":"); return i < 0 ? [s.trim(), ""] : [s.slice(0, i).trim(), s.slice(i + 1).trim()]; };
@@ -33,7 +35,7 @@ const srcHTML = (s) => {
 // 배경 글에 쓰인 출처 id(중복 없이, 처음 나온 차례)
 const usedSources = (bgs) => [...new Set(bgs.flatMap((bg) => BG_KINDS.flatMap((k) => (bg?.[k.key] || []).flatMap((it) => [...(it.src || []), it.quote?.src].filter(Boolean).map((s) => splitSrc(s)[0])))))].filter((id) => SOURCES[id]);
 
-export function createBooks({ onEvent, onPerson, onStory, onBack, onOpen, onClose }) {
+export function createBooks({ onEvent, onPerson, onStory, onDebate, onBack, onOpen, onClose }) {
   const root = document.getElementById("book");
   const page = document.getElementById("bPage");
   const scroll = document.getElementById("bScroll");
@@ -166,6 +168,7 @@ export function createBooks({ onEvent, onPerson, onStory, onBack, onOpen, onClos
         </div>
         ${emps.length ? `<section class="p-card"><h3>이 시대의 제국</h3><ul class="bg-emps">${emps.map((x) => `<li><i style="background:${esc(x.color)}"></i><b>${esc(x.name)}</b><span>${esc(range(x))}</span></li>`).join("")}</ul></section>` : ""}
         ${books.length ? `<section class="p-card"><h3>이 시대를 다루거나 이때 쓴 책</h3><div class="b-people">${books.map((b) => `<button class="b-chip link" type="button" data-book="${esc(b.id)}.bg">${esc(b.name)}</button>`).join("")}</div></section>` : ""}
+        ${debatesOf(e).length ? `<section class="p-card"><h3>이 시대의 논쟁</h3><ul class="b-links">${debatesOf(e).map((c) => `<li><button type="button" data-debate="${esc(c.id)}">${esc(c.title)} →</button><span>${c.from === c.to ? c.from : `${c.from}~${c.to}`}년</span></li>`).join("")}</ul></section>` : ""}
         ${evs.length ? `<section class="p-card"><h3>연표의 사건</h3><ul class="bg-evs">${evs.map((ev) => `<li><span>${esc(ev.yearLabel || yr(ev.year))}</span><button type="button" data-event="${esc(ev.id)}">${esc(ev.title)}</button></li>`).join("")}</ul></section>` : ""}
       </aside>
       <div class="p-main">
@@ -197,6 +200,8 @@ export function createBooks({ onEvent, onPerson, onStory, onBack, onOpen, onClos
     if (!e.target.closest("#bpop")) hidePop();
     const st = e.target.closest("[data-story]");
     if (st) { onStory(st.dataset.story); return; }
+    const db = e.target.closest("[data-debate]");
+    if (db) { close(); onDebate(db.dataset.debate); return; }
     const tb = e.target.closest("[data-tab]");
     if (tb) { setTab(tb.dataset.tab); return; }
     const er = e.target.closest("[data-era]");

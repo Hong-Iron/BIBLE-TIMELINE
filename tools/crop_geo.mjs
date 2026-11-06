@@ -1,4 +1,5 @@
-// Natural Earth 지도 자료를 성경 지역(동경 0~66도, 북위 15~50도)만 잘라 site/shared/geo.json으로 저장한다.
+// Natural Earth 지도 자료를 성경과 교회사 지역(서경 11도~동경 66도, 북위 15~58도)만 잘라 site/shared/geo.json으로 저장한다.
+// 교회사(종교개혁까지)에 비텐베르크·런던·도르트레흐트(북위 51~52도)와 스코틀랜드가 나와 북쪽과 서쪽을 넓혔다.
 // 준비: 같은 폴더에 land50.json(world-atlas@2.0.2 land-50m), ne_10m_rivers_lake_centerlines.geojson, ne_10m_lakes.geojson을 받고
 //       npm i d3-geo@3 d3-geo-projection@4 topojson-client@3
 // 실행: node crop_geo.mjs <저장할 geo.json 경로>
@@ -6,7 +7,7 @@ import fs from "fs";
 import { geoIdentity, geoBounds, geoArea } from "d3-geo";
 import { geoProject } from "d3-geo-projection";
 import { feature } from "topojson-client";
-const BOX = [[0, 15], [66, 50]];
+const BOX = [[-11, 15], [66, 58]];
 const clip = geoIdentity().clipExtent(BOX);
 // d3는 바깥 고리가 시계 방향이어야 땅으로 본다. 반대면 '지구 전체에서 이 땅을 뺀 면'이 되므로 고리를 뒤집는다.
 const fixPoly = (rings) => (geoArea({ type: "Polygon", coordinates: rings }) > 2 * Math.PI ? rings.map((r) => r.slice().reverse()) : rings);
@@ -29,7 +30,7 @@ const pick = (file, keep) => {
   return rewind(round({ type: "FeatureCollection", features: feats.filter((f) => f.geometry) }));
 };
 const rivers = pick("ne_10m_rivers_lake_centerlines.geojson", (f) => f.properties.scalerank <= 6 && !/Canal|Csatorna|Soroksari|Bratul|Borcea/.test(f.properties.name));
-const lakes = pick("ne_10m_lakes.geojson", (f) => f.properties.scalerank <= 8 && /Galilee|Dead Sea|Van|Urmia|Tuz|Hammar|Bitter|Sevan/.test(f.properties.name || ""));
+const lakes = pick("ne_10m_lakes.geojson", (f) => f.properties.scalerank <= 8 && /Galilee|Dead Sea|Van|Urmia|Tuz|Hammar|Bitter|Sevan|Geneva|Léman|Constance|Bodensee/.test(f.properties.name || ""));
 console.log("rivers", rivers.features.map((f) => f.properties.en).join(", "));
 console.log("lakes", lakes.features.map((f) => f.properties.en).join(", "));
 fs.writeFileSync(process.argv[2], JSON.stringify({ land, rivers, lakes }));
