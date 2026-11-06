@@ -1,5 +1,7 @@
 // 시안 B · 박물관 회랑. 사건 하나가 화면 한 칸짜리 전시실이고, 옆으로 넘기며 걷는다.
-import { EVENTS, ERAS, PEOPLE, STRENGTH, PLACES, RANGE, byId, yearText } from "../shared/data.js";
+import { EVENTS as ALL_EVENTS, ERAS, PEOPLE, STRENGTH, PLACES, RANGE, byId, yearText } from "../shared/data.js";
+// 비교용 시안은 처음 만든 표본 사건 11개만 보여 준다.
+const EVENTS = ALL_EVENTS.filter((ev) => ev.sample);
 
 const ERA = byId(ERAS);
 const PERSON = byId(PEOPLE);

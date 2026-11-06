@@ -1,8 +1,13 @@
 // 인물 프로필. 사실마다 근거 장절(ref)을 붙인다. 성경 밖 자료에서 온 사실은 ref 대신 src에 출처를 적는다.
-// 장절의 본문은 tools/build_verses.py가 개역한글에서 뽑아 verses.json에 넣는다. 연도는 data.js와 같은 전통 연대이고 대부분 추정이다.
+// 장절의 본문은 tools/build_verses.py가 개역한글에서 뽑아 verses.js에 넣는다. 연도는 data.js와 같은 전통 연대이고 대부분 추정이다.
 //
 // family.rel → 가계도의 줄: 윗세대(조상·부모), 같은 세대(본인·배우자·형제), 아랫세대(자녀·후손)는 profile 화면이 rel 이름으로 나눈다.
 // records: { ev: "<사진 키>" }는 data.js 사건의 증거를 그대로 쓰고, 나머지 칸을 적으면 그 칸만 바꾼다. img가 없는 항목은 글로만 싣는다.
+
+import { PROFILES_G1 } from "./profiles_g1.js";
+import { PROFILES_G2 } from "./profiles_g2.js";
+import { PROFILES_G3 } from "./profiles_g3.js";
+import { PROFILES_G4 } from "./profiles_g4.js";
 
 export const PROFILES = {
   abraham: {
@@ -618,6 +623,9 @@ export const PROFILES = {
     records: [{ ev: "gallio", strength: "indirect", says: "바울을 재판한 갈리오가 아가야 총독이던 해(기원후 51~52년)를 알려 주어, 바울의 여행 연대를 정하는 기준점이 된다." }],
   },
 };
+
+// 시대별 묶음 파일의 프로필을 합친다(족장~사사, 왕국, 포로~중간기, 신약).
+Object.assign(PROFILES, PROFILES_G1, PROFILES_G2, PROFILES_G3, PROFILES_G4);
 
 // 가계도에서 윗세대·아랫세대로 놓을 관계 이름. 나머지는 본인과 같은 줄에 놓는다.
 export const UPPER = new Set(["조상", "증조부모", "할아버지", "외할아버지", "아버지", "어머니", "장인", "삼촌"]);

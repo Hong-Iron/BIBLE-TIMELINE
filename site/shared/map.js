@@ -42,7 +42,8 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, p
   function drawMarks() {
     const ids = current ? current.route : [];
     const pts = ids.map((id) => proj(PLACES[id].at));
-    route.attr("d", pts.length > 1 ? d3.line().curve(d3.curveCatmullRom.alpha(0.5))(pts) : null);
+    // noLine이면 점만 찍는다(인물 프로필처럼 순서 없는 장소 모음).
+    route.attr("d", pts.length > 1 && !current?.noLine ? d3.line().curve(d3.curveCatmullRom.alpha(0.5))(pts) : null);
     const sel = marks.selectAll("g.pl").data(ids, (d) => d);
     sel.exit().remove();
     const enter = sel.enter().append("g").attr("class", "pl");

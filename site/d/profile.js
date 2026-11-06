@@ -3,19 +3,20 @@
 import { PEOPLE, EVENTS, STRENGTH, PLACES, byId } from "../shared/data.js";
 import { PROFILES, UPPER, LOWER } from "../shared/profiles.js";
 import { createMap, THEMES } from "../shared/map.js";
+import { VERSES } from "../shared/verses.js";
 
 const PERSON = byId(PEOPLE);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const yearRange = (a, b) => (a < 0 && b < 0 ? `기원전 ${-a}~${-b}년` : a > 0 ? `기원후 ${a}~${b}년` : `기원전 ${-a}년~기원후 ${b}년`);
-const EVIDENCE = Object.fromEntries(EVENTS.flatMap((ev) => ev.evidence.map((e) => [e.img, { ...e, eventId: ev.id }])));
+const EVIDENCE = Object.fromEntries(EVENTS.flatMap((ev) => ev.evidence.filter((e) => e.img).map((e) => [e.img, { ...e, eventId: ev.id }])));
 
 export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
   const root = document.getElementById("profile");
   const page = document.getElementById("pPage");
   const scroll = document.getElementById("pScroll");
   const pop = document.getElementById("vpop");
-  let verses = {}, map = null, mapLoading = null, current = null;
-  const versesReady = fetch("../shared/verses.json").then((r) => r.json()).then((v) => (verses = v)).catch(() => {});
+  const verses = VERSES;
+  let map = null, mapLoading = null, current = null;
 
   const refBtn = (ref) => (ref ? `<button class="vref" type="button" data-ref="${esc(ref)}">${esc(ref)}</button>` : "");
   const srcTag = (src) => (src ? `<span class="src">${esc(src)}</span>` : "");
@@ -94,7 +95,7 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
         </section>
         ${events.length ? `<section class="p-sec"><h2>연표의 사건</h2><div class="p-events">${events.map((ev) => `
           <button class="p-event" type="button" data-event="${esc(ev.id)}">
-            <img src="../img/sm/${esc(ev.evidence[0].img)}.jpg" alt="" loading="lazy">
+            ${ev.evidence[0]?.img ? `<img src="../img/sm/${esc(ev.evidence[0].img)}.jpg" alt="" loading="lazy">` : `<span class="p-noimg">글</span>`}
             <span><small>${esc(ev.yearLabel)}</small><b>${esc(ev.title)}</b><em>전시실에서 보기 →</em></span>
           </button>`).join("")}</div></section>` : ""}
         <section class="p-sec">
@@ -127,7 +128,7 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
     const el = document.getElementById("pMap");
     const route = places.filter((k) => PLACES[k]);
     // 지도는 한 번만 만들고, 열 때마다 새 칸으로 옮겨 붙인다.
-    if (map) { el.appendChild(map.el); map.resize(); map.show({ route }, { instant: true }); return; }
+    if (map) { el.appendChild(map.el); map.resize(); map.show({ route, noLine: true }, { instant: true }); return; }
     if (mapLoading) return;
     const host = document.createElement("div");
     host.className = "p-map-host";
@@ -137,7 +138,7 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
       const now = document.getElementById("pMap");
       if (now && !now.contains(host)) now.appendChild(host);
       m.resize();
-      m.show({ route: PROFILES[current].places.filter((k) => PLACES[k]) }, { instant: true });
+      m.show({ route: PROFILES[current].places.filter((k) => PLACES[k]), noLine: true }, { instant: true });
     }).catch(() => {});
   }
 
@@ -169,7 +170,6 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
 
   async function open(id) {
     if (!PROFILES[id] || !PERSON[id]) return;
-    await versesReady;
     current = id;
     hidePop();
     render(id);

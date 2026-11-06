@@ -1,4 +1,6 @@
-import { RANGE, ERAS, EVENTS, PEOPLE, PLACES, STRENGTH, byId, yearsBetween } from "../shared/data.js";
+import { RANGE, ERAS, EVENTS as ALL_EVENTS, PEOPLE, PLACES, STRENGTH, byId, yearsBetween } from "../shared/data.js";
+// 비교용 시안은 처음 만든 표본 사건 11개만 보여 준다.
+const EVENTS = ALL_EVENTS.filter((ev) => ev.sample);
 import { createMap, THEMES } from "../shared/map.js";
 
 const $ = (id) => document.getElementById(id);

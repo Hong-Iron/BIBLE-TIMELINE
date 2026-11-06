@@ -21,12 +21,45 @@ FILES = {
     "gallio": "File:Delphes Gallion.jpg",
     "kurkh": "File:Shalmaneser III-1.jpg",
     "ishtar": "File:Pergamon museum Ishtar Gate.jpg",
+    "benihasan": "File:Asiatics with lyre Beni Hasan.jpg",
+    "rekhmire": "File:Brickmakers, Tomb of Rekhmire MET DT10882.jpg",
+    "stcatherine": "File:Katharinenkloster Sinai BW 2.jpg",
+    "sinai": "File:Mount Sinai BW 4.jpg",
+    "sodom": "File:Mount Sodom, Dead Sea Outlook, Israel 20.jpg",
+    "jericho": "File:Jericho BW 1.jpg",
+    "tabor": "File:Mt Tabor aerial view 2 Mordagan IMOT (14530932473).jpg",
+    "harod": "File:Gideon's Fountain, Near Jezreel.jpg",
+    "elah": "File:Valley of Elah.jpg",
+    "stepped": "File:Stepped structure unearthed in the City of David.jpg",
+    "megiddo": "File:Chambered Gate of Megiddo (20726303061).jpg",
+    "bubastite": "File:Karnak Tempel Bubastis-Portal 03.jpg",
+    "samivory": "File:Furniture Inlays, Samaria, 9th-8th Century BC (43218962441).jpg",
+    "muhraka": "File:St Elias Church at the Muhraka Monastery 0651.jpg",
+    "nineveh": "File:Nineveh - Mashki Gate.jpg",
+    "sargon": "File:Sargon II and dignitary.jpg",
+    "ketef": "File:Ketef hinom scrolls.JPG",
+    "nabonidus": "File:Cylinder Nabonidus BM WA91128.jpg",
+    "behistun": "File:Behistun inscription reliefs.jpg",
+    "persepolis": "File:Persepolis – Gate of All Nations 02.jpg",
+    "warning": "File:Temple Warning Inscription from Jerusalem Istanbul Archaeology Museums.jpg",
+    "nativity": "File:2130 Bethlehem - Grotto of the Nativity.jpg",
+    "jordan": "File:Holy Land 2016 P0577 Jordan River Kasr al-Jahud site of the baptism of Jesus.jpg",
+    "galboat": "File:2,000 year-old Galilee Boat (25590631200).jpg",
+    "olives": "File:Jerusalem Mount of Olives BW 2010-09-20 07-57-31.JPG",
+    "rollingstone": "File:Schijfvormige steen bij het familiegraf van Herodus, Bestanddeelnr 255-2387.jpg",
+    "steps": "File:PikiWiki Israel 4050 huldas steps.jpg",
+    "damascus": "File:Damascus Straight Street and East Gate 8193.jpg",
+    "appian": "File:Appian Way.jpg",
+    "titus": "File:Spoils from Jerusalem - Arch of Titus - Rome 2008.jpg",
+    "patmos": "File:Cave of the Apocalypse.jpg",
     "babchron": "File:The cuneiform inscription highlights the conquest of Jerusalem and the surrender of Jehoiakim, king of Judah, in 597 BCE. From Babylon, Iraq.jpg",
 }
 # Commons의 작성자 칸이 긴 설명문인 사진은 화면에 이름만 보이도록 줄여 적는다.
 AUTHOR_SHORT = {"ur": "Hardnfast", "taylor": "David Castor", "lachish": "Mike Peel",
                 "cyrus": "Mike Peel (수정: مانفی)", "isaiah": "Ardon Bar Hama",
-                "kurkh": "David Castor", "babchron": "Osama Shukir Muhammed Amin"}
+                "kurkh": "David Castor", "babchron": "Osama Shukir Muhammed Amin",
+                "sargon": "작자 미상", "nabonidus": "작자 미상", "behistun": "작자 미상",
+                "galboat": "Konrad Summers", "samivory": "Gary Todd", "harod": "OSU 특별 소장품(1910년 사진)"}
 UA = "BibleTimeline/0.1 (https://github.com/Hong-Iron/BIBLE-TIMELINE)"
 ROOT = Path(__file__).resolve().parent.parent / "site"
 
@@ -37,8 +70,12 @@ def curl(url, out=None):
 def plain(s):
     return html.unescape(re.sub(r"<[^>]+>", "", s or "")).strip()
 
+import sys
+old = json.loads((ROOT / "shared" / "credits.json").read_text()) if (ROOT / "shared" / "credits.json").exists() else {}
 credits = {}
 for key, title in FILES.items():
+    if "--all" not in sys.argv and key in old and (ROOT / "img" / f"{key}.jpg").exists():
+        credits[key] = old[key]; continue
     api = "https://commons.wikimedia.org/w/api.php?" + urllib.parse.urlencode({
         "action": "query", "titles": title, "prop": "imageinfo", "format": "json",
         "iiprop": "url|extmetadata", "iiurlwidth": 1200})

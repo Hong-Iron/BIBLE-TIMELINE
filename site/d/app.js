@@ -27,8 +27,10 @@ const ctx2d = document.createElement("canvas").getContext("2d");
 const tw = (text, size = 11, weight = 500) => ((ctx2d.font = `${weight} ${size}px ${UI_FONT}`), ctx2d.measureText(text).width);
 
 // 증거를 사건과 묶어 한 줄로 편다. 옛 사본은 그 책이 다루는 시기 끝에도 이어 준다.
-const EVID = EVENTS.flatMap((ev) => ev.evidence.map((e, i) => ({ ...e, ev, i, key: `${ev.id}:${i}` })))
-  .sort((a, b) => a.madeYear - b.madeYear);
+// 사진이 있는 증거만 연표의 증거 줄에 놓는다. 장소 사진(kind: "place")은 만든 해가 없어 사건의 해에 놓고 곡선을 긋지 않는다.
+const EVID = EVENTS.flatMap((ev) => ev.evidence.map((e, i) => ({ ...e, ev, i, key: `${ev.id}:${i}`, at: e.madeYear ?? ev.year })))
+  .filter((e) => e.img)
+  .sort((a, b) => a.at - b.at);
 const bookOf = (name) => BOOKS.find((b) => b.name === name);
 
 function gapText(made, at) {
@@ -69,7 +71,7 @@ function layout() {
   const m = state.mobile;
   const d = {
     axis: 26, gap: m ? 6 : 8, emp: m ? 18 : 20, era: m ? 20 : 22, bookRow: m ? 16 : 17, personRow: m ? 19 : 21,
-    evRow: m ? 15 : 16, evRows: 3, band: m ? 46 : 54, thumb: m ? 34 : 42, labelW: m ? 52 : 96,
+    evRow: m ? 15 : 16, evRows: m ? 3 : 4, band: m ? 46 : 54, thumb: m ? 34 : 42, labelW: m ? 52 : 96,
   };
   let y = d.axis + d.gap;
   const lane = (name, h) => { const top = y; y += h + d.gap; return { top, h, name }; };
@@ -228,13 +230,10 @@ function render() {
       const r = rowEnd.findIndex((end) => end + 12 <= x - 3);
       return r < 0 ? null : { r, w, label };
     };
-    let p = tryPlace(ev.title) ?? tryPlace(SHORT[ev.id] ?? ev.title);
-    if (!p) {
-      const w = tw(SHORT[ev.id], 12);
-      const r = rowEnd.indexOf(Math.min(...rowEnd));
-      p = { r, w, label: SHORT[ev.id], crowded: true };
-    }
-    rowEnd[p.r] = x - 3 + p.w;
+    const short = ev.short ?? SHORT[ev.id] ?? ev.title;
+    let p = tryPlace(ev.title) ?? tryPlace(short);
+    if (!p) p = { r: d.evRows - 1, w: 0, label: short, crowded: true };
+    else rowEnd[p.r] = x - 3 + p.w;
     return { ev, x, ...p };
   });
   G.ev.selectAll("g.ev").data(evLayout.filter((o) => o.x > -200 && o.x < W + 40), (o) => o.ev.id).join((e) => {
@@ -250,9 +249,10 @@ function render() {
   }).classed("on", (o) => sel === o.ev).classed("near", (o) => state.near === o.ev && sel !== o.ev).each(function (o) {
     const g = d3.select(this);
     const ty = L.ev.top + (d.evRows - 1 - o.r) * d.evRow + 13;
-    g.select(".lead").attr("x1", o.x).attr("x2", o.x).attr("y1", ty + 3).attr("y2", dotY);
+    g.select(".lead").attr("x1", o.x).attr("x2", o.x).attr("y1", o.crowded ? dotY : ty + 3).attr("y2", dotY);
     g.selectAll("circle").attr("cx", o.x).attr("cy", dotY);
-    g.select("text").attr("x", o.x - 3).attr("y", ty).attr("opacity", o.crowded ? 0.45 : 1).text(o.label);
+    // 자리가 없는 이름은 숨기고 점만 남긴다. 확대하거나 마우스를 올리면 이름이 보인다.
+    g.select("text").attr("x", o.x - 3).attr("y", ty).style("display", o.crowded ? "none" : null).text(o.label);
     g.select(".hit").attr("x", o.x - 8).attr("y", ty - 13).attr("width", o.w + 12).attr("height", dotY - ty + 21);
     g.select("title").text(`${o.ev.title} · ${o.ev.yearLabel}`);
   });
@@ -260,7 +260,7 @@ function render() {
   // 증거: 만든 해에 핀을 꽂고, 사진은 겹치지 않게 두 줄로 옆으로 비켜 놓는다
   const T = d.thumb, rowRight = [-Infinity, -Infinity];
   const thumbs = EVID.map((e) => {
-    const pin = X(e.madeYear);
+    const pin = X(e.at);
     let best = null;
     for (let r = 0; r < 2; r++) {
       const left = Math.max(pin - T / 2, rowRight[r] + 6);
@@ -298,6 +298,7 @@ function render() {
   const bt = L.band.top, bb = L.evid.top;
   const arcs = [];
   for (const t of thumbs) {
+    if (t.e.kind === "place") continue;
     const xe = X(t.e.ev.year);
     arcs.push({ key: t.e.key, x0: xe, x1: t.pin, ev: t.e.ev, gap: gapText(t.e.madeYear, t.e.ev.year), ms: false, from: dotY + 5 });
     const book = t.e.strength === "manuscript" && bookOf(t.e.ev.book);
@@ -483,17 +484,18 @@ function roomHTML(ev, i) {
   const thumbs = multi
     ? `<div class="g-thumbs" role="tablist" aria-label="이 방의 유물">${ev.evidence.map((e, k) =>
         `<button class="g-thumb" role="tab" data-k="${k}" title="${esc(e.name)}" aria-label="${esc(e.name)}">
-          <img src="${smUrl(e.img)}" alt="" loading="lazy" decoding="async"></button>`).join("")}</div>`
+          ${e.img ? `<img src="${smUrl(e.img)}" alt="" loading="lazy" decoding="async">` : `<span class="g-thumb-text">글</span>`}</button>`).join("")}</div>`
     : "";
   const people = ev.people.map((id) => PERSON[id]).filter(Boolean)
     .map((p) => `<button class="g-person" type="button" data-person="${esc(p.id)}" title="인물 프로필 보기">${esc(p.name)}</button>(${esc(p.kind)} ${esc(rangeText(p.from, p.to))})`).join(" · ");
-  return `<section class="room${multi ? " multi" : ""}" data-i="${i}" aria-label="${esc(ev.yearLabel)}, ${esc(ev.title)}">
+  const empty = `<div class="g-empty"><b>빈 진열장</b><p>이 사건을 직접 보여 주는 유물이나 장소 사진은 아직 싣지 않았다. 사건은 성경 본문으로만 전해진다.</p></div>`;
+  return `<section class="room${multi ? " multi" : ""}${ev.evidence.length ? "" : " no-ev"}" data-i="${i}" aria-label="${esc(ev.yearLabel)}, ${esc(ev.title)}">
     <div class="bgyear" aria-hidden="true">${Math.abs(ev.year)}</div>
     <div class="g-inner">
       <div class="g-stage">
-        <figure class="photo"><img alt="" decoding="async" loading="lazy"><span class="floor" aria-hidden="true"></span></figure>
-        ${thumbs}
-        <div class="plate"><div class="plate-body">
+        ${ev.evidence.length ? `<figure class="photo"><img alt="" decoding="async" loading="lazy"><div class="g-textcard"><small>글로만 남은 기록</small><b></b></div></figure>
+        ${thumbs}` : empty}
+        ${ev.evidence.length ? "" : "<!--"}<div class="plate"><div class="plate-body">
           <div class="plate-head"><h3 class="pname"></h3><span class="chip"></span></div>
           <p class="g-sdesc"></p>
           <dl class="pmeta"><dt>만든 때</dt><dd><span class="pmade"></span> · <span class="pgap"></span></dd><dt>소장</dt><dd class="pwhere"></dd><dt>발견</dt><dd class="pfound"></dd></dl>
@@ -502,7 +504,7 @@ function roomHTML(ev, i) {
             <div><h4>주의할 점</h4><p class="pcaveat"></p></div>
           </div>
         </div></div>
-        <p class="g-credit"></p>
+        <p class="g-credit"></p>${ev.evidence.length ? "" : "-->"}
       </div>
       <article class="story">
         <p class="g-era">${esc(ERA[ev.era]?.name)}</p>
@@ -521,8 +523,9 @@ const rooms = [...hall.children];
 
 function fillCredit(room) {
   const e = EVENTS[room.dataset.i].evidence[+room.dataset.k || 0];
-  const c = credits[e.img];
+  const c = e && credits[e.img];
   const el = room.querySelector(".g-credit");
+  if (!el) return;
   if (!c) { el.textContent = ""; return; }
   const lic = c.licenseUrl ? `<a href="${esc(c.licenseUrl)}" target="_blank" rel="noopener">${esc(c.license)}</a>` : esc(c.license);
   el.innerHTML = `사진 ${esc(c.author)} · ${lic} · <a href="${esc(c.page)}" target="_blank" rel="noopener">원본</a>`;
@@ -538,9 +541,15 @@ function fillPlate(room, ev, e) {
   chip.title = s.desc;
   q(".g-sdesc").textContent = s.desc;
   q(".pmade").textContent = e.madeLabel;
-  // 라벨에는 연표의 곡선 이름표보다 촘촘하게 적는다. 1년 이내면 같은 무렵으로 본다.
-  const n = yearsBetween(e.madeYear, ev.year);
-  q(".pgap").textContent = n <= 1 ? "사건과 같은 무렵" : `사건보다 ${n >= 100 ? `약 ${Math.round(n / 10) * 10}` : n}년 ${e.madeYear > ev.year ? "뒤" : "앞"}`;
+  // 라벨에는 연표의 곡선 이름표보다 촘촘하게 적는다. 1년 이내면 같은 무렵으로 본다. 장소 사진은 만든 해가 없다.
+  const n = e.madeYear == null ? null : yearsBetween(e.madeYear, ev.year);
+  q(".pmeta dt").textContent = e.kind === "place" ? "사진" : "만든 때";
+  // 만든 때가 '세기'나 '경'처럼 대략일 때 100년 안쪽의 차이는 햇수로 적지 않는다(기원전 21세기 유물을 '9년 앞'이라 적지 않게).
+  const rough = /세기|경|쯤|~/.test(e.madeLabel || "") || /경|쯤|~/.test(ev.yearLabel);
+  const dir = e.madeYear > ev.year ? "뒤" : "앞";
+  q(".pgap").textContent = e.kind === "place" ? "사건이 일어난 곳" : n == null ? "" : n <= 1 ? "사건과 같은 무렵"
+    : rough && n < 100 ? "사건과 같은 시대" : `사건보다 ${n >= 100 ? `약 ${Math.round(n / 10) * 10}` : n}년 ${dir}`;
+  q(".pfound").parentElement.querySelectorAll("dt")[2].style.display = q(".pfound").style.display = e.found ? "" : "none";
   q(".pwhere").textContent = e.where;
   q(".pfound").textContent = e.found;
   q(".psays").textContent = e.says;
@@ -561,7 +570,12 @@ function setEvidence(room, k, instant = false) {
   if (isOpen() && +room.dataset.i === gCur) { state.focusKey = `${ev.id}:${k}`; frame(); }
   const stageEl = room.querySelector(".g-stage");
   const im = room.querySelector(".photo img");
-  const swap = () => { fillPlate(room, ev, e); im.src = imgUrl(e.img); im.alt = e.name; };
+  const fig = room.querySelector(".photo");
+  const swap = () => {
+    fillPlate(room, ev, e);
+    fig.classList.toggle("noimg", !e.img);
+    if (e.img) { im.src = imgUrl(e.img); im.alt = e.name; } else { im.removeAttribute("src"); fig.querySelector(".g-textcard b").textContent = e.name; }
+  };
   if (instant || reduce) { swap(); return; }
   stageEl.classList.add("swap");
   setTimeout(() => {
@@ -570,7 +584,7 @@ function setEvidence(room, k, instant = false) {
     im.decode ? im.decode().then(done, done) : done();
   }, 220);
 }
-rooms.forEach((r) => setEvidence(r, 0, true));
+rooms.forEach((r) => { if (EVENTS[r.dataset.i].evidence.length) setEvidence(r, 0, true); });
 
 // 아래 시간 띠: 실제 햇수 비율로 시대와 사건 점을 놓는다
 gTrack.innerHTML = `<div class="line"></div>`
@@ -613,7 +627,7 @@ function setRoom(i) {
   $("gMapCap").textContent = `${names.length > 1 ? "경로" : "장소"} · ${names.join(" → ")}`;
   gMap?.show(ev);
   state.selected = ev;
-  state.focusKey = `${ev.id}:${+rooms[i].dataset.k || 0}`;
+  state.focusKey = ev.evidence.length ? `${ev.id}:${+rooms[i].dataset.k || 0}` : null;
   setCenter(ev.year);
   history.replaceState(null, "", `#${ev.id}`);
 }

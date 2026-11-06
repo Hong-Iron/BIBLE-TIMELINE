@@ -1,7 +1,9 @@
 // 시안 C · 동시대 차선: 실제 비율의 시간축 위에 제국·시대·책·인물·사건·증거를 나란히 놓는다.
 // 화면은 가로로 넓은 '트랙'을 스크롤하고, 그림은 화면 폭만 한 SVG 하나에 그때그때 다시 그린다.
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
-import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "../shared/data.js";
+import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS as ALL_EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "../shared/data.js";
+// 비교용 시안은 처음 만든 표본 사건 11개만 보여 준다.
+const EVENTS = ALL_EVENTS.filter((ev) => ev.sample);
 import { createMap, THEMES } from "../shared/map.js";
 
 const SPAN = RANGE[1] - RANGE[0];

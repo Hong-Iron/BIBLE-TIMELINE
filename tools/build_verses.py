@@ -1,4 +1,5 @@
-"""인물 프로필(site/shared/profiles.js)에 적힌 장절의 본문을 개역한글에서 뽑아 site/shared/verses.json에 저장한다.
+"""사건 자료(data.js, events_more.js)와 인물 프로필(profiles*.js)에 적힌 장절의 본문을 개역한글에서 뽑아
+site/shared/verses.js(export const VERSES = {...})로 저장한다. data.js와 프로필 화면이 이 모듈을 불러 쓴다.
 
 실행: python3 -I tools/build_verses.py          (저장소 맨 위에서)
       python3 -I tools/build_verses.py --check  (주장과 본문을 나란히 출력해 눈으로 대조한다)
@@ -64,9 +65,18 @@ def collect_refs(js):
     return list(dict.fromkeys(refs))
 
 
+SOURCES = ["data.js", "events_more.js", "profiles.js", "profiles_*.js"]
+
+
+def read_sources():
+    shared = ROOT / "site" / "shared"
+    files = sorted({f for pat in SOURCES for f in shared.glob(pat)})
+    return "\n".join(f.read_text() for f in files)
+
+
 def main():
     bible = load_bible()
-    js = (ROOT / "site" / "shared" / "profiles.js").read_text()
+    js = read_sources()
     out, missing = {}, []
     for ref in collect_refs(js):
         parts = []
@@ -77,8 +87,11 @@ def main():
                 continue
             parts.append([f"{book} {c}:{v}", text])
         out[ref] = parts
-    (ROOT / "site" / "shared" / "verses.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")))
-    print(f"장절 {len(out)}개, 절 {sum(len(p) for p in out.values())}개를 verses.json에 저장했다.")
+    body = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
+    (ROOT / "site" / "shared" / "verses.js").write_text(
+        "// tools/build_verses.py가 만든 파일이다. 손으로 고치지 않는다. 장절 → [[\"책 장:절\", 개역한글 본문], ...]\n"
+        f"export const VERSES = {body};\n")
+    print(f"장절 {len(out)}개, 절 {sum(len(p) for p in out.values())}개를 verses.js에 저장했다.")
     if missing:
         print("찾지 못한 절:", *missing, sep="\n  ")
         sys.exit(1)

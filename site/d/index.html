@@ -356,6 +356,21 @@ button { font: inherit; color: inherit; }
 .g-meta { display: grid; grid-template-columns: 44px 1fr; gap: 6px 12px; margin: clamp(14px, 2.4vh, 22px) 0 0; padding-top: 14px; border-top: 1px solid #ddd5c7; font-size: 13px; line-height: 1.6; }
 .g-meta dd { margin: 0; color: var(--gink2); }
 
+
+/* 빈 진열장, 글로만 남은 기록 */
+.g-empty { width: min(100%, 560px); margin: auto 0; padding: 34px 30px; border: 1.5px dashed #cfc5b3; border-radius: 10px; background: rgba(255, 255, 255, 0.55); text-align: center; }
+.g-empty b { display: block; font: 600 20px/1.3 var(--serif); color: var(--ink2); }
+.g-empty p { margin: 10px 0 0; font-size: 14px; line-height: 1.7; color: var(--muted); word-break: keep-all; }
+.photo .g-textcard { display: none; }
+.photo.noimg img { display: none; }
+.photo.noimg .g-textcard {
+  display: flex; flex-direction: column; justify-content: center; gap: 8px; width: min(100%, 420px); min-height: 200px; padding: 26px 28px;
+  background: #fff; border: 1.5px dashed #cfc5b3; border-radius: 6px; text-align: center;
+}
+.g-textcard small { font-size: 12px; letter-spacing: 0.08em; color: var(--muted); }
+.g-textcard b { font: 600 20px/1.4 var(--serif); color: var(--ink); word-break: keep-all; }
+.g-thumb-text { display: grid; place-items: center; width: 100%; height: 100%; font: 600 13px var(--serif); color: var(--muted); }
+
 /* 옆 넘김 단추 */
 .g-nav {
   position: absolute; top: 50%; z-index: 26; width: 44px; height: 44px; margin-top: -22px;
@@ -534,7 +549,8 @@ button { font: inherit; color: inherit; }
 .p-events { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
 .p-event { display: flex; gap: 12px; align-items: center; text-align: left; cursor: pointer; padding: 8px; border-radius: 10px; border: 1px solid var(--card-line); background: #fff; }
 .p-event:hover { border-color: var(--accent); }
-.p-event img { width: 58px; height: 58px; object-fit: cover; border-radius: 6px; flex: none; }
+.p-event img, .p-noimg { width: 58px; height: 58px; object-fit: cover; border-radius: 6px; flex: none; }
+.p-noimg { display: grid; place-items: center; background: #f2ede4; color: var(--muted); font: 600 13px var(--serif); }
 .p-event small { display: block; font-size: 11.5px; color: var(--accent); font-weight: 600; }
 .p-event b { display: block; font-size: 14px; line-height: 1.35; word-break: keep-all; }
 .p-event em { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 2px; }

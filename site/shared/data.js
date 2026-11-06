@@ -1,5 +1,8 @@
-// 시안 3개가 함께 쓰는 표본 데이터. 연도는 기원전을 음수로 적는다(기원전 1446년 → -1446).
-// 구절은 개역한글(1961, 저작권 만료)에서 그대로 옮겼다.
+// 모든 화면이 함께 쓰는 사건·인물·책·장소 자료. 연도는 기원전을 음수로 적는다(기원전 1446년 → -1446).
+// 표본 사건 11개는 이 파일에, 나머지 49개는 events_more.js에 있다. 표본 사건에는 sample: true를 붙여 시안 A·B·C가 이 11개만 쓰게 한다.
+// 구절은 개역한글(1961, 저작권 만료)이다. verse가 없는 사건은 verses.js(tools/build_verses.py가 뽑은 본문)로 채운다.
+import { VERSES } from "./verses.js";
+import { MORE_EVENTS, MORE_PEOPLE, MORE_BOOKS, MORE_PLACES } from "./events_more.js";
 
 export const RANGE = [-2200, 100];
 
@@ -145,7 +148,7 @@ export const EVENTS = [
     ref: "출 12:51",
     verse: "그 같은 날에 여호와께서 이스라엘 자손을 그 군대대로 애굽 땅에서 인도하여 내셨더라",
     summary: "430년 동안 애굽에 살던 이스라엘 자손이 모세를 따라 애굽을 떠나 시내산으로 간다.",
-    people: ["moses"],
+    people: ["moses", "aaron"],
     route: ["rameses", "sinai"],
     evidence: [
       {
@@ -392,6 +395,15 @@ export function yearsBetween(a, b) {
   const [lo, hi] = a < b ? [a, b] : [b, a];
   return hi - lo - (lo < 0 && hi > 0 ? 1 : 0);
 }
+
+for (const ev of EVENTS) ev.sample = true;
+PEOPLE.push(...MORE_PEOPLE);
+BOOKS.push(...MORE_BOOKS);
+Object.assign(PLACES, MORE_PLACES);
+EVENTS.push(...MORE_EVENTS);
+for (const ev of EVENTS) ev.verse ??= (VERSES[ev.ref] || []).map(([, t]) => t).join(" ");
+// 같은 해의 사건은 적은 순서를 지킨다(Array.prototype.sort는 안정 정렬).
+EVENTS.sort((a, b) => a.year - b.year);
 
 export const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
 
