@@ -1,9 +1,9 @@
 // 인물 프로필 화면. 연표의 인물 막대나 전시실의 인물 이름을 누르면 화면 가득 열린다.
 // 왼쪽 열(고정): 이름·기본 정보·가계도·관련 장소 지도 / 오른쪽 열(스크롤): 요약·생애·핵심 구절·성경 밖 기록·등장하는 책
-import { PEOPLE, EVENTS, STRENGTH, PLACES, byId } from "../shared/data.js";
-import { PROFILES, UPPER, LOWER } from "../shared/profiles.js";
-import { createMap, THEMES } from "../shared/map.js";
-import { VERSES } from "../shared/verses.js";
+import { PEOPLE, EVENTS, STRENGTH, PLACES, byId } from "./shared/data.js";
+import { PROFILES, UPPER, LOWER } from "./shared/profiles.js";
+import { createMap, THEMES } from "./shared/map.js";
+import { VERSES } from "./shared/verses.js";
 
 const PERSON = byId(PEOPLE);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -45,7 +45,7 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
     const c = x.img ? getCredits()[x.img] : null;
     const lic = c ? (c.licenseUrl ? `<a href="${esc(c.licenseUrl)}" target="_blank" rel="noopener">${esc(c.license)}</a>` : esc(c.license)) : "";
     return `<article class="rec${x.img ? "" : " textonly"}">
-      ${x.img ? `<figure><img src="../img/${esc(x.img)}.jpg" alt="${esc(x.name)}" loading="lazy"></figure>` : ""}
+      ${x.img ? `<figure><img src="img/${esc(x.img)}.jpg" alt="${esc(x.name)}" loading="lazy"></figure>` : ""}
       <div class="rec-body">
         <div class="rec-head"><h4>${esc(x.name)}</h4>${s ? `<span class="chip" data-s="${esc(x.strength)}" title="${esc(s.desc)}">${esc(s.label)}</span>` : ""}</div>
         <p class="rec-meta">${[x.madeLabel, x.where, x.found].filter(Boolean).map(esc).join(" · ")}</p>
@@ -95,7 +95,7 @@ export function createProfiles({ getCredits, onEvent, onOpen, onClose }) {
         </section>
         ${events.length ? `<section class="p-sec"><h2>연표의 사건</h2><div class="p-events">${events.map((ev) => `
           <button class="p-event" type="button" data-event="${esc(ev.id)}">
-            ${ev.evidence[0]?.img ? `<img src="../img/sm/${esc(ev.evidence[0].img)}.jpg" alt="" loading="lazy">` : `<span class="p-noimg">글</span>`}
+            ${ev.evidence[0]?.img ? `<img src="img/sm/${esc(ev.evidence[0].img)}.jpg" alt="" loading="lazy">` : `<span class="p-noimg">글</span>`}
             <span><small>${esc(ev.yearLabel)}</small><b>${esc(ev.title)}</b><em>전시실에서 보기 →</em></span>
           </button>`).join("")}</div></section>` : ""}
         <section class="p-sec">

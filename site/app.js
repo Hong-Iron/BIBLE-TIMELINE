@@ -2,8 +2,8 @@
 // 사건이나 유물을 누르면 시안 B의 어두운 전시실을 화면 가득 연다.
 // 화면은 가로로 넓은 '트랙'을 스크롤하고, 그림은 화면 폭만 한 SVG 하나에 그때그때 다시 그린다.
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
-import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "../shared/data.js";
-import { createMap, THEMES } from "../shared/map.js";
+import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";
+import { createMap, THEMES } from "./shared/map.js";
 import { createProfiles } from "./profile.js";
 
 const SPAN = RANGE[1] - RANGE[0];
@@ -280,7 +280,7 @@ function render() {
     const g = e.append("g").attr("class", "thumb");
     g.append("clipPath").attr("id", (t) => `c-${t.e.img}`).append("rect").attr("rx", 3);
     g.append("rect").attr("class", "frame").attr("rx", 3);
-    g.append("image").attr("preserveAspectRatio", "xMidYMid slice").attr("clip-path", (t) => `url(#c-${t.e.img})`).attr("href", (t) => `../img/sm/${t.e.img}.jpg`);
+    g.append("image").attr("preserveAspectRatio", "xMidYMid slice").attr("clip-path", (t) => `url(#c-${t.e.img})`).attr("href", (t) => `img/sm/${t.e.img}.jpg`);
     g.append("rect").attr("class", "str").attr("rx", 1.5);
     g.append("title");
     g.on("click", (event, t) => openGallery(t.e.ev, t.e.i));
@@ -472,8 +472,8 @@ $("cap").addEventListener("click", () => state.near && openGallery(state.near));
 // 사건 하나가 화면 한 칸짜리 방이다. 옆으로 넘기면 뒤쪽 연표도 같은 사건으로 옮겨 가서, 닫으면 그 자리에서 이어 본다.
 const gallery = $("gallery"), hall = $("hall"), gTrack = $("gTrack"), gMapBox = $("gMapBox");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const imgUrl = (key) => `../img/${key}.jpg`;
-const smUrl = (key) => `../img/sm/${key}.jpg`;
+const imgUrl = (key) => `img/${key}.jpg`;
+const smUrl = (key) => `img/sm/${key}.jpg`;
 const pad2 = (n) => String(n).padStart(2, "0");
 const pct = (y) => ((y - RANGE[0]) / SPAN) * 100;
 const isOpen = () => gallery.classList.contains("open");
@@ -853,7 +853,7 @@ async function init() {
   hintAnchor = scroller.scrollLeft;
   new ResizeObserver(onResize).observe(scroller);
 
-  credits = await fetch("../shared/credits.json").then((r) => r.json()).catch(() => ({}));
+  credits = await fetch("shared/credits.json").then((r) => r.json()).catch(() => ({}));
   rooms.forEach(fillCredit);
   if (fromHash) openGallery(fromHash);
   else if (location.hash.startsWith("#p-")) profiles.open(location.hash.slice(3));
