@@ -5,7 +5,7 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 OUT="$(cd "$(dirname "$0")/.." && pwd)/site/thumbs"
 TMP="${TMPDIR:-/tmp}/bt-thumbs"; mkdir -p "$TMP"
 for k in "$@"; do
-  case "$k" in b|c) URL="$k/#sennacherib" ;; *) URL="$k/" ;; esac
+  case "$k" in b|c|d) URL="$k/#sennacherib" ;; d0) URL="d/" ;; *) URL="$k/" ;; esac
   "$CHROME" --headless=new --hide-scrollbars --window-size=1280,800 --force-device-scale-factor=1 \
     --virtual-time-budget=6000 --user-data-dir="$TMP/profile" \
     --screenshot="$TMP/$k.png" "http://localhost:8793/$URL" >/dev/null 2>&1
