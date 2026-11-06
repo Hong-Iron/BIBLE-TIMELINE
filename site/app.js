@@ -665,7 +665,7 @@ function parallax(x) {
 
 function ensureMap() {
   if (gMap || gMapLoading) return;
-  gMapLoading = createMap($("gMap"), THEMES.atlas, { labels: true, pad: 0.5 })
+  gMapLoading = createMap($("gMap"), THEMES.atlas, { labels: true, pad: 0.5, reserve: (w) => [[0, 0, w, 28]] })
     .then((m) => { gMap = m; if (gCur >= 0) m.show(EVENTS[gCur], { instant: true }); })
     .catch(() => gMapBox.remove());
 }
@@ -859,7 +859,9 @@ async function init() {
   else if (location.hash.startsWith("#p-")) profiles.open(location.hash.slice(3));
   document.fonts?.ready.then(frame);
 
-  map = await createMap($("map"), THEMES.atlas, { pad: 0.4 });
+  // 왼쪽 아래의 "지도에 보이는 사건" 상자 자리에는 바탕 지명을 놓지 않는다.
+  const cap = $("cap");
+  map = await createMap($("map"), THEMES.atlas, { pad: 0.4, reserve: (w, h) => [[0, h - cap.offsetHeight - 22, cap.offsetWidth + 24, cap.offsetHeight + 22]] });
   const first = state.near ?? nearestEvent(state.center);
   state.mapEv = first;
   map.show(first, { instant: true });
