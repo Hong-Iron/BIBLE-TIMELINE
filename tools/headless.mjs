@@ -17,9 +17,13 @@ const chrome = spawn("/Applications/Google Chrome.app/Contents/MacOS/Google Chro
   `--user-data-dir=${mkdtempSync(join(tmpdir(), "bt-headless-"))}`, "about:blank"], { stdio: "ignore" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-let tabs;
-for (let i = 0; i < 50; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); break; } catch { await sleep(200); } }
-const ws = new WebSocket(tabs.find((t) => t.type === "page").webSocketDebuggerUrl);
+// 크롬이 막 뜬 때는 디버그 주소가 빈 응답을 주기도 하므로, 페이지 목록이 나올 때까지 기다린다.
+let page;
+for (let i = 0; i < 75 && !page; i++) {
+  try { const tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); page = Array.isArray(tabs) && tabs.find((t) => t.type === "page"); } catch { /* 아직 안 떴다 */ }
+  if (!page) await sleep(200);
+}
+const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r) => (ws.onopen = r));
 
 let id = 0;
