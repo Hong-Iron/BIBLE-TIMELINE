@@ -876,6 +876,7 @@ lgBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleLegend(); })
 // 더 보기: 제국·성경 책·인물 차선 켜고 끄기. 단추는 줄 위(넓은 화면)와 범례 창 안 두 군데에 있다.
 function syncLayers() {
   document.querySelectorAll("[data-layer]").forEach((b) => b.setAttribute("aria-pressed", String(state.show[b.dataset.layer])));
+  $("legendBar").classList.toggle("with-person", state.show.person);
 }
 document.querySelectorAll("[data-layer]").forEach((b) => b.addEventListener("click", (e) => {
   e.stopPropagation();
