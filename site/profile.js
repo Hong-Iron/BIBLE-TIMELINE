@@ -1,7 +1,7 @@
 // 인물 프로필 화면. 연표의 인물 막대나 전시실의 인물 이름을 누르면 화면 가득 열린다.
 // 왼쪽 열(고정): 이름·기본 정보·가계도·관련 장소 지도 / 오른쪽 열(스크롤): 요약·생애·핵심 구절·성경 밖 기록·등장하는 책
 import { nav } from "./nav.js";
-import { PEOPLE, EVENTS, STRENGTH, PLACES, byId } from "./shared/data.js";
+import { PEOPLE, EVENTS, STRENGTH, STRENGTH_CH, PLACES, byId } from "./shared/data.js";
 import { PROFILES, UPPER, LOWER } from "./shared/profiles.js";
 import { createMap, THEMES } from "./shared/map.js";
 import { VERSES } from "./shared/verses.js";
@@ -67,7 +67,7 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
     return `<article class="rec${x.img ? "" : " textonly"}">
       ${x.img ? `<figure><img src="img/${esc(x.img)}.jpg" alt="${esc(x.name)}" loading="lazy"></figure>` : ""}
       <div class="rec-body">
-        <div class="rec-head"><h4>${esc(x.name)}</h4>${s ? `<span class="chip" data-s="${esc(x.strength)}" title="${esc(s.desc)}">${esc(s.label)}</span>` : ""}</div>
+        <div class="rec-head"><h4>${esc(x.name)}</h4>${s ? `<span class="chip" data-s="${esc(x.strength)}" title="${esc(CHURCH.has(current) ? STRENGTH_CH[x.strength] : s.desc)}">${esc(s.label)}</span>` : ""}</div>
         <p class="rec-meta">${[x.madeLabel, x.where, x.found].filter(Boolean).map(esc).join(" · ")}</p>
         <p>${esc(x.says)}</p>
         ${x.caveat ? `<p class="rec-caveat"><b>주의할 점</b>${esc(x.caveat)}</p>` : ""}
@@ -99,7 +99,7 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
           <p class="p-role">${esc(f.role)}</p>
           <h1>${esc(p.name)}</h1>
           ${f.aliases.length ? `<p class="p-alias">다른 이름 · ${f.aliases.map(esc).join(", ")}</p>` : ""}
-          <p class="p-years"><span>${esc(p.kind)}</span>${esc(yearRange(p.from, p.to))} <em>추정</em></p>
+          <p class="p-years"><span>${esc(p.kind)}</span>${esc(p.now ? `기원후 ${p.from}년~` : yearRange(p.from, p.to))} ${p.now ? "<em>지금까지</em>" : p.from < 1600 ? "<em>추정</em>" : ""}</p>
         </div>
         <section class="p-card">
           <h3>기본 정보</h3>

@@ -44,9 +44,9 @@ export function createDebates({ onEvent, onPerson, onEra, onBack, onOpen, onClos
     const byEra = (e) => CONTROVERSIES.filter((c) => c.era === e.id);
     const card = (c) => `<button class="db-card" type="button" data-c="${esc(c.id)}"><b>${esc(c.title)}</b><small>${esc(years(c.from, c.to))}</small><span>${esc(c.question)}</span></button>`;
     return `<div class="lib">
-      <p class="p-role">교회사 100~1648년</p>
+      <p class="p-role">교회사 100년~오늘</p>
       <h1 class="lib-title">논쟁을 지나며 자라 온 교리</h1>
-      <p class="lib-lead">공의회와 종교개혁에 이르는 논쟁마다 쟁점, 쪽마다의 주장과 성경 근거, 교회의 결정, 그리고 오늘 각 교회의 입장을 나란히 적었습니다. 어느 쪽도 정답으로 고르지 않았습니다.</p>
+      <p class="lib-lead">초대 교회의 공의회부터 종교개혁, 근대 선교, 오늘의 교회 일치 운동과 최근 논쟁까지, 논쟁마다 쟁점, 쪽마다의 주장과 성경 근거, 교회의 결정, 그리고 오늘 각 교회의 입장을 나란히 적었습니다. 어느 쪽도 정답으로 고르지 않았습니다.</p>
       <section class="lib-eras"><h2>교회사 시대</h2><p>시대마다 그때의 제국, 교회의 중심지, 예배와 수도원, 글을 모았습니다.</p>
         <div class="lib-era-row">${CHURCH_ERAS.map((e) => `<button class="lib-era" type="button" data-era="${esc(e.id)}"><b>${esc(e.name)}</b><small>${esc(years(e.from, e.to))}</small></button>`).join("")}</div></section>
       <section class="lib-eras"><h2>교리의 줄기</h2><p>주제마다 논쟁을 시간 순서로 이어 봅니다.</p>

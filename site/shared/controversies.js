@@ -1,4 +1,4 @@
-// 교회사의 신학 논쟁(기원후 100~1648년). 논쟁 화면(#c-<id>)과 교리의 줄기(#d-<주제>)가 쓴다.
+// 교회사의 신학 논쟁(기원후 100~2026년). 논쟁 화면(#c-<id>)과 교리의 줄기(#d-<주제>)가 쓴다.
 // 어느 쪽을 정답으로 고르지 않는다. '이단'은 판정이 아니라 사실로 적는다('OO 공의회가 정죄했다').
 // 각 교회는 스스로 부르는 이름으로 적고, 반대편이 붙인 이름은 그 이름이 생긴 까닭과 함께 밝힌다.
 //
@@ -22,6 +22,9 @@
 import { CONTROVERSIES_1, SRC_K1 } from "./controversies_1.js";
 import { CONTROVERSIES_2, SRC_K2 } from "./controversies_2.js";
 import { CONTROVERSIES_3, SRC_K3 } from "./controversies_3.js";
+import { CONTROVERSIES_4, SRC_K4 } from "./controversies_4.js";
+import { CONTROVERSIES_5, SRC_K5 } from "./controversies_5.js";
+import { CONTROVERSIES_6, SRC_K6 } from "./controversies_6.js";
 
 // 입장을 나란히 적는 전통. 순서는 갈라진 차례(먼저 갈라진 교회부터).
 export const TRADITIONS = [
@@ -47,5 +50,5 @@ export const THEMES = [
     summary: "무엇이 성경이고 무엇이 최종 권위인지에 관한 논쟁이다. 2세기의 마르키온과 영지주의, 몬타누스 운동은 교회가 정경을 모으는 계기가 되었다. 성화상 논쟁은 그림이 신앙을 전할 수 있는지를, 위클리프와 후스와 종교개혁은 교회의 가르침보다 성경을 앞세울 수 있는지를 물었다. 트리엔트 공의회(1546)는 성경과 전통을 함께 받는다고 정했고, 개혁자들은 '오직 성경'을 내세웠다. 정경에 넣는 책의 범위도 교회마다 조금씩 다르다." },
 ];
 
-export const CONTROVERSIES = [...CONTROVERSIES_1, ...CONTROVERSIES_2, ...CONTROVERSIES_3].sort((a, b) => a.from - b.from);
-export const CONTROVERSY_SOURCES = { ...SRC_K1, ...SRC_K2, ...SRC_K3 };
+export const CONTROVERSIES = [...CONTROVERSIES_1, ...CONTROVERSIES_2, ...CONTROVERSIES_3, ...CONTROVERSIES_4, ...CONTROVERSIES_5, ...CONTROVERSIES_6].sort((a, b) => a.from - b.from);
+export const CONTROVERSY_SOURCES = { ...SRC_K1, ...SRC_K2, ...SRC_K3, ...SRC_K4, ...SRC_K5, ...SRC_K6 };

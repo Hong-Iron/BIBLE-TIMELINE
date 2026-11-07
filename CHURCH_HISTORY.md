@@ -1,6 +1,6 @@
 # 교회사와 신학 논쟁 확장 계획
 
-> 성경 시대 뒤의 교회사, 신학이 자라 온 길, 그 사이의 논쟁과 각 교회의 주장을 사이트에 더하는 계획입니다. 2026-11-07에 1·2단계(1648년까지)를 만들어 올렸습니다. 화면과 점검 방법은 [DESIGN.md](DESIGN.md)의 '교회사' 절에 있습니다.
+> 성경 시대 뒤의 교회사, 신학이 자라 온 길, 그 사이의 논쟁과 각 교회의 주장을 사이트에 더하는 계획입니다. 2026-11-07에 1·2단계(1648년까지)를, 같은 날 3단계(1648년~오늘)를 만들어 올렸습니다. 화면과 점검 방법은 [DESIGN.md](DESIGN.md)의 '교회사' 절에 있습니다.
 
 ## 범위와 단계
 
@@ -8,9 +8,11 @@
 |---|---|---|
 | 1단계 | 기원후 100~451년(칼케돈 공의회) | 정경이 모이고, 삼위일체와 그리스도에 대한 교리가 공의회에서 정해진 시기. 교회들이 처음 크게 갈라진 곳(에베소 431년, 칼케돈 451년)까지 |
 | 2단계 | 451~1648년 | 칼케돈 뒤의 공의회들, 성상 논쟁, 동서 분열(1054년), 중세 신학, 종교개혁과 신앙고백들 |
-| 3단계(선택) | 1648년~오늘 | 근대 신학, 교회 일치 운동과 교회 사이의 공동 선언, 한국 교회사 |
+| 3단계 | 1648년~오늘 | 경건주의와 대각성, 근대 선교, 근대 신학, 세계대전과 교회 일치 운동, 교회 사이의 공동 선언, 한국 교회사 |
 
 사용자가 1단계와 2단계를 한 번에(종교개혁과 신앙고백까지, 1648년) 만들기로 정했습니다.
+
+2026-11-07에 사용자가 3단계를 이렇게 정했습니다: 오늘까지 다룬다, 지도를 세계로 넓힌다, 한국 교회사를 넣는다, 최근의 민감한 논쟁(여성 안수, 성 윤리 등)도 넣되 교회마다의 공식 입장만 나란히 적는다. 자세한 계획은 아래 '3단계' 절에 있습니다.
 
 ## 입장을 적는 교회 전통
 
@@ -139,3 +141,49 @@
 - **논쟁 화면:** 새로 만듭니다. 논쟁마다 쟁점, 주장, 결정을 보이고, 전통별 입장은 표로 나란히 놓습니다.
 - **교리의 줄기:** 삼위일체, 그리스도론, 은혜와 구원, 교회와 성례, 성경과 전통을 주제마다 따라가며, 그 주제의 논쟁을 차례로 잇습니다.
 - **인물과 시대 배경:** 지금 있는 인물 프로필과 시대 배경 화면을 그대로 씁니다.
+
+## 3단계: 1648년부터 오늘까지
+
+### 시대
+
+| id | 이름 | 기간 | 다루는 것 |
+|---|---|---|---|
+| pietism | 경건주의와 계몽주의 | 1648~1789년 | 러시아 정교회의 구교도 분열, 얀센주의, 경건주의와 모라비안, 대각성과 감리교 부흥, 중국 의례 논쟁, 『필로칼리아』, 조선 천주교의 시작 |
+| missions | 혁명과 선교의 세기 | 1789~1914년 | 프랑스 혁명과 교회, 근대 선교, 슐라이어마허와 자유주의 신학, 1차 바티칸 공의회, 정교회의 민족 교회 문제, 조선의 천주교 박해와 개신교 선교, 오순절 운동, 에든버러 선교 대회 |
+| worldwars | 세계대전과 교회 일치 | 1914~1965년 | 아르메니아인 학살, 러시아 혁명과 교회, 바르트와 고백교회, 신사참배, 세계교회협의회, 한국 장로교의 분열, 2차 바티칸 공의회, 동서 파문 철회 |
+| today | 오늘의 교회 | 1965~2026년 | 해방신학, 로잔 운동, 교회 사이의 공동 선언, 남반구로 옮겨 간 그리스도교, 여성 안수와 성 윤리 논쟁, 우크라이나 정교회 독립 |
+
+### 묶음과 공통 id 명단
+
+묶음마다 자기 파일에만 씁니다. 사건·인물 묶음은 `site/shared/church_ev<n>.js`와 `profiles_c<n>.js`, 논쟁 묶음은 `controversies_<n>.js`, 시대 배경 묶음은 `bg_c3.js`입니다. 빈 틀은 미리 만들어 두었습니다.
+
+| 묶음 | 기간 | 사건 id | 인물 id(모두 프로필을 씀) |
+|---|---|---|---|
+| v4 | 1648~1789년 | old-believers-1666, unigenitus-1713, pietism-1675, melkite-1724, herrnhut-1727, aldersgate-1738, awakening-1740, rites-1742, philokalia-1782, korea-1784 | nikon, avvakum, spener, pascal, zinzendorf, jonathanedwards, johnwesley, whitefield, nikodemos, leeseunghun |
+| v5 | 1789~1869년 | civil-constitution-1790, carey-1793, schleiermacher-1799, shinyu-1801, ineffabilis-1854, byeongin-1866 | schleiermacher, carey, jeongyakjong, kimdaegeon, pius9, newman |
+| v6 | 1870~1914년 | vatican1-1870, phyletism-1872, underwood-1885, uganda-1886, azusa-1906, pyongyang-1907, pascendi-1907, edinburgh-1910 | dollinger, underwood, appenzeller, gilseonju, seymour, pius10, mott |
+| v7 | 1914~1965년 | armenia-1915, moscow-council-1917, romans-1919, barmen-1934, shrine-1938, bonhoeffer-1945, wcc-1948, split-1959, vatican2-1962, anathemas-1965 | tikhon, barth, bonhoeffer, jugicheol, visserthooft, john23, athenagoras, paul6 |
+| v8 | 1965~2026년 | medellin-1968, lausanne-1974, bem-1982, saints-1984, econe-1988, christology-1994, lambeth-1998, jddj-1999, havana-2016, crete-2016, ukraine-2019 | gutierrez, stott, johnpaul2, lefebvre, shenouda3, dinkha4, ratzinger, bartholomew, popefrancis, kirill, kimsuhwan |
+
+| 묶음 | 논쟁 id |
+|---|---|
+| k4 | jansenism(얀센주의), old-believers(구교도 논쟁), rites(중국·조선 의례 논쟁, 1645~1939), free-grace(웨슬리와 휫필드의 예정 논쟁), liberal-theology(자유주의 신학과 성서 비평), infallibility(무염시태와 교황 무류성), phyletism(민족 교회주의), modernism(가톨릭 근대주의 위기) |
+| k5 | fundamentalism(근본주의와 성경 무오), confessing-church(고백교회와 국가), shrine-worship(신사참배), ecumenism(교회 일치 운동과 그 반대), pentecostal(성령 세례와 은사) |
+| k6 | vatican2(2차 바티칸 공의회와 그 해석), liberation-theology(해방신학), women-ordination(여성 안수), sexuality(성 윤리와 동성 결합), ukraine-autocephaly(우크라이나 정교회 독립) |
+| c3 | 시대 배경 4개(pietism, missions, worldwars, today) |
+
+이미 있는 사람(프란치스코 = `francis`는 아시시의 프란치스코)과 겹치지 않게, 교황 프란치스코는 `popefrancis`, 베네딕토 16세는 `ratzinger`로 씁니다.
+
+### 함께 쓰는 장소
+
+새로 나오는 큰 도시는 `church_events.js`의 `CH_PLACES`에 미리 넣었습니다(모스크바, 베이징, 서울, 평양, 보스턴, 로스앤젤레스 등). 묶음이 장소를 더할 때는 자기 `PLACES_CH<n>`에 넣고, 다른 파일에 같은 id가 있으면 점검이 오류를 냅니다.
+
+### 3단계에서 더 지킬 것
+
+- **글:** 다른 단계와 같이 [Humanize.md](Humanize.md)를 따르고, 각 교회는 스스로 부르는 이름으로 적습니다. 한국 교단도 공식 이름으로 적습니다(예: 대한예수교장로회(합동), 기독교대한감리회, 천주교 서울대교구).
+- **민감한 논쟁(여성 안수, 성 윤리, 우크라이나 정교회 등):** 어느 쪽도 정답으로 고르지 않습니다. 교회마다 공식 문서나 회의 결정에 적힌 입장만, 날짜와 출처를 달아 나란히 적습니다. 한 교회 안에서 갈린 곳(예: 성공회, 감리교)은 갈린 대로 나눠 적습니다. 학계 칸에는 사실(어느 교회가 언제 무엇을 정했는가, 신자 수의 흐름)만 적고 평가하지 않습니다.
+- **아르메니아인 학살처럼 이름부터 다투는 사건:** 일어난 일과 각 쪽이 부르는 이름을 함께 적습니다.
+- **인용:** 20세기 문서는 대부분 저작권이 살아 있습니다. 공유·CC0·CC BY 자료이거나, 1955년 전에 죽은 사람이 쓴 원문을 우리가 옮긴 것만 인용합니다. 그 밖의 문서는 우리말로 요약하고 출처만 답니다. 그래서 1900년 뒤의 사건은 `source`(옛 문헌 한두 줄)를 비워 둘 수 있습니다.
+- **사진:** 위키미디어 공용의 공유·CC 사진만 씁니다. 파일 이름과 이용 조건을 확인해 `IMG_CH<n>`에 적으면, 내려받기는 `tools/fetch_images.py`로 한꺼번에 합니다.
+- **점검:** `node tools/check_church.mjs v4`(또는 k4, …)와 `node tools/check_profiles.mjs site/shared/profiles_c4.js`, 시대 배경은 `node tools/check_bg.mjs c3`. 새 장절을 쓰면 먼저 `python3 -I tools/build_verses.py`를 돌립니다.
+

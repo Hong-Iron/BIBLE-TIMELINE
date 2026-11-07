@@ -17,7 +17,7 @@ const CHURCH = { id: "church", name: "교회사" };
 const GUIDES = {
   ...BOOK_GUIDES,
   church: {
-    summary: "박해 속의 교부들부터 공의회, 동서 교회의 갈라짐, 종교개혁과 신앙고백까지 교회사 사건을 해 순서대로 따라갑니다.",
+    summary: "박해 속의 교부들부터 공의회, 동서 교회의 갈라짐, 종교개혁, 근대 선교와 한국 교회, 오늘의 교회까지 교회사 사건을 해 순서대로 따라갑니다.",
     events: EVENTS.filter((e) => CHURCH_IDS.has(e.id)).sort((a, b) => a.year - b.year).map((e) => ({ text: e.title, when: e.yearLabel, event: e.id })),
   },
 };
@@ -100,7 +100,7 @@ export function createStory({ onEvent, onBack, onClose }) {
     const prev = near(-1), next = church ? null : near(1) || CHURCH;
     list.innerHTML = `
       <header class="st-intro">
-        <p class="p-role">${church ? "교회사 · 기원후 100~1648년" : `${esc(grp?.testament)} · ${esc(grp?.name)}`}</p>
+        <p class="p-role">${church ? "교회사 · 기원후 100년~오늘" : `${esc(grp?.testament)} · ${esc(grp?.name)}`}</p>
         <h1>${esc(book.name)}</h1>
         ${g.summary ? `<p class="st-sum">${esc(g.summary)}</p>` : ""}
         <p class="st-hint">아래로 내리면 사건 ${steps.length}개를 차례로 따라가며 지도가 그 장소로 옮겨 갑니다. <span class="st-key">↑ ↓</span> 키로도 넘길 수 있습니다.</p>

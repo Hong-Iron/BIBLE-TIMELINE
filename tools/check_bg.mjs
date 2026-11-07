@@ -1,6 +1,6 @@
 // 당대 배경(bg_*.js)을 점검한다.
 // 사용: node tools/check_bg.mjs          (전체)
-//       node tools/check_bg.mjs g3       (bg_g3.js만, 시대 묶음은 e1·e2, 교회사 시대는 c1·c2)
+//       node tools/check_bg.mjs g3       (bg_g3.js만, 시대 묶음은 e1·e2, 교회사 시대는 c1~c3)
 // 먼저 python3 tools/build_verses.py를 돌려 새 장절의 본문을 verses.js에 넣는다.
 // 점검:
 //   - 시대·책 id가 맞는지, 묶음이 맡은 책을 모두 썼는지
@@ -23,12 +23,12 @@ const { SOURCES } = await load("backgrounds.js");
 const GROUP_BOOKS = {};
 for (let i = 1; i <= 7; i++) GROUP_BOOKS[`g${i}`] = Object.keys((await load(`guides_g${i}.js`))[`GUIDES_G${i}`]);
 const ERA_GROUPS = { e1: ["patriarchs", "egypt", "judges", "united", "divided"], e2: ["exile", "between", "jesus", "church"],
-  c1: ["fathers", "councils", "byzantine"], c2: ["eastwest", "latemedieval", "reformation"] };
+  c1: ["fathers", "councils", "byzantine"], c2: ["eastwest", "latemedieval", "reformation"], c3: ["pietism", "missions", "worldwars", "today"] };
 const ERA_IDS = new Set(ERAS.map((e) => e.id));
 const KINDS = ["events", "culture", "literature", "rhetoric"];
 
 const only = process.argv[2];
-const groups = only ? [only] : ["e1", "e2", "c1", "c2", "g1", "g2", "g3", "g4", "g5", "g6", "g7"];
+const groups = only ? [only] : ["e1", "e2", "c1", "c2", "c3", "g1", "g2", "g3", "g4", "g5", "g6", "g7"];
 const errors = [], notes = [];
 const err = (m) => errors.push(m);
 

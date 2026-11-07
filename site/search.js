@@ -40,7 +40,7 @@ function buildIndex() {
   }
   for (const p of PEOPLE) {
     const f = PROFILES[p.id] || {};
-    add("person", p.name, [f.role, span(p.from, p.to)].filter(Boolean).join(" · "), [p.name, ...(f.aliases || [])], [f.role, p.kind], f.summary, { kind: "person", id: p.id });
+    add("person", p.name, [f.role, p.now ? `${p.from}년~지금` : span(p.from, p.to)].filter(Boolean).join(" · "), [p.name, ...(f.aliases || [])], [f.role, p.kind], f.summary, { kind: "person", id: p.id });
   }
   for (const b of BIBLE_BOOKS) {
     const g = BOOK_GROUPS.find((x) => x.id === b.group);

@@ -11,6 +11,11 @@ import { PROFILES_G4 } from "./profiles_g4.js";
 import { PROFILES_C1 } from "./profiles_c1.js";
 import { PROFILES_C2 } from "./profiles_c2.js";
 import { PROFILES_C3 } from "./profiles_c3.js";
+import { PROFILES_C4 } from "./profiles_c4.js";
+import { PROFILES_C5 } from "./profiles_c5.js";
+import { PROFILES_C6 } from "./profiles_c6.js";
+import { PROFILES_C7 } from "./profiles_c7.js";
+import { PROFILES_C8 } from "./profiles_c8.js";
 
 export const PROFILES = {
   abraham: {
@@ -628,7 +633,7 @@ export const PROFILES = {
 };
 
 // 시대별 묶음 파일의 프로필을 합친다(족장~사사, 왕국, 포로~중간기, 신약).
-Object.assign(PROFILES, PROFILES_G1, PROFILES_G2, PROFILES_G3, PROFILES_G4, PROFILES_C1, PROFILES_C2, PROFILES_C3);
+Object.assign(PROFILES, PROFILES_G1, PROFILES_G2, PROFILES_G3, PROFILES_G4, PROFILES_C1, PROFILES_C2, PROFILES_C3, PROFILES_C4, PROFILES_C5, PROFILES_C6, PROFILES_C7, PROFILES_C8);
 
 // 가계도에서 윗세대·아랫세대로 놓을 관계 이름. 나머지는 본인과 같은 줄에 놓는다.
 export const UPPER = new Set(["조상", "증조부모", "할아버지", "외할아버지", "아버지", "어머니", "장인", "삼촌"]);

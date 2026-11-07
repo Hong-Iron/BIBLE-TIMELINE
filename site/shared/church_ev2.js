@@ -284,7 +284,7 @@ export const SRC_V2 = {
   lethaby1894: { name: "W. Lethaby & H. Swainson 번역, 프로코피오스 『건축에 대하여』(『The Church of Sancta Sophia』, 1894)", url: "https://sourcebooks.fordham.edu/source/procop-deaed1.asp", license: "공유" },
   bedejane: { name: "베다 『잉글랜드 교회사』(L. C. Jane 번역으로 보이는 1903년판, Medieval Sourcebook)", url: "https://sourcebooks.fordham.edu/basis/bede-book1.asp", license: "공유" },
   allies1898: { name: "다마스쿠스의 요한 『성화상에 대하여』(M. H. Allies 번역, 1898)", url: "https://sourcebooks.fordham.edu/basis/johndamascus-images.asp", license: "공유" },
-  legge1888: { name: "J. Legge, 『The Nestorian Monument of Hsî-an Fû』(1888)", url: "https://archive.org/details/nestorianmonumen00legg", license: "공유" },
+  legge1888: { name: "J. Legge, 『The Nestorian Monument of Hsî-an Fû in Shen-hsî, China』(1888)", url: "https://archive.org/details/nestorianmonumen00legg", license: "공유" },
   einhard: { name: "아인하르트 『카롤루스 대제의 생애』(S. E. Turner 번역, 1880)", url: "https://sourcebooks.fordham.edu/basis/einhard.asp", license: "공유" },
   robinson1904: { name: "J. H. Robinson 편, 『Readings in European History』(1904)의 우르바누스 2세 연설(로베르 수도사판)", url: "https://sourcebooks.fordham.edu/source/urban2a.asp", license: "공유" },
   munro1912: { name: "D. C. Munro 번역, 니케타스 코니아테스의 콘스탄티노플 약탈 기록(『Translations and Reprints』 3권 1호, 1912)", url: "https://sourcebooks.fordham.edu/source/choniates1.asp", license: "공유" },

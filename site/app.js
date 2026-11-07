@@ -2,7 +2,7 @@
 // 사건이나 유물을 누르면 밝은 전시실을 화면 가득 연다.
 // 화면은 가로로 넓은 '트랙'을 스크롤하고, 그림은 화면 폭만 한 SVG 하나에 그때그때 다시 그린다.
 import * as d3 from "./vendor/d3-7.9.0.js";
-import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";
+import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, STRENGTH_CH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";
 import { createMap, THEMES } from "./shared/map.js";
 import { findBook } from "./shared/books.js";
 import { SOURCES as BASE_SOURCES } from "./shared/sources.js";
@@ -44,6 +44,9 @@ function gapText(made, at) {
   return `${n >= 100 ? `약 ${Math.round(n / 10) * 10}` : n}년 ${d > 0 ? "뒤" : "앞"}`;
 }
 
+// 인물의 연도: 지금도 재위·활동 중이면 '기원후 1991년~지금', 1600년 뒤 사람은 기록이 정확하므로 '추정'을 붙이지 않는다.
+const personYears = (p) => (p.now ? `기원후 ${p.from}년~지금` : rangeText(p.from, p.to));
+const personGuess = (p) => (p.now || p.from >= 1600 ? "" : " (추정)");
 function rangeText(a, b) {
   if (a < 0 && b < 0) return `기원전 ${-a}~${-b}년`;
   if (a > 0 && b > 0) return `기원후 ${a}~${b}년`;
@@ -267,7 +270,7 @@ function render() {
       const lx = start + w <= Math.max(xb, room) ? start : xb - w >= xa ? xb - w : null;
       g.select("text").attr("x", lx ?? 0).attr("y", ly - 5).style("display", lx == null ? "none" : null).text(p.name);
       g.select(".hit").attr("x", Math.min(xa, lx ?? xa) - 2).attr("y", top).attr("width", Math.max(xb, (lx ?? xa) + w) - Math.min(xa, lx ?? xa) + 4).attr("height", d.personRow);
-      g.select("title").text(`${p.name} · ${p.kind} ${rangeText(p.from, p.to)} (추정) · 눌러서 프로필 보기`);
+      g.select("title").text(`${p.name} · ${p.kind} ${personYears(p)}${personGuess(p)} · 눌러서 프로필 보기`);
     });
 
   // 사건: 점은 차선 맨 아래, 이름은 위쪽 세 줄 중 비어 있는 줄에
@@ -556,8 +559,9 @@ function roomHTML(ev, i) {
           ${e.img ? `<img src="${smUrl(e.img)}" alt="" loading="lazy" decoding="async">` : `<span class="g-thumb-text">글</span>`}</button>`).join("")}</div>`
     : "";
   const people = ev.people.map((id) => PERSON[id]).filter(Boolean)
-    .map((p) => `<button class="g-person" type="button" data-person="${esc(p.id)}" title="인물 프로필 보기">${esc(p.name)}</button>(${esc(p.kind)} ${esc(rangeText(p.from, p.to))})`).join(" · ");
-  const empty = `<p class="g-only-text">${ev.source ? "옛 문헌에만 기록됨" : "성경 본문에만 기록됨"}</p>`;
+    .map((p) => `<button class="g-person" type="button" data-person="${esc(p.id)}" title="인물 프로필 보기">${esc(p.name)}</button>(${esc(p.kind)} ${esc(personYears(p))})`).join(" · ");
+  // 사진이 없을 때: 성경 사건은 '성경 본문에만', 교회사 사건은 '옛 문헌에만'. 근래 사건은 옮겨 실을 문헌도 사진도 없을 수 있다.
+  const empty = `<p class="g-only-text">${ev.source ? "옛 문헌에만 기록됨" : ev.ref ? "성경 본문에만 기록됨" : "실을 수 있는 사진이 없음"}</p>`;
   return `<section class="room${multi ? " multi" : ""}${ev.evidence.length ? "" : " no-ev"}" data-i="${i}" aria-label="${esc(ev.yearLabel)}, ${esc(ev.title)}">
     <div class="bgyear" aria-hidden="true">${Math.abs(ev.year)}</div>
     <div class="g-inner">
@@ -580,7 +584,7 @@ function roomHTML(ev, i) {
         <p class="g-year">${esc(ev.yearLabel)}</p>
         <h2 class="g-title">${esc(ev.title)}</h2>
         ${ev.controversy ? `<button class="g-debate" type="button" data-debate="${esc(ev.controversy)}">이 사건을 둘러싼 논쟁 보기 →</button>` : ""}
-        ${ev.source ? sourceHTML(ev) : `<blockquote class="g-verse"><p>${esc(ev.verse)}</p><cite>${esc(ev.ref)} · ${findBook(ev.book) ? `<button class="g-person" type="button" data-book="${esc(findBook(ev.book).id)}" title="책 해설 보기">${esc(ev.book)}</button>` : esc(ev.book)} · 개역한글</cite></blockquote>`}
+        ${ev.source ? sourceHTML(ev) : !ev.ref ? "" : `<blockquote class="g-verse"><p>${esc(ev.verse)}</p><cite>${esc(ev.ref)} · ${findBook(ev.book) ? `<button class="g-person" type="button" data-book="${esc(findBook(ev.book).id)}" title="책 해설 보기">${esc(ev.book)}</button>` : esc(ev.book)} · 개역한글</cite></blockquote>`}
         <p class="g-summary">${esc(ev.summary)}</p>
         <dl class="g-meta">${ev.dateNote ? `<dt>연대</dt><dd>${esc(ev.dateNote)}</dd>` : ""}${people ? `<dt>인물</dt><dd>${people}</dd>` : ""}</dl>
       </article>
@@ -608,8 +612,10 @@ function fillPlate(room, ev, e) {
   const chip = q(".chip");
   chip.textContent = s.label;
   chip.dataset.s = e.strength;
-  chip.title = s.desc;
-  q(".g-sdesc").textContent = s.desc;
+  // 교회사 사건(성경 구절이 없는 사건)은 증거 설명을 교회사에 맞게 바꾼다.
+  const desc = ev.ref ? s.desc : STRENGTH_CH[e.strength];
+  chip.title = desc;
+  q(".g-sdesc").textContent = desc;
   q(".pmade").textContent = e.madeLabel;
   // 라벨에는 연표의 곡선 이름표보다 촘촘하게 적는다. 1년 이내면 같은 무렵으로 본다. 장소 사진은 만든 해가 없다.
   const n = e.madeYear == null ? null : yearsBetween(e.madeYear, ev.year);

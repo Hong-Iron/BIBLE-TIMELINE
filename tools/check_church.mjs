@@ -41,14 +41,52 @@ const ROSTER = {
     people: "innocent3 francis aquinas palamas barlaam wycliffe hus markephesus erasmus luther zwingli melanchthon grebel calvin cranmer loyola arminius lucaris",
     controversies: "hesychasm conciliarism wycliffe-hus florence-union justification free-will lords-supper baptism scripture-tradition predestination-dort",
   },
+  // 3단계(1648년~오늘). 논쟁 묶음 k4~k6은 사건 묶음과 번호가 따로다.
+  4: {
+    range: [1648, 1789],
+    events: "old-believers-1666 unigenitus-1713 pietism-1675 melkite-1724 herrnhut-1727 aldersgate-1738 awakening-1740 rites-1742 philokalia-1782 korea-1784",
+    people: "nikon avvakum spener pascal zinzendorf jonathanedwards johnwesley whitefield nikodemos leeseunghun",
+    controversies: "jansenism old-believers rites free-grace liberal-theology infallibility phyletism modernism",
+  },
+  5: {
+    range: [1789, 1869],
+    events: "civil-constitution-1790 carey-1793 schleiermacher-1799 shinyu-1801 ineffabilis-1854 byeongin-1866",
+    people: "schleiermacher carey jeongyakjong kimdaegeon pius9 newman",
+    controversies: "fundamentalism confessing-church shrine-worship ecumenism pentecostal",
+  },
+  6: {
+    range: [1870, 1914],
+    events: "vatican1-1870 phyletism-1872 underwood-1885 uganda-1886 azusa-1906 pyongyang-1907 pascendi-1907 edinburgh-1910",
+    people: "dollinger underwood appenzeller gilseonju seymour pius10 mott",
+    controversies: "vatican2 liberation-theology women-ordination sexuality ukraine-autocephaly",
+  },
+  7: {
+    range: [1914, 1965],
+    events: "armenia-1915 moscow-council-1917 romans-1919 barmen-1934 shrine-1938 bonhoeffer-1945 wcc-1948 split-1959 vatican2-1962 anathemas-1965",
+    people: "tikhon barth bonhoeffer jugicheol visserthooft john23 athenagoras paul6",
+    controversies: "",
+  },
+  8: {
+    range: [1965, 2026],
+    events: "medellin-1968 lausanne-1974 bem-1982 saints-1984 econe-1988 christology-1994 lambeth-1998 jddj-1999 havana-2016 crete-2016 ukraine-2019",
+    people: "gutierrez stott johnpaul2 lefebvre shenouda3 dinkha4 ratzinger bartholomew popefrancis kirill kimsuhwan",
+    controversies: "",
+  },
 };
-for (const r of Object.values(ROSTER)) for (const k of ["events", "people", "controversies"]) r[k] = r[k].split(" ");
+for (const r of Object.values(ROSTER)) for (const k of ["events", "people", "controversies"]) r[k] = r[k].split(" ").filter(Boolean);
 const ALL_ROSTER = { events: new Set(), people: new Set(), controversies: new Set() };
 for (const r of Object.values(ROSTER)) for (const k of Object.keys(ALL_ROSTER)) r[k].forEach((id) => ALL_ROSTER[k].add(id));
 
+// 장소 id 겹침 점검용: 성경 장소·함께 쓰는 장소와 묶음마다의 장소
+const { CH_PLACES } = await load("church_events.js");
+const BIBLE_PLACES = (await import(pathToFileURL(join(SHARED, "data.js")).href + "?bare")).PLACES;
+const ALL_GROUP_PLACES = {};
+for (let m = 1; m <= 8; m++) ALL_GROUP_PLACES[m] = (await load(`church_ev${m}.js`))[`PLACES_CH${m}`];
+const BASE_PLACE_IDS = new Set([...Object.keys(CH_PLACES), ...Object.keys(BIBLE_PLACES).filter((id) => !Object.values(ALL_GROUP_PLACES).some((g) => g[id]))]);
+
 const arg = process.argv.slice(2).find((a) => !a.startsWith("--"));
 const strict = process.argv.includes("--strict");
-const groups = arg ? [arg] : ["v1", "v2", "v3", "k1", "k2", "k3"];
+const groups = arg ? [arg] : ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "k1", "k2", "k3", "k4", "k5", "k6"];
 const errors = [], notes = [];
 const err = (m) => errors.push(m);
 const EV = new Map(EVENTS.map((e) => [e.id, e])), PE = new Map(PEOPLE.map((p) => [p.id, p]));
@@ -70,7 +108,8 @@ const checkQuote = (where, q) => {
 const checkRefs = (where, refs) => { for (const r of refs || []) if (!VERSES[r]) err(`${where}: 장절 '${r}'가 verses.js에 없다(build_verses.py를 먼저 돌린다)`); };
 // 다른 묶음이 쓸 id: 명단에 있으면 아직 없어도 괜찮다(--strict가 아니면)
 const refOk = (kind, id, have) => have || (!strict && ALL_ROSTER[kind].has(id));
-const inMap = ([lon, lat]) => lon >= -11 && lon <= 66 && lat >= 15 && lat <= 58;
+// 지도가 그리는 범위(tools/crop_geo.mjs의 BOX와 같다)
+const inMap = ([lon, lat]) => lon >= -130 && lon <= 155 && lat >= -45 && lat <= 72;
 
 for (const grp of groups) {
   const n = grp.slice(1);
@@ -81,9 +120,13 @@ for (const grp of groups) {
     const profs = (await load(`profiles_c${n}.js`))[`PROFILES_C${n}`];
     for (const id of R.events) if (!events.some((e) => e.id === id)) err(`${grp}: 명단의 사건 '${id}'가 없다`);
     for (const id of R.people) if (!people.some((p) => p.id === id)) err(`${grp}: 명단의 인물 '${id}'가 없다`);
+    for (const id of Object.keys(places)) {
+      if (BASE_PLACE_IDS.has(id)) err(`PLACES_CH${n}.${id}: 이미 있는 장소 id다(data.js·CH_PLACES). 그것을 그대로 쓴다`);
+      for (const m of Object.keys(ALL_GROUP_PLACES)) if (+m !== +n && ALL_GROUP_PLACES[m][id]) err(`PLACES_CH${n}.${id}: PLACES_CH${m}에도 같은 id가 있다`);
+    }
     for (const [id, p] of Object.entries(places)) {
       if (!/^[a-z][a-z0-9]*$/.test(id)) err(`PLACES_CH${n}.${id}: id는 영어 소문자와 숫자만`);
-      if (!p.name || !Array.isArray(p.at) || !inMap(p.at)) err(`PLACES_CH${n}.${id}: name과 지도 범위(경도 -11~66, 위도 15~58) 안의 at이 필요하다`);
+      if (!p.name || !Array.isArray(p.at) || !inMap(p.at)) err(`PLACES_CH${n}.${id}: name과 지도 범위(경도 -130~155, 위도 -45~72) 안의 at이 필요하다`);
     }
     for (const e of events) {
       const where = `${grp} 사건 ${e.id}`;
@@ -96,7 +139,8 @@ for (const grp of groups) {
       if (!e.route?.length) err(`${where}: route(장소)가 없다`);
       for (const id of e.route || []) if (!PLACES[id]) err(`${where}: 장소 '${id}'가 없다`); else if (!inMap(PLACES[id].at)) err(`${where}: 장소 '${id}'가 지도 범위 밖이다`);
       for (const id of e.people || []) if (!refOk("people", id, PE.has(id))) err(`${where}: 인물 '${id}'가 없다`);
-      if (!e.source) err(`${where}: source(그 사건을 전하는 옛 문헌 한두 줄)가 없다`); else checkQuote(`${where} source`, e.source);
+      // 1900년 뒤의 사건은 옮겨 실을 수 있는 문헌이 드물어 source를 비워 둘 수 있다(CHURCH_HISTORY.md 3단계)
+      if (!e.source) { if (e.year < 1900) err(`${where}: source(그 사건을 전하는 옛 문헌 한두 줄)가 없다`); } else checkQuote(`${where} source`, e.source);
       if (e.controversy && !refOk("controversies", e.controversy, KO.has(e.controversy))) err(`${where}: 논쟁 '${e.controversy}'가 없다`);
       (e.evidence || []).forEach((v, i) => {
         const w = `${where} 증거 ${i + 1}`;
@@ -144,6 +188,21 @@ for (const grp of groups) {
       checkSrc(`${where}`, c.src);
       notes.push(`${where}: 주장 ${c.sides?.length ?? 0}쪽, 입장 ${TRADITIONS.filter((t) => c.positions?.[t.id]?.text).length}/6`);
     }
+  }
+}
+
+// 묶음 파일마다 따로 적은 출처 가운데 같은 id가 서로 다른 이름·주소를 가리키면, 합칠 때 한쪽이 덮어써진다.
+// 같은 자료면 이름과 주소를 똑같이 적고, 다른 자료면 id를 따로 둔다.
+{
+  const srcFiles = {};
+  for (let m = 1; m <= 8; m++) srcFiles[`church_ev${m}.js`] = (await load(`church_ev${m}.js`))[`SRC_V${m}`];
+  for (let m = 1; m <= 6; m++) srcFiles[`controversies_${m}.js`] = (await load(`controversies_${m}.js`))[`SRC_K${m}`];
+  for (const f of ["bg_e1", "bg_e2", "bg_c1", "bg_c2", "bg_c3"]) { const mod = await load(`${f}.js`); srcFiles[`${f}.js`] = mod[Object.keys(mod).find((k) => k.startsWith("SRC_"))]; }
+  const seen = {};
+  for (const [f, list] of Object.entries(srcFiles)) for (const [id, src] of Object.entries(list || {})) {
+    const key = `${src.name}|${src.url ?? ""}|${src.license}`;
+    if (seen[id] && seen[id].key !== key) err(`출처 '${id}'를 ${seen[id].file}과 ${f}가 서로 다르게 적었다(이름·주소·이용 조건). 같은 자료면 똑같이, 다른 자료면 id를 따로`);
+    else seen[id] ??= { key, file: f };
   }
 }
 

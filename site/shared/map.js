@@ -1,4 +1,4 @@
-// 고대 근동 지도. 사건의 장소들이 화면에 들어오도록 부드럽게 옮겨 간다.
+// 고대 근동에서 세계까지의 지도. 사건의 장소들이 화면에 들어오도록 부드럽게 옮겨 간다.
 // 사용: const map = await createMap(el, theme); map.show(event)
 import * as d3 from "../vendor/d3-7.9.0.js";
 import { PLACES } from "./data.js";
@@ -6,6 +6,11 @@ import { PLACES } from "./data.js";
 const BASE = new URL(".", import.meta.url).href;
 let geoPromise;
 const loadGeo = () => (geoPromise ??= fetch(`${BASE}geo.json`).then((r) => r.json()));
+// 세계의 땅(geo_world.json)은 크다. 처음에는 성경·교회사 지역(geo.json, 서경 11도~동경 66도, 북위 15~58도)만 그리고,
+// 쉬는 틈에, 또는 그 밖의 장소(아메리카·동아시아 등)를 처음 보여 줄 때 받아서 땅을 다시 그린다.
+let worldPromise;
+const loadWorld = () => (worldPromise ??= fetch(`${BASE}geo_world.json`).then((r) => r.json()));
+const inNear = ([lon, lat]) => lon >= -11 && lon <= 66 && lat >= 15 && lat <= 58;
 
 export const THEMES = {
   parchment: { sea: "#c9d0c0", land: "#f1e6c9", coast: "#8a6f45", river: "#7c93a3", lake: "#b9c3c2", route: "#8b2d1f", dot: "#3b2a1a", label: "#3b2a1a", halo: "#efe4c8", muted: "#7a6a55", water: "#5f7484", region: "#a08a6a", font: "'Gowun Batang', serif" },
@@ -47,7 +52,7 @@ const FEATURES = [
   { name: "아가야", at: [21.9, 37.6], kind: "region", pri: 45 },
   { name: "이탈리아", at: [15.0, 41.2], kind: "region", pri: 46 },
   // 교회사(유럽) 쪽. 로마 시대와 중세 모두에 쓰는 이름으로 적는다.
-  { name: "대서양", at: [-8.0, 46.0], kind: "water", pri: 16, alts: [[-9.5, 41.5], [-8.5, 50.0]] },
+  { name: "대서양", at: [-8.0, 46.0], kind: "water", pri: 16, alts: [[-9.5, 41.5], [-8.5, 50.0], [-40.0, 30.0], [-62.0, 35.0], [-30.0, 10.0]] },
   { name: "북해", at: [3.0, 55.5], kind: "water", pri: 17, alts: [[2.0, 53.5]] },
   { name: "아드리아해", at: [15.5, 43.0], kind: "water", pri: 33 },
   { name: "라인강", at: [7.2, 50.6], kind: "river", pri: 52, alts: [[8.3, 49.2]] },
@@ -56,12 +61,28 @@ const FEATURES = [
   { name: "히스파니아", at: [-4.0, 40.0], kind: "region", pri: 48 },
   { name: "브리타니아", at: [-1.8, 52.8], kind: "region", pri: 49 },
   { name: "게르마니아", at: [10.5, 51.5], kind: "region", pri: 50 },
+  // 교회사 3단계(1648년~오늘)의 세계
+  { name: "태평양", at: [150.0, 28.0], kind: "water", pri: 60, alts: [[-125.0, 28.0], [140.0, 15.0]] },
+  { name: "인도양", at: [78.0, -8.0], kind: "water", pri: 61 },
+  { name: "동해", at: [133.5, 39.5], kind: "water", pri: 63 },
+  { name: "황해", at: [123.6, 35.8], kind: "water", pri: 64 },
+  { name: "카리브해", at: [-74.0, 15.0], kind: "water", pri: 65 },
+  { name: "멕시코만", at: [-90.0, 25.0], kind: "water", pri: 66 },
+  { name: "한반도", at: [127.9, 36.4], kind: "region", pri: 67, alts: [[127.5, 39.8]] },
+  { name: "중국", at: [106.0, 33.0], kind: "region", pri: 68 },
+  { name: "일본", at: [138.2, 36.4], kind: "region", pri: 69 },
+  { name: "인도", at: [78.5, 20.5], kind: "region", pri: 70 },
+  { name: "러시아", at: [48.0, 61.0], kind: "region", pri: 71 },
+  { name: "북아메리카", at: [-100.0, 42.0], kind: "region", pri: 72 },
+  { name: "남아메리카", at: [-60.0, -12.0], kind: "region", pri: 73 },
+  { name: "아프리카", at: [22.0, 5.0], kind: "region", pri: 74 },
 ];
 // 도시 우선순위. 목록에 없는 장소는 맨 뒤에 놓는다.
 const MAJOR = ["jerusalem", "babylon", "nineveh", "memphis", "damascus", "rome", "susa", "samaria", "ur", "haran", "antioch",
   "constantinople", "alexandria", "carthage", "paris", "wittenberg", "geneva",
   "nicaea", "milan", "lyon", "hippo", "edessa", "ctesiphon", "athos", "ravenna", "aachen", "cluny", "avignon", "florence", "prague",
   "constance", "worms", "augsburg", "zurich", "trent", "oxford", "london", "canterbury", "dordrecht",
+  "moscow", "berlin", "seoul", "pyongyang", "beijing", "tokyo", "newyork", "boston", "losangeles", "calcutta", "cairo", "kyiv",
   "ephesus", "corinth", "tarsus", "caesarea", "thebes", "carchemish", "bethlehem", "nazareth", "capernaum", "hebron", "beersheba",
   "jericho", "shechem", "bethel", "dan", "lachish", "dibon", "megiddo", "joppa", "patmos", "persepolis", "pasargadae", "ecbatana"];
 // 바탕 지명으로 쓸 때 괄호 설명을 줄인 이름
@@ -114,6 +135,13 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
   const refProj = d3.geoMercator().scale(REF).translate([0, 0]).center([0, 0]);
   const refPath = d3.geoPath(refProj);
   land.attr("d", refPath(geo.land));
+  let world = false;
+  const useWorld = () => {
+    if (world) return;
+    world = true;
+    loadWorld().then((w) => land.attr("d", refPath(w.land))).catch(() => (world = false));
+  };
+  (window.requestIdleCallback ? (f) => requestIdleCallback(f, { timeout: 6000 }) : (f) => setTimeout(f, 3000))(useWorld);
   lakes.attr("d", refPath(geo.lakes));
   rivers.attr("d", refPath(geo.rivers));
   const baseG = g.append("g").attr("class", "base").style("pointer-events", "none");
@@ -268,6 +296,7 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
   function show(ev, { instant = false } = {}) {
     if (ev === current) return;
     current = ev;
+    if (!world && [...ev.route, ...(ev.trail || [])].some((id) => PLACES[id] && !inNear(PLACES[id].at))) useWorld();
     const from = view, to = target(ev);
     cancelAnimationFrame(raf);
     marks.selectAll("g.pl").remove();

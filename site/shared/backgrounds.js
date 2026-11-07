@@ -19,6 +19,7 @@ import { ERA_BG_E1, SRC_E1 } from "./bg_e1.js";
 import { ERA_BG_E2, SRC_E2 } from "./bg_e2.js";
 import { ERA_BG_C1, SRC_C1 } from "./bg_c1.js";
 import { ERA_BG_C2, SRC_C2 } from "./bg_c2.js";
+import { ERA_BG_C3, SRC_C3 } from "./bg_c3.js";
 import { BOOK_BG_G1, SRC_G1 } from "./bg_g1.js";
 import { BOOK_BG_G2, SRC_G2 } from "./bg_g2.js";
 import { BOOK_BG_G3, SRC_G3 } from "./bg_g3.js";
@@ -27,10 +28,10 @@ import { BOOK_BG_G5, SRC_G5 } from "./bg_g5.js";
 import { BOOK_BG_G6, SRC_G6 } from "./bg_g6.js";
 import { BOOK_BG_G7, SRC_G7 } from "./bg_g7.js";
 
-export const ERA_BG = Object.assign({}, ERA_BG_E1, ERA_BG_E2, ERA_BG_C1, ERA_BG_C2);
+export const ERA_BG = Object.assign({}, ERA_BG_E1, ERA_BG_E2, ERA_BG_C1, ERA_BG_C2, ERA_BG_C3);
 export const BOOK_BG = Object.assign({}, BOOK_BG_G1, BOOK_BG_G2, BOOK_BG_G3, BOOK_BG_G4, BOOK_BG_G5, BOOK_BG_G6, BOOK_BG_G7);
 // 기본 출처 목록이 먼저다. 묶음 파일은 없는 id만 더한다.
-export const SOURCES = { ...SRC_E1, ...SRC_E2, ...SRC_C1, ...SRC_C2, ...SRC_G1, ...SRC_G2, ...SRC_G3, ...SRC_G4, ...SRC_G5, ...SRC_G6, ...SRC_G7, ...BASE };
+export const SOURCES = { ...SRC_E1, ...SRC_E2, ...SRC_C1, ...SRC_C2, ...SRC_C3, ...SRC_G1, ...SRC_G2, ...SRC_G3, ...SRC_G4, ...SRC_G5, ...SRC_G6, ...SRC_G7, ...BASE };
 export const BG_KINDS = [
   { key: "events", name: "사건" },
   { key: "culture", name: "문화" },

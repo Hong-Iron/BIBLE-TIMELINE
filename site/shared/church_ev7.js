@@ -1,0 +1,251 @@
+// 교회사 사건·인물 묶음 7(1914~1965년, 세계대전과 교회 일치). 형식은 church_events.js 머리말과 church_ev1.js를 따른다.
+// 증거의 kind: "place"는 장소를 오늘(또는 근래에) 찍은 사진이다. 사건을 직접 보여 주지는 않는다.
+// 사건 자리에서 찍은 사진(공의회 회의, 개회 예배 등)은 strength를 "direct"로, 사건보다 앞이나 뒤에 찍은 사진은 "context"로 둔다.
+// 20세기 문서는 대부분 저작권이 살아 있어서, source에는 공유 자료나 1955년 전에 죽은 사람이 쓴 원문을 우리가 옮긴 글만 싣는다.
+
+const place = (img, name, where, says, caveat) => ({
+  img, kind: "place", name, madeLabel: "오늘의 모습", where, found: "", says, strength: "context",
+  caveat: caveat ?? "장소 사진이다. 사건을 직접 보여 주지는 않는다.",
+});
+
+export const CH_EVENTS_7 = [
+  {
+    id: "armenia-1915", title: "오스만 제국이 아르메니아인을 강제로 옮기고 대량으로 죽이다", short: "아르메니아인 학살", year: 1915, yearLabel: "1915~1917년",
+    dateNote: "1915년 4월 24일 콘스탄티노플에서 아르메니아인 지식인과 지도자 수백 명을 붙잡아 보냈다. 아르메니아인은 이날을 추모일로 지킨다. 강제 이주와 학살은 1917년까지 이어졌다.",
+    era: "worldwars",
+    summary: "1차 세계대전 중 오스만 제국 정부(청년튀르크당의 통일진보위원회가 이끈 정부)가 나라 안의 아르메니아인을 시리아 사막 쪽으로 강제로 옮긴다. 1915년 4월 24일 콘스탄티노플의 지식인과 지도자들을 붙잡아 보낸 일을 시작으로, 마을마다 아르메니아인이 걸어서 사막으로 내몰렸다. 데이르에조르 같은 사막의 수용지로 가는 길과 그곳에서 많은 사람이 굶주림과 병, 학살로 죽었다. 죽은 사람의 수는 연구자에 따라 60만 명에서 150만 명까지 다르게 잡는다. 같은 무렵 그리스인과 아시리아인(시리아어를 쓰는 그리스도인) 공동체도 강제 이주와 학살을 겪었다.\n\n이 사건은 부르는 이름부터 다툰다. 아르메니아와 아르메니아 사도 교회는 '제노사이드(한 민족을 없애려고 계획해서 저지른 집단 학살)'라 부르고, 아르메니아어로는 '메츠 예게른(큰 범죄)'이라고도 한다. 우루과이(1965)를 시작으로 독일 연방의회(2016), 미국 대통령(2021) 등 여러 나라 정부와 의회가 이 이름을 쓴다. 프란치스코 교황은 2015년 4월 12일 메시지에서 2001년 요한 바오로 2세와 카레킨 2세의 공동 선언을 들어 '20세기 첫 제노사이드'라는 말을 썼고, 튀르키예는 바티칸 주재 대사를 불러들였다. 튀르키예 정부는 '1915년 사건'이라 부른다. 전쟁터에서 아르메니아인을 옮긴 이주 조치 중에 내란과 보복, 기근과 전염병으로 튀르크인과 아르메니아인이 함께 많이 죽은 비극이라고 보며, 미리 계획한 학살이라는 증거가 없으므로 제노사이드라는 이름은 법적 근거가 없다고 한다. 2015년 4월 23일 아르메니아 사도 교회는 에치미아진에서 희생자들을 '아르메니아인 제노사이드의 순교자'로 시성(교회가 성인으로 공식 선포하는 일)했다. 이 교회가 400년 만에 한 시성이었다.",
+    people: [], route: ["constantinople", "adana", "deirezzor", "etchmiadzin"],
+    source: { text: "1915년 봄과 여름 내내 강제 이주가 이어졌다. 콘스탄티노플, 스미르나, 알레포 같은 큰 도시를 빼면, 아르메니아인 가족이 하나라도 사는 곳은 거의 모두 이 일을 겪었다.", src: "morgenthau1918: 24장(당시 미국 대사의 회고록)" },
+    evidence: [
+      {
+        img: "ch-adana-deportation-1915", name: "강제 이주 열차에 탄 아다나의 아르메니아인 아이들", madeYear: 1915, madeLabel: "1915년 9월 2일",
+        where: "아르메니아 예레반의 아르메니아 제노사이드 박물관-연구소가 공개한 사진", found: "",
+        says: "남부 아나톨리아의 도시 아다나에서 아르메니아인 아이들을 열차에 태워 옮기는 장면이다. 강제 이주가 걷는 행렬만이 아니라 철도로도 이루어졌음을 보여 준다.",
+        strength: "direct", caveat: "찍은 사람은 알려지지 않았다. 날짜와 사진 설명은 박물관이 단 것이다.",
+      },
+      place("ch-tsitsernakaberd", "치체르나카베르드 추모관", "아르메니아 예레반",
+        "희생자를 기리려고 1967년 11월에 완공한 추모관이다. 해마다 4월 24일이면 많은 사람이 꽃을 들고 이곳을 찾는다.",
+        "추모 시설의 사진이다. 사건을 직접 보여 주지는 않는다."),
+    ],
+  },
+  {
+    id: "moscow-council-1917", title: "러시아 정교회 지역 공의회가 총대주교직을 되살리고 티혼을 뽑다", short: "모스크바 지역 공의회", year: 1917, yearLabel: "1917년 8월~1918년 9월",
+    dateNote: "러시아는 1918년 2월까지 율리우스력을 썼다. 공의회는 율리우스력 1917년 8월 15일(오늘의 달력으로 8월 28일)에 열렸다. 10월 28일(11월 10일)에 총대주교직을 되살리기로 정했고, 11월 5일(11월 18일)에 제비를 뽑았다. 회의는 1918년 9월 20일에 끝났다.",
+    era: "worldwars",
+    summary: "2월 혁명으로 황제가 물러난 1917년 여름, 러시아 정교회가 주교와 사제, 평신도 564명을 모스크바에 모아 지역 공의회(한 나라 교회의 대표들이 모여 그 교회의 일을 정하는 회의)를 연다. 17세기 말 뒤로 처음 열린 지역 공의회였다. 1721년부터 러시아 교회는 총대주교(한 지역 정교회의 으뜸 주교) 없이, 황제가 세운 신성 종무원(국가 관리가 감독하는 주교 회의)의 다스림을 받아 왔다. 볼셰비키가 페트로그라드에서 권력을 잡고 사흘 뒤, 공의회는 총대주교직을 되살리기로 정했다. 표를 가장 많이 얻은 세 후보를 두고 한 노수도사가 제비를 뽑았고, 모스크바 대주교 티혼이 총대주교가 되었다. 1918년 1월 소비에트 정부는 교회와 국가, 학교와 교회를 떼는 법령으로 교회 재산을 거두었고, 그 무렵 키예프 수도대주교 블라디미르를 비롯한 성직자들이 죽임을 당했다. 공의회는 총대주교가 잡혀가거나 죽을 때를 대비해 그 자리를 맡을 사람을 차례로 정해 두게 했다. 공의회가 돈이 떨어져 1918년 9월 문을 닫은 뒤, 이어진 박해 속에서 수많은 성직자와 신자가 목숨을 잃었다.",
+    people: ["tikhon"], route: ["moscow"],
+    source: { text: "정신을 차려라, 미친 사람들아. 피비린내 나는 보복을 그쳐라. 너희가 하는 일은 그저 잔인한 일이 아니라 참으로 사탄의 일이다.", src: "tikhon1918: 티혼 총대주교의 1918년 1월 19일(율리우스력) 교서" },
+    evidence: [{
+      img: "ch-sobor-1917", name: "모스크바 교구 회관에서 열린 지역 공의회 회의", madeYear: 1917, madeLabel: "1917년 12월",
+      where: "러시아 모스크바(성 티혼 정교회 인문대학 누리집 사진첩에 실린 사진)", found: "",
+      says: "총대주교로 뽑힌 티혼과 공의회의 주교들이 모스크바 교구 회관의 회의실에 모인 장면이다. 공의회가 열리던 때 그 자리에서 찍었다.",
+      strength: "direct", caveat: "찍은 사람은 알려지지 않았다.",
+    }],
+  },
+  {
+    id: "romans-1919", title: "바르트가 『로마서』 주석을 펴내다", short: "바르트의 『로마서』", year: 1919, yearLabel: "1919년(개정판 1922년)",
+    dateNote: "첫판은 1918년 12월에 나왔지만 판권에는 1919년으로 찍혔다. 바르트는 1920년 10월부터 열한 달 가까이 책을 다시 써서 1922년에 제2판을 냈다.",
+    era: "worldwars",
+    summary: "스위스 아르가우주의 작은 공업 마을 자펜빌에서 목사로 일하던 카를 바르트는 1914년 8월, 자기 스승들이 독일의 전쟁 정책을 지지하는 지식인 93명의 선언에 이름을 올린 것을 보고 큰 충격을 받았다. 스승들에게 배운 자유주의 신학(성경과 신앙을 사람의 역사와 경험, 문화로 설명하려던 19세기 개신교 신학)으로는 설교할 수 없다고 느낀 그는 1916년부터 바울의 로마서를 다시 읽으며 주석을 썼다. 1919년 베른의 출판사에서 낸 첫판은 하나님은 사람의 종교와 문화로 닿을 수 없는 분이고, 사람은 하나님이 스스로 하시는 말씀으로만 하나님을 안다고 외쳤다. 이 책 덕분에 그는 박사 학위 없이 1921년 독일 괴팅겐 대학의 교수가 되었다. 1922년에 거의 새로 쓴 제2판은 자유주의 신학과 공개적으로 갈라섰고, '변증법적 신학', 뒤에는 '신정통주의'라 불린 흐름의 출발점이 되었다. 가톨릭 신학자 카를 아담은 이 책이 신학자들의 놀이터에 폭탄처럼 떨어졌다고 평했다.",
+    people: ["barth"], route: ["safenwil", "bern", "gottingen"],
+    evidence: [
+      {
+        img: "ch-romerbrief-1926", name: "『로마서』 개정판 표지(1926년 쇄)", madeYear: 1926, madeLabel: "1926년",
+        where: "개인 소장본", found: "",
+        says: "1922년에 바르트가 다시 쓴 제2판을 1926년에 다시 찍은 책이다. 개정판이 몇 해 사이 여러 번 다시 찍힐 만큼 많이 읽혔음을 보여 준다.",
+        strength: "direct", caveat: "1919년 첫판이 아니라 다시 쓴 판의 뒤 쇄다.",
+      },
+      place("ch-safenwil-church", "자펜빌 개혁교회", "스위스 아르가우주 자펜빌",
+        "바르트가 1911~1921년에 목사로 일한 마을의 교회다. 그는 이 마을에서 『로마서』 첫판을 썼다."),
+    ],
+  },
+  {
+    id: "barmen-1934", title: "고백 총회가 바르멘 신학 선언을 받아들이다", short: "바르멘 신학 선언", year: 1934, yearLabel: "1934년 5월 29~31일",
+    dateNote: "선언은 총회 마지막 날인 5월 31일에 대표들의 만장일치로 받아들여졌다.",
+    era: "worldwars",
+    summary: "히틀러가 권력을 잡은 1933년, '독일 그리스도인'(나치의 민족주의와 인종주의를 교회에 끌어들인 개신교 운동)이 교회 선거에서 크게 이기고 루트비히 뮐러를 제국 감독(독일 개신교 전체를 다스리게 한 감독)으로 세운다. 이들은 유대인 출신 그리스도인을 교회 직분에서 몰아내는 '아리아인 조항'을 교회에도 들이려 했다. 이에 맞선 목사와 교회들이 1934년 5월 부퍼탈 바르멘의 게마르케 교회에 모여 첫 고백 총회를 열었다. 루터교회와 개혁교회, 연합교회에서 온 대표 138명은 카를 바르트가 주로 쓰고 루터교 신학자 한스 아스무센과 토마스 브라이트가 함께 다듬은 여섯 조항의 신학 선언을 받아들였다. 첫 조항은 성경이 증언하는 예수 그리스도가 교회가 듣고 믿고 순종할 하나님의 유일한 말씀이며, 교회는 다른 사건이나 권력, 인물을 하나님의 계시로 받아들일 수 없다고 고백한다. 이 선언은 고백교회(나치에 맞춘 교회 지도부를 거부하고 따로 선 개신교 교회들)의 기초가 되었다. 다만 박해받는 유대인에 대해서는 아무 말도 하지 않았다는 비판을 받는다. 오늘 독일 개신교회(EKD)는 기본법에서 이 총회의 결정을 확인하고, 미국 장로교회(PCUSA)는 신앙고백서 모음에 이 선언을 넣었다.",
+    people: ["barth"], route: ["wuppertal"],
+    controversy: "confessing-church",
+    evidence: [{
+      img: "ch-gemarke-1890", name: "게마르케 교회(1890년 무렵)", madeYear: 1890, madeLabel: "1890년 무렵",
+      where: "독일 부퍼탈 바르멘", found: "",
+      says: "1887~1890년에 지은 개혁교회 예배당이다. 1934년 고백 총회가 이 건물에서 열렸다.",
+      strength: "context", caveat: "총회보다 40여 년 앞서 찍은 사진이다. 이 건물은 1943년 5월 공습으로 불탔고, 1954~1955년에 더 작게 다시 지었다.",
+    }],
+  },
+  {
+    id: "shrine-1938", title: "조선예수교장로회 총회가 신사참배를 결의하다", short: "장로회 총회의 신사참배 결의", year: 1938, yearLabel: "1938년 9월 10일",
+    dateNote: "제27회 총회는 1938년 9월 9일부터 15일까지 평양 서문밖교회에서 열렸고, 결의는 둘째 날인 9월 10일에 했다.",
+    era: "worldwars",
+    summary: "일본은 1930년대 중반부터 조선의 학교와 교회에 신사참배(일본 천황의 조상과 나라를 위해 죽은 사람을 신으로 모신 신사에 가서 절하는 의식)를 강요했다. 총독부는 이것이 종교가 아니라 국민이 지킬 의례라고 내세웠다. 1935년 11월 평양의 기독교 사립학교 교장들이 참배를 거부하자, 총독부는 거부하는 학교를 문 닫게 했다. 천주교는 1936년 교황청 포교성성의 지침에 따라 참배를 받아들였고, 감리교도 받아들였다. 1938년 2월 일본 경찰은 개교회에서 노회와 총회까지 차례로 참배를 결의하게 하는 방침을 세웠다. 그해 9월 평양에서 열린 조선예수교장로회 제27회 총회는 경찰의 압력 속에서 신사참배를 결의했고, 그날 부회장 김길창이 각 노회 대표들을 이끌고 평양 신사에 가서 절했다. 끝까지 거부한 주기철, 이기선, 한상동, 주남선, 손양원 등은 감옥에 갇혔다. 『한국민족문화대백과사전』은 이때 갇힌 사람을 2,000여 명, 문을 닫은 교회를 200여 곳, 순교한 사람을 50여 명으로 추산한다. 해방 뒤에는 이 결의를 어떻게 회개하고 책임질지가 장로교회가 갈라지는 쟁점의 하나가 되었다.",
+    people: ["jugicheol"], route: ["pyongyang"],
+    controversy: "shrine-worship",
+    evidence: [{
+      img: "ch-heijo-shrine-1942", name: "평양 신사의 옆모습", madeYear: 1942, madeLabel: "1942년",
+      where: "조선건축회 『조선과 건축』 20집 11호(1942)에 실린 사진", found: "",
+      says: "1938년 총회 대표들이 결의를 마치고 가서 절한 평양 신사다.",
+      strength: "context", caveat: "총회 4년 뒤 건축 잡지에 실린 사진이다. 참배 장면을 보여 주지는 않는다.",
+    }],
+  },
+  {
+    id: "bonhoeffer-1945", title: "본회퍼가 플로센뷔르크 강제수용소에서 처형되다", short: "본회퍼의 처형", year: 1945, yearLabel: "1945년 4월 9일",
+    dateNote: "전날인 4월 8일 친위대(SS) 판사의 즉결 재판이 사형을 선고했다. 같은 달 형 클라우스와 매형 한스 폰 도나니, 뤼디거 슐라이허도 저항에 가담한 일로 처형되었다.",
+    era: "worldwars",
+    summary: "고백교회의 목사이자 신학자 디트리히 본회퍼는 1935년부터 핀켄발데에서 고백교회 목사 후보생들을 가르쳤고, 1937년 9월 게슈타포(나치 독일의 비밀경찰)가 이 신학교를 닫았다. 1940년 10월부터는 매형 한스 폰 도나니를 통해 빌헬름 카나리스가 이끈 국방군 정보국(군의 첩보 기관)에 들어갔다. 이 기관 안에는 히틀러를 몰아내려던 사람들이 있었고, 본회퍼는 이 일로 외국을 여러 번 오갔다. 1943년 4월 5일 도나니와 함께 체포되어 베를린 테겔 감옥에 1년 반 동안 갇혔다. 1944년 7월 20일 히틀러 암살 시도가 실패하고 9월에 저항 모임의 문서가 드러나자 게슈타포 본부의 감옥으로 옮겨졌고, 1945년 2월에는 부헨발트 수용소로 보내졌다. 전쟁이 끝나기 한 달 전인 4월 9일, 그는 플로센뷔르크 수용소에서 카나리스, 한스 오스터 등과 함께 교수형을 당했다. 감옥에서 쓴 편지와 글은 친구 에버하르트 베트게가 모아 1951년 『저항과 복종』으로 펴냈다. 잉글랜드 성공회 등 여러 교회의 교회력이 4월 9일에 그를 기억한다.",
+    people: ["bonhoeffer"], route: ["berlin", "flossenburg"],
+    source: { text: "어리석음은 악보다 더 위험한 선의 적이다. 악에는 항의할 수 있고 악을 드러낼 수 있지만, 어리석음 앞에서 우리는 막아 낼 힘이 없다.", src: "bonhoeffer1951: 「어리석음에 대하여」(1943년에 씀, 『저항과 복종』 17쪽)" },
+    controversy: "confessing-church",
+    evidence: [place("ch-flossenburg-memorial", "플로센뷔르크 수용소의 추모판", "독일 바이에른주 플로센뷔르크 강제수용소 추모지",
+      "1945년 4월 9일 이곳에서 처형된 본회퍼, 카나리스, 루트비히 게레, 오스터, 프리드리히 폰 라베나우, 카를 자크, 테오도어 슈트륀크 일곱 사람의 이름을 새긴 추모판이다.",
+      "오늘의 추모 시설을 찍은 사진이다. 처형 장면을 보여 주지는 않는다.")],
+  },
+  {
+    id: "wcc-1948", title: "암스테르담에서 세계교회협의회가 세워지다", short: "세계교회협의회 창립", year: 1948, yearLabel: "1948년 8월 22일~9월 4일",
+    dateNote: "개회 예배는 8월 22일 암스테르담의 신교회(니우어 케르크)에서 드렸다.",
+    era: "worldwars",
+    summary: "20세기 초 개신교와 정교회는 세 갈래로 서로 만나기 시작했다. 1910년 에든버러 세계 선교 대회 뒤의 선교 협력, 교회들의 사회 참여를 함께 의논한 '삶과 일' 운동(1925년 스톡홀름 대회), 교리와 교회 제도를 놓고 대화한 '신앙과 직제' 운동(1927년 로잔 대회)이다. 뒤의 두 운동은 1938년 위트레흐트에서 하나의 협의회를 세우기로 하고 빌럼 피서르트호프트를 준비 위원회 총무로 뽑았지만, 2차 세계대전으로 창립이 미뤄졌다. 전쟁이 끝나고 3년 뒤 147개 교회의 대표 351명이 암스테르담에 모여 '사람의 무질서와 하나님의 계획'을 주제로 첫 총회를 열고 세계교회협의회(WCC)를 세웠다. 바르트가 주제 강연을 했고, 피서르트호프트가 첫 총무가 되었다. 창립 교회 가운데 아프리카와 아시아, 라틴아메리카 교회는 30곳뿐이었고, 한국의 장로교 총회도 이때 회원이 되었다(오늘의 대한예수교장로회(통합)가 이 회원 자격을 이었다). 로마 가톨릭 교회는 회원이 되지 않았고, 동유럽 공산권의 정교회들은 1961년 뉴델리 총회에서야 들어왔다. 교회들이 갈라져 있더라도 함께 머물며 일하겠다는 다짐이 이 총회의 메시지였다.",
+    people: ["visserthooft", "barth"], route: ["amsterdam"],
+    controversy: "ecumenism",
+    evidence: [{
+      img: "ch-wcc-1948", name: "세계교회협의회 첫 총회의 개회 예배", madeYear: 1948, madeLabel: "1948년 8월 22일",
+      where: "네덜란드 국립문서보관소(아네포 사진 모음)", found: "",
+      says: "암스테르담 신교회(니우어 케르크)에서 드린 개회 예배를 네덜란드 통신사 아네포의 사진가가 찍었다.",
+      strength: "direct", caveat: "",
+    }],
+  },
+  {
+    id: "split-1959", title: "한국 장로교가 고신·기장·합동·통합으로 갈라지다", short: "한국 장로교의 분열", year: 1959, yearLabel: "1952~1959년",
+    dateNote: "고신 측은 1952년 9월에 총노회를, 기장 측은 1953년 6월에 총회를 따로 세웠다. 제44회 총회는 1959년 9월 24일 대전중앙교회에서 열렸다가 파행했다.",
+    era: "worldwars",
+    summary: "해방 뒤 남한의 장로교회는 10년도 안 되는 사이 세 번 갈라졌다. 첫째 쟁점은 신사참배였다. 감옥에서 풀려난 한상동과 주남선이 1946년 9월 부산에 고려신학교를 세우고 신사참배에 대한 회개를 요구하며 기존 노회·총회와 부딪혔고, 이들을 따르는 쪽이 1952년 9월 따로 총노회를 조직했다. 오늘의 대한예수교장로회(고신)다. 둘째 쟁점은 성경을 보는 눈이었다. 조선신학교의 김재준이 성경의 낱말 하나하나가 틀림없다는 생각(축자영감설·문자 무오설)을 받아들이지 않자, 1952년 총회가 그의 교수직을 빼앗고 1953년 총회가 그를 목사직에서 파면했다. 그를 따르는 쪽은 1953년 6월 서울 동자동 한국신학대학 강당에서 따로 총회를 열었다. 오늘의 한국기독교장로회(기장)다. 셋째 쟁점은 세계교회협의회였다. 1959년 대전에서 열린 제44회 총회는 WCC와 교회 일치 운동(에큐메니컬 운동)을 받아들일지, 신학교 교장 박형룡과 얽힌 3,000만 환 사건, 경기노회 총대 선거를 두고 맞서다 파행했다. WCC를 받아들인 쪽은 서울 연동교회에서, 거부한 쪽은 승동교회에서 따로 총회를 이었다. 앞쪽이 대한예수교장로회(통합), 뒤쪽이 대한예수교장로회(합동)다. 합동 측은 1960년 고신 측과 합쳤다가 1963년 다시 갈라졌다. 『한국민족문화대백과사전』은 1959년 분열을 신학의 차이와 교권 다툼이 맞물린 결과로 설명한다.",
+    people: [], route: ["busan", "seoul", "daejeon"],
+    controversy: "ecumenism",
+    evidence: [
+      place("ch-yeondong-church", "연동교회", "서울 종로구 연지동",
+        "1959년 WCC를 받아들인 쪽이 총회를 이어 연 교회다. 이 쪽은 대한예수교장로회(통합)가 되었다."),
+      place("ch-seungdong-church", "승동교회", "서울 종로구 인사동",
+        "1912년에 지은 예배당이다. 1959년 WCC를 거부한 쪽이 이곳에서 총회를 이어 열었고, 이 쪽은 대한예수교장로회(합동)가 되었다."),
+    ],
+  },
+  {
+    id: "vatican2-1962", title: "요한 23세가 제2차 바티칸 공의회를 열다", short: "제2차 바티칸 공의회", year: 1962, yearLabel: "1962~1965년",
+    dateNote: "요한 23세는 1959년 1월 25일 로마의 성 바오로 대성당에서 공의회를 열겠다고 알렸다. 공의회는 1962년 10월 11일 성 베드로 대성당에서 시작해 해마다 가을에 네 차례 모였고, 바오로 6세 때인 1965년 12월 8일에 끝났다.",
+    era: "worldwars",
+    summary: "교황 요한 23세가 교회를 오늘의 세상에 맞게 새롭게 하겠다며 전 세계 가톨릭 주교들을 로마로 부른다. 첫날 주교 2,400명쯤이 행렬했고, 정교회와 개신교 교회들도 참관인을 보냈다. 요한 23세가 1963년 6월 세상을 떠나자 뒤를 이은 바오로 6세가 공의회를 이어 갔다. 공의회는 헌장 4개, 교령 9개, 선언 3개, 모두 16개 문서를 냈다. 전례 헌장 「거룩한 공의회」(1963)는 라틴어 대신 각 나라 말로 미사를 드릴 길을 열었다. 일치 교령 「일치의 재건」(1964)은 다른 그리스도인과의 대화를 권했고, 선언 「우리 시대」(1965)는 다른 종교들 안의 참되고 거룩한 것을 하나도 배척하지 않는다며 반유대주의를 규탄했다. 가장 크게 다툰 문서는 종교 자유에 관한 선언 「인간 존엄성」(1965)이었다. 마르셀 르페브르 대주교는 이 선언이 이전 교황들의 가르침과 어긋난다고 보아 반대표를 던졌다. 공의회를 어떻게 읽을지는 지금도 가톨릭 안의 논쟁거리다.",
+    people: ["john23", "paul6"], route: ["rome"],
+    controversy: "vatican2",
+    evidence: [
+      {
+        img: "ch-vatican2-wolleh", name: "회의를 마치고 흩어지는 공의회 교부들", madeYear: 1963, madeLabel: "1962~1965년 사이",
+        where: "독일 사진가 로타르 볼레가 찍은 공의회 사진 모음", found: "",
+        says: "공의회 회기 중 성 베드로 대성당에서 회의를 마친 주교들이 흩어지는 모습이다.",
+        strength: "direct", caveat: "네 회기 가운데 어느 날 찍었는지는 사진 설명에 없다.",
+      },
+      {
+        img: "ch-vatican2-closing-tv", name: "공의회 폐막 연설을 하는 바오로 6세의 텔레비전 화면", madeYear: 1965, madeLabel: "1965년 12월 8일",
+        where: "네덜란드 국립문서보관소(아네포 사진 모음)", found: "",
+        says: "로마에서 열린 폐막 예식을 중계한 텔레비전 화면을 네덜란드에서 찍은 사진이다. 공의회가 텔레비전으로 여러 나라에 전해졌음을 보여 준다.",
+        strength: "direct", caveat: "텔레비전 화면을 찍은 사진이라 흐리다.",
+      },
+    ],
+  },
+  {
+    id: "anathemas-1965", title: "바오로 6세와 아테나고라스 1세가 1054년의 파문을 거두다", short: "1054년 파문 철회", year: 1965, yearLabel: "1965년 12월 7일",
+    dateNote: "공동 선언은 같은 날 로마의 공의회 공개 회의와 이스탄불(옛 콘스탄티노플)의 총대주교청 예식에서 함께 읽혔다. 두 사람은 1964년 1월 5~6일 예루살렘에서 처음 만났다.",
+    era: "worldwars",
+    summary: "1054년 교황 사절 훔베르트와 콘스탄티노플 총대주교 미카엘 케룰라리오스가 서로 파문을 내린 뒤, 로마 가톨릭 교회와 정교회는 900년 넘게 갈라져 있었다. 1964년 1월 교황 바오로 6세가 성지 순례 중 예루살렘에서 세계 총대주교(정교회에서 첫째 자리를 가진 콘스탄티노플 총대주교) 아테나고라스 1세를 만났다. 교황과 콘스탄티노플 총대주교가 만난 일은 15세기 피렌체 공의회 뒤로 처음이었다. 이듬해 제2차 바티칸 공의회가 끝나기 하루 전, 두 사람은 공동 선언을 내어 1054년의 파문을 유감으로 여기고, 그 판결을 교회의 기억과 교회 한가운데서 지워 잊음에 맡긴다고 밝혔다. 선언은 그 파문이 특정한 사람들을 향한 것이었지 교회 전체를 향한 것이 아니었다고 보았다. 이 선언으로 갈라짐이 끝나지는 않았다. 두 교회는 아직 성찬을 함께 나누지 않고, 교황의 권한과 필리오케 같은 쟁점은 신학 대화의 과제로 남았다.",
+    people: ["paul6", "athenagoras"], route: ["rome", "phanar", "jerusalem"],
+    controversy: "schism-1054",
+    evidence: [place("ch-phanar-stgeorge", "파나르의 성 게오르기오스 총대주교 성당", "튀르키예 이스탄불 파나르",
+      "콘스탄티노플 세계 총대주교청의 성당이다. 1965년 12월 7일 공동 선언은 이스탄불의 총대주교청 예식에서도 읽혔다.")],
+  },
+];
+
+export const CH_PEOPLE_7 = [
+  { id: "tikhon", name: "티혼 총대주교", from: 1865, to: 1925, kind: "생애" },
+  { id: "barth", name: "카를 바르트", from: 1886, to: 1968, kind: "생애" },
+  { id: "bonhoeffer", name: "디트리히 본회퍼", from: 1906, to: 1945, kind: "생애" },
+  { id: "jugicheol", name: "주기철", from: 1897, to: 1944, kind: "생애" },
+  { id: "visserthooft", name: "빌럼 피서르트호프트", from: 1900, to: 1985, kind: "생애" },
+  { id: "john23", name: "요한 23세", from: 1881, to: 1963, kind: "생애" },
+  { id: "athenagoras", name: "아테나고라스 1세", from: 1886, to: 1972, kind: "생애" },
+  { id: "paul6", name: "바오로 6세", from: 1897, to: 1978, kind: "생애" },
+];
+
+// church_events.js의 CH_PLACES와 다른 묶음에 없는 장소만
+export const PLACES_CH7 = {
+  adana: { name: "아다나", at: [35.32, 37.0] },
+  deirezzor: { name: "데이르에조르", at: [40.14, 35.33] },
+  toropets: { name: "토로페츠(프스코프 지방)", at: [31.63, 56.5] },
+  sanfrancisco: { name: "샌프란시스코", at: [-122.42, 37.77] },
+  yaroslavl: { name: "야로슬라블", at: [39.89, 57.63] },
+  vilnius: { name: "빌뉴스", at: [25.28, 54.69] },
+  bern: { name: "베른", at: [7.45, 46.95] },
+  safenwil: { name: "자펜빌", at: [7.98, 47.32] },
+  gottingen: { name: "괴팅겐", at: [9.93, 51.53] },
+  bonn: { name: "본", at: [7.1, 50.73] },
+  breslau: { name: "브로츠와프(브레슬라우)", at: [17.04, 51.11] },
+  barcelona: { name: "바르셀로나", at: [2.17, 41.39] },
+  finkenwalde: { name: "핀켄발데(오늘의 슈체친)", at: [14.63, 53.39] },
+  flossenburg: { name: "플로센뷔르크", at: [12.35, 49.73] },
+  ungcheon: { name: "웅천(오늘의 창원시 진해구)", at: [128.74, 35.12] },
+  jeongju: { name: "정주(평안북도)", at: [125.2, 39.69] },
+  busan: { name: "부산", at: [129.04, 35.1] },
+  masan: { name: "마산", at: [128.57, 35.21] },
+  daejeon: { name: "대전", at: [127.38, 36.35] },
+  haarlem: { name: "하를럼", at: [4.64, 52.38] },
+  sottoilmonte: { name: "소토일몬테", at: [9.5, 45.7] },
+  bergamo: { name: "베르가모", at: [9.67, 45.7] },
+  sofia: { name: "소피아", at: [23.32, 42.7] },
+  concesio: { name: "콘체시오", at: [10.22, 45.6] },
+  castelgandolfo: { name: "카스텔간돌포", at: [12.65, 41.75] },
+  ioannina: { name: "이오아니나", at: [20.85, 39.66] },
+  halki: { name: "할키섬(헤이벨리아다)", at: [29.09, 40.88] },
+  corfu: { name: "케르키라(코르푸)", at: [19.92, 39.62] },
+  phanar: { name: "파나르(이스탄불의 세계 총대주교청)", at: [28.95, 41.03] },
+};
+
+// 증거 사진: 키(img 이름) → 위키미디어 공용 파일 이름. tools/fetch_images.py가 받는다.
+export const IMG_CH7 = {
+  "ch-adana-deportation-1915": "File:Armenian children of Adana on the deportation train.png",
+  "ch-tsitsernakaberd": "File:Genocide Memorial complex from air on a sunny day, September 2017.jpg",
+  "ch-sobor-1917": "File:Поместный собор в декабре 1917 года.jpg",
+  "ch-romerbrief-1926": "File:Karl Bart, Der Römerbrief.jpg",
+  "ch-safenwil-church": "File:Safenwil Kirche.jpg",
+  "ch-gemarke-1890": "File:Wuppertal Gemarker Kirche ca 1890.jpg",
+  "ch-heijo-shrine-1942": "File:평양신사측면전경.png",
+  "ch-flossenburg-memorial": "File:Flossenbürg concentration camp memorial 06.jpg",
+  "ch-wcc-1948": "File:Congres Wereldraad van Kerken in de Nieuwe Kerk, Bestanddeelnr 902-9330.jpg",
+  "ch-yeondong-church": "File:Yeondong Church, Seoul.jpg",
+  "ch-seungdong-church": "File:승동교회, Insadong, Seoul 01.jpg",
+  "ch-vatican2-wolleh": "File:Second Vatican Council by Lothar Wolleh 004.jpg",
+  "ch-vatican2-closing-tv": "File:Televisiebeeld van Paus Paulus VI bij het sluiten van het Tweede Vaticaans Conci, Bestanddeelnr 918-5400.jpg",
+  "ch-phanar-stgeorge": "File:Church of St. George, Istanbul (August 2010).jpg",
+  // 프로필의 기록 사진
+  "ch-tikhon-1923": "File:Patriarch Tikhon of Moscow near Donskoy Monastery Jul 1923.jpg",
+  "ch-barth-1956": "File:Karl Barth Bundesarchiv Bild.png",
+  "ch-bonhoeffer-1939": "File:Bundesarchiv Bild 146-1987-074-16, Dietrich Bonhoeffer.jpg",
+  "ch-sanjeonghyeon-1937": "File:1937년 조만식.jpg",
+  "ch-visserthooft-1961": "File:W. A. Visser , t Hooft, Bestanddeelnr 912-6542.jpg",
+  "ch-john23-anefo": "File:Paus Johannes XXIII , kop, Bestanddeelnr 924-1801 (cropped).jpg",
+  "ch-athenagoras-1967": "File:Patriarch Athenagoras (1967) (cropped).jpg",
+  "ch-paul6-1963": "File:Paus Paulus VI, Bestanddeelnr 915-2834.jpg",
+};
+
+// 이 묶음에서 새로 쓴 출처(sources.js와 다른 묶음에 없는 것만)
+export const SRC_V7 = {
+  morgenthau1918: { name: "H. 모겐소 『Ambassador Morgenthau's Story』(1918, 영어 위키문헌)", url: "https://en.wikisource.org/wiki/Ambassador_Morgenthau%27s_Story", license: "공유" },
+  tikhon1918: { name: "티혼 총대주교 「1918년 1월 19일 교서」(러시아어 원문, 『Богословский Вестник』 1918년 1권, 러시아어 위키문헌)", url: "https://ru.wikisource.org/wiki/Послание_святейшего_патриарха_Тихона_от_19_января_1918", license: "공유" },
+  bonhoeffer1951: { name: "D. 본회퍼 「Von der Dummheit」(『Widerstand und Ergebung』 1951, 독일어 원문, 독일어 위키문헌)", url: "https://de.wikisource.org/wiki/Von_der_Dummheit", license: "공유" },
+  // 아래는 옮겨 싣지 않고 근거로만 단다.
+  agbu2015: { name: "AGBU 보도자료 「Martyrs of the Armenian Genocide Canonized at Mother See of Holy Etchmiadzin」(2015년 5월 12일)", url: "https://agbu.org/press-release/martyrs-armenian-genocide-canonized-mother-see-holy-etchmiadzin", license: "링크만" },
+  mfaturkey: { name: "튀르키예 외교부 「The Events of 1915 and the Turkish-Armenian Controversy over History: An Overview」", url: "https://www.mfa.gov.tr/the-events-of-1915-and-the-turkish-armenian-controversy-over-history_-an-overview.en.mfa", license: "링크만" },
+  orthodoxwiki: { name: "OrthodoxWiki 「All-Russian Church Council of 1917-1918」", url: "https://orthodoxwiki.org/All-Russian_Church_Council_of_1917-1918", license: "링크만" },
+  barthcenter: { name: "프린스턴 신학교 바르트 연구 센터 「Biography」", url: "https://barth.ptsem.edu/karl-barth/biography/", license: "링크만" },
+  barmen1934de: { name: "「Theologische Erklärung der Bekenntnissynode von Barmen」(EKD 교회법 모음)", url: "https://www.kirchenrecht-ekd.de/pdf/5733.pdf", license: "링크만" },
+  ushmmbonhoeffer: { name: "미국 홀로코스트 기념 박물관 『Holocaust Encyclopedia』 「Dietrich Bonhoeffer」", url: "https://encyclopedia.ushmm.org/content/en/article/dietrich-bonhoeffer", license: "링크만" },
+  encykorea: { name: "『한국민족문화대백과사전』(한국학중앙연구원)", url: "https://encykorea.aks.ac.kr/", license: "링크만" },
+  britannica: { name: "『Encyclopaedia Britannica』 온라인판", url: "https://www.britannica.com/", license: "링크만" },
+  enwiki: { name: "영어 위키백과 해당 문서(2026년 11월에 읽음)", url: "https://en.wikipedia.org/", license: "CC BY-SA" },
+  dewiki: { name: "독일어 위키백과 해당 문서(2026년 11월에 읽음)", url: "https://de.wikipedia.org/", license: "CC BY-SA" },
+};

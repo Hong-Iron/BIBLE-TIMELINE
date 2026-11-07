@@ -8,7 +8,7 @@ import { STORY_PLACES } from "./places_story.js";
 import { CH_ERAS, CH_EMPIRES, CH_PLACES, CH_MORE_PLACES, CH_EVENTS, CH_PEOPLE } from "./church_events.js";
 
 // 성경 시대(기원전 2200년~)에서 교회사의 종교개혁과 베스트팔렌 조약(1648년)까지
-export const RANGE = [-2200, 1650];
+export const RANGE = [-2200, 2030];
 
 // 연대는 전통 연대(열왕기상 6:1 등 성경 숫자로 거슬러 센 값)를 기본으로 둔다. 학계 연대는 각 사건의 dateNote에 적는다.
 export const ERAS = [
@@ -105,6 +105,14 @@ export const STRENGTH = {
   indirect: { label: "간접 증거", desc: "같은 시대·상황을 보여 주지만 성경 사건을 직접 말하지는 않는다" },
   context: { label: "배경", desc: "그 시대와 장소가 실제로 어땠는지 보여 준다" },
   manuscript: { label: "옛 사본", desc: "성경 본문이 그 시대에 이미 이 모양이었다는 증거다" },
+};
+
+// 교회사 사건(성경 구절이 아니라 옛 문헌이나 기록으로 전하는 사건)의 증거 설명. 표시 이름은 STRENGTH와 같다.
+export const STRENGTH_CH = {
+  direct: "그 사건을 직접 보여 주거나, 그 사건의 사람과 자리에서 나온 것이다",
+  indirect: "같은 시대와 상황을 보여 주지만 그 사건을 직접 말하지는 않는다",
+  context: "그 시대와 장소가 실제로 어땠는지 보여 준다",
+  manuscript: "그 글이 그 시대에 이미 이 모양이었다는 증거다",
 };
 
 export const EVENTS = [

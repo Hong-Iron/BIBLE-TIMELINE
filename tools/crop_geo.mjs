@@ -3,6 +3,9 @@
 // 준비: 같은 폴더에 land50.json(world-atlas@2.0.2 land-50m), ne_10m_rivers_lake_centerlines.geojson, ne_10m_lakes.geojson을 받고
 //       npm i d3-geo@3 d3-geo-projection@4 topojson-client@3
 // 실행: node crop_geo.mjs <저장할 geo.json 경로>
+//       node crop_geo.mjs --world <저장할 geo_world.json 경로>
+//         교회사 3단계(1648년~오늘)에 아메리카·아프리카·동아시아가 나와, 땅만 세계 범위(서경 130도~동경 155도, 남위 45도~북위 72도)로
+//         따로 자른다. 이 파일만 있으면 되고 land50.json만 쓴다. 지도는 처음에 geo.json으로 그리고 이 파일을 나중에 받아 땅을 바꿔 그린다.
 import fs from "fs";
 import { geoIdentity, geoBounds, geoArea } from "d3-geo";
 import { geoProject } from "d3-geo-projection";
@@ -22,6 +25,13 @@ const rewind = (g) => {
 };
 const round = (g) => JSON.parse(JSON.stringify(g, (k, v) => (typeof v === "number" ? Math.round(v * 100) / 100 : v)));
 const inBox = (f) => { const [[a, b], [c, d]] = geoBounds(f); return c >= BOX[0][0] && a <= BOX[1][0] && d >= BOX[0][1] && b <= BOX[1][1]; };
+if (process.argv[2] === "--world") {
+  const WORLD = [[-130, -45], [155, 72]];
+  const topo = JSON.parse(fs.readFileSync("land50.json"));
+  const land = rewind(round(geoProject(feature(topo, topo.objects.land), geoIdentity().clipExtent(WORLD))));
+  fs.writeFileSync(process.argv[3], JSON.stringify({ land }));
+  process.exit(0);
+}
 const topo = JSON.parse(fs.readFileSync("land50.json"));
 const land = rewind(round(geoProject(feature(topo, topo.objects.land), clip)));
 const pick = (file, keep) => {
