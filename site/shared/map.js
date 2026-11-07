@@ -68,6 +68,30 @@ const MAJOR = ["jerusalem", "babylon", "nineveh", "memphis", "damascus", "rome",
 const SHORT_NAME = { memphis: "멤피스", sinai: "시내산", sodomsite: "소돔", nimrud: "갈라", hor: "호르산", khorsabad: "두르샤루킨",
   ecbatana: "악메다", tayma: "데마", susa: "수산", penuel: "브니엘", bethanyjordan: "베다니" };
 const baseName = (id) => SHORT_NAME[id] ?? PLACES[id].name.replace(/\(.*\)/, "").trim();
+// 이동 길: 장소를 지나는 부드러운 곡선. 구간마다 화살촉을 하나씩 놓아 어디서 어디로 가는지 보인다.
+const CURVE = d3.curveCatmullRom.alpha(0.5);
+// 화살촉은 구간 가운데보다 조금 도착 쪽(ARROW_T)에 둔다. 같은 길을 되돌아와도 두 화살이 겹치지 않는다.
+// 화면에서 너무 짧은 구간(점과 이름에 가려지는 곳)에는 놓지 않는다.
+const ARROW_T = 0.58, ARROW_MIN = 34;
+function arrowSpots(pts) {
+  // d3.line이 그리는 구간(직선 또는 3차 베지에)을 그대로 받아 적는다.
+  const segs = [];
+  let p0 = null;
+  const rec = {
+    moveTo(x, y) { p0 = [x, y]; },
+    lineTo(x, y) { segs.push([p0, p0, [x, y], [x, y]]); p0 = [x, y]; },
+    bezierCurveTo(ax, ay, bx, by, x, y) { segs.push([p0, [ax, ay], [bx, by], [x, y]]); p0 = [x, y]; },
+    closePath() {},
+  };
+  d3.line().curve(CURVE).context(rec)(pts);
+  const t = ARROW_T, u = 1 - t;
+  return segs.filter(([a, , , b]) => Math.hypot(b[0] - a[0], b[1] - a[1]) >= ARROW_MIN).map(([P, C1, C2, Q]) => {
+    const at = (i) => u * u * u * P[i] + 3 * u * u * t * C1[i] + 3 * u * t * t * C2[i] + t * t * t * Q[i];
+    const dir = (i) => 3 * u * u * (C1[i] - P[i]) + 6 * u * t * (C2[i] - C1[i]) + 3 * t * t * (Q[i] - C2[i]);
+    return { x: at(0), y: at(1), deg: (Math.atan2(dir(1), dir(0)) * 180) / Math.PI };
+  });
+}
+
 // 글자 폭 어림: 한글은 글자 크기만큼, 나머지는 절반 남짓
 const textW = (t, size, spacing = 0) => 4 + [...t].reduce((n, c) => n + (/[\u3131-\uD79D]/.test(c) ? size * 1.06 : size * 0.6) + spacing, 0);
 
@@ -95,6 +119,7 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
   const baseG = g.append("g").attr("class", "base").style("pointer-events", "none");
   const trail = g.append("g").style("pointer-events", "none");
   const route = g.append("path").attr("fill", "none").attr("stroke", theme.route).attr("stroke-width", 2.2).attr("stroke-dasharray", "5 4").attr("stroke-linecap", "round");
+  const arrows = g.append("g").style("pointer-events", "none");
   const marks = g.append("g");
 
   const proj = d3.geoMercator();
@@ -123,7 +148,11 @@ export async function createMap(el, theme = THEMES.parchment, { labels = true, b
       .attr("transform", (d) => `translate(${proj(PLACES[d].at)})`);
     const pts = ids.map((id) => proj(PLACES[id].at));
     // noLine이면 점만 찍는다(인물 프로필처럼 순서 없는 장소 모음).
-    route.attr("d", pts.length > 1 && !current?.noLine ? d3.line().curve(d3.curveCatmullRom.alpha(0.5))(pts) : null);
+    const line = pts.length > 1 && !current?.noLine;
+    route.attr("d", line ? d3.line().curve(CURVE)(pts) : null);
+    arrows.selectAll("path").data(line ? arrowSpots(pts) : [])
+      .join((e) => e.append("path").attr("d", "M-7,-6 L7,0 L-7,6 L-3.5,0 Z").attr("fill", theme.route).attr("stroke", theme.halo).attr("stroke-width", 1.2).attr("stroke-linejoin", "round"))
+      .attr("transform", (a) => `translate(${a.x},${a.y}) rotate(${a.deg})`);
     const sel = marks.selectAll("g.pl").data(ids, (d) => d);
     sel.exit().remove();
     const enter = sel.enter().append("g").attr("class", "pl");
