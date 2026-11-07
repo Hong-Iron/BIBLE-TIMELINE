@@ -1096,6 +1096,10 @@ button { font: inherit; color: inherit; }
   font-size: 14px;
   line-height: 1.6;
   white-space: nowrap;
+  /* 자리 이름이 길면 말풍선 너비 안에서 '…'로 줄인다(전체 이름은 인사말에 나온다). 닫기 단추 자리는 비워 둔다. */
+  max-width: calc(100% - 64px);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .robot__name small {
