@@ -98,6 +98,15 @@ function checkOne(id, f) {
   notes.push(`${id}: 사실 ${(f.facts || []).length}, 생애 ${(f.life || []).length}, 가족·관계 ${(f.family || []).length}, 장소 ${(f.places || []).length}, 구절 ${(f.quotes || []).length}, 기록 ${(f.records || []).length}`);
 }
 
+// 맨 위 초상(shared/portraits.js): 인물이 있고, 사진 파일이 받아져 있고, 종류가 정해진 값인지
+const { PORTRAITS } = await load("portraits.js");
+for (const [id, pt] of Object.entries(PORTRAITS)) {
+  if (!PE.has(id)) err(`초상 ${id}: 인물 목록에 없는 id다`);
+  if (!existsSync(join(ROOT, "site/img", `${pt.img}.jpg`))) err(`초상 ${id}: site/img/${pt.img}.jpg가 없다(python3 -I tools/fetch_images.py)`);
+  if (!["사진", "생전 초상", "죽은 직후 초상"].includes(pt.kind)) err(`초상 ${id}: kind '${pt.kind}'`);
+  if (!pt.madeLabel) err(`초상 ${id}: madeLabel이 없다`);
+}
+
 const files = process.argv.slice(2);
 if (!BIBLE) notes.push("개역한글 캐시가 없어 장절은 형식만 보았다(python3 -I tools/build_verses.py를 한 번 돌린다)");
 if (files.length) {

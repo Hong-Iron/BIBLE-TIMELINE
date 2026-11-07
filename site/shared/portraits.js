@@ -1,6 +1,57 @@
 // 인물의 생김새를 확실히 보여 주는 사진이나 생전 초상. 인물 프로필 맨 위, 이름 옆에 보인다.
 // 성경 인물과 고대·중세 인물처럼 후대에 상상해서 그린 그림만 있는 사람은 넣지 않는다.
-// { 인물 id: { img: 사진 열쇠(site/img/<열쇠>.jpg), kind: "사진" | "생전 초상", madeLabel, by?, note } }
+// { 인물 id: { img: 사진 열쇠(site/img/<열쇠>.jpg), kind: "사진" | "생전 초상" | "죽은 직후 초상", madeLabel, by?, note } }
 // 사진 파일은 PORTRAIT_IMG(열쇠 → 위키미디어 공용 파일)에 적으면 tools/fetch_images.py가 받는다. 이미 다른 곳에서 받은 사진은 그 열쇠를 그대로 쓴다.
-export const PORTRAITS = {};
-export const PORTRAIT_IMG = {};
+export const PORTRAITS = {
+  erasmus: {"img": "ch-erasmus-holbein", "kind": "생전 초상", "madeLabel": "1523년", "by": "한스 홀바인(아들)", "note": "1523년 바젤에서 홀바인이 에라스무스를 직접 보고 그린 유화(런던 내셔널 갤러리). 에라스무스가 살아 있을 때 그렸다."},
+  luther: {"img": "ch-luther-1520", "kind": "생전 초상", "madeLabel": "1520년", "by": "루카스 크라나흐(아버지)", "note": "1520년 비텐베르크의 궁정 화가 크라나흐가 새긴 동판화로, 아우구스티누스회 수사 시절의 루터 반신상이다(암스테르담 국립미술관). 크라나흐는 루터와 같은 도시에서 가까이 지냈다."},
+  zwingli: {"img": "pt-zwingli", "kind": "죽은 직후 초상", "madeLabel": "1531년(죽은 직후)", "by": "한스 아스퍼", "note": "츠빙글리가 전사한 1531년에 취리히 화가 한스 아스퍼가 양피지에 그린 옆얼굴(빈터투어 미술관). 그림에 '47세, 1531년에 죽다'라고 적혀 있고, 아스퍼는 츠빙글리가 일하던 때 취리히에서 활동했다."},
+  melanchthon: {"img": "ch-melanchthon-1543", "kind": "생전 초상", "madeLabel": "1543년", "by": "루카스 크라나흐(아버지)와 공방", "note": "1543년 비텐베르크의 크라나흐 공방이 그린 멜란히톤 초상. 멜란히톤(1560년 죽음)이 살아 있을 때 같은 도시의 화가가 그렸다."},
+  calvin: {"img": "pt-calvin", "kind": "생전 초상", "madeLabel": "1562년", "by": "르네 부아뱅", "note": "칼뱅이 53세이던 1562년에 르네 부아뱅이 새긴 동판화(제네바 도서관 소장본). 칼뱅은 1564년에 죽었으므로 생전 작품이다."},
+  cranmer: {"img": "ch-cranmer-flicke", "kind": "생전 초상", "madeLabel": "1545년", "by": "게를라흐 플리케", "note": "1545년 런던에서 독일 화가 게를라흐 플리케가 그린 크랜머 유화(국립 초상화 미술관). 크랜머가 1556년에 처형되기 전, 그를 보고 그렸다."},
+  loyola: {"img": "ch-loyola-conte", "kind": "죽은 직후 초상", "madeLabel": "1556년(죽은 직후)", "by": "야코피노 델 콘테", "note": "1556년 7월 31일 이냐시오가 죽은 직후, 그날 뜬 데스마스크를 보고 로마의 화가 야코피노 델 콘테가 그린 초상(로마 예수회 본부). 델 콘테는 이냐시오와 같은 때 로마에서 활동했다."},
+  nikon: {"img": "pt-nikon", "kind": "생전 초상", "madeLabel": "1660~1665년", "by": "화가 미상", "note": "니콘이 살아 있던 1660~1665년에 그린 집단 초상 「새 예루살렘 수도원 형제들과 함께 있는 총대주교 니콘」(새 예루살렘 박물관)에서 니콘 부분."},
+  spener: {"img": "ch-spener-kilian", "kind": "생전 초상", "madeLabel": "1683년", "by": "바르톨로메우스 킬리안", "note": "1683년 아우크스부르크의 판화가 킬리안이 새긴 슈페너 초상 동판화. 슈페너(1705년 죽음)가 프랑크푸르트 목사로 일할 때 만들었다."},
+  zinzendorf: {"img": "ch-zinzendorf-haas", "kind": "생전 초상", "madeLabel": "1750년", "by": "요나스 하스", "note": "1750년 요나스 하스가 새긴 친첸도르프 초상 동판화. 친첸도르프(1760년 죽음)가 살아 있을 때 만들었다."},
+  johnwesley: {"img": "ch-wesley-hone", "kind": "생전 초상", "madeLabel": "1766년", "by": "너새니얼 혼", "note": "1766년 너새니얼 혼이 웨슬리를 보고 그린 유화(런던 국립 초상화 미술관 NPG 135). 웨슬리가 63세일 때다."},
+  whitefield: {"img": "ch-whitefield-wollaston", "kind": "생전 초상", "madeLabel": "1742년 무렵", "by": "존 월래스턴", "note": "1742년 무렵 존 월래스턴이 그린 휫필드 유화(런던 국립 초상화 미술관 NPG 131). 휫필드(1770년 죽음)가 20대일 때 그렸다."},
+  carey: {"img": "ch-carey-pundit", "kind": "생전 초상", "madeLabel": "1811년", "by": "로버트 홈", "note": "1811년 캘커타에서 로버트 홈이 그린, 캐리와 그의 인도인 스승 므리튠자야 비댜랑카르의 2인 초상(옥스퍼드 리젠츠 파크 칼리지)."},
+  schleiermacher: {"img": "pt-schleiermacher", "kind": "생전 초상", "madeLabel": "1817년 이전", "by": "요한 하인리히 립스", "note": "판화가 립스(1758~1817)가 새긴 슐라이어마허 초상 동판화(암스테르담 국립미술관). 립스가 1817년에 죽었으므로 슐라이어마허가 살아 있을 때 만든 것이다."},
+  pius9: {"img": "ch-pius9-braun", "kind": "사진", "madeLabel": "1875년 5월 13일", "by": "아돌프 브라운", "note": "1875년 5월 13일, 83세 생일을 맞은 비오 9세를 아돌프 브라운이 찍은 사진."},
+  newman: {"img": "ch-newman-richmond", "kind": "생전 초상", "madeLabel": "1844년", "by": "조지 리치먼드", "note": "1844년 초상화가 조지 리치먼드가 뉴먼을 보고 그린 분필 소묘. 뉴먼이 가톨릭으로 옮기기 전해다."},
+  dollinger: {"img": "ch-dollinger-hanfstaengl", "kind": "사진", "madeLabel": "1860년 무렵", "by": "프란츠 한프슈텡글", "note": "1860년 무렵 뮌헨의 사진가 한프슈텡글이 찍은 되링거 사진."},
+  underwood: {"img": "ch-underwood-1884", "kind": "사진", "madeLabel": "1884년", "by": "찍은 사람 미상", "note": "조선에 오기 전해인 1884년의 언더우드 사진. 아내 릴리어스 언더우드가 1918년에 펴낸 전기에 실렸다."},
+  appenzeller: {"img": "ch-appenzeller-1901", "kind": "사진", "madeLabel": "1901년", "by": "찍은 사람 미상", "note": "1901년의 아펜젤러 사진. 그리피스가 1912년에 펴낸 전기 『조선의 근대 개척자』에 실렸다."},
+  gilseonju: {"img": "ch-gilseonju", "kind": "사진", "madeLabel": "1935년 이전", "by": "찍은 사람 미상", "note": "길선주 목사의 생전 사진(1935년 이전)."},
+  seymour: {"img": "ch-seymour", "kind": "사진", "madeLabel": "1910년대 초", "by": "찍은 사람 미상", "note": "1910년대 초에 찍은 윌리엄 시모어의 사진."},
+  pius10: {"img": "ch-pius10-bain", "kind": "사진", "madeLabel": "1903~1914년", "by": "베인 뉴스 서비스", "note": "교황 재위(1903~1914) 중의 비오 10세 사진. 미국 의회도서관 베인 뉴스 서비스 사진 모음."},
+  mott: {"img": "ch-mott-1910", "kind": "사진", "madeLabel": "1910년", "by": "찍은 사람 미상", "note": "에든버러 세계 선교 대회 무렵인 1910년의 모트 사진."},
+  tikhon: {"img": "ch-tikhon-1923", "kind": "사진", "madeLabel": "1923년 7월", "by": "삼소노프", "note": "1923년 7월 모스크바 돈스코이 수도원 근처에서 찍은 티혼 총대주교 사진. 잡지 『오고뇨크』에 실렸다."},
+  barth: {"img": "ch-barth-1956", "kind": "사진", "madeLabel": "1956년 3월", "by": "한스 라흐만", "note": "1956년 3월 부퍼탈의 복음주의 협회 연례 모임에서 한스 라흐만이 찍은 바르트(독일 연방문서보관소)."},
+  bonhoeffer: {"img": "ch-bonhoeffer-1939", "kind": "사진", "madeLabel": "1939년", "by": "찍은 사람 미상", "note": "1939년의 본회퍼 사진(독일 연방문서보관소)."},
+  jugicheol: {"img": "pt-jugicheol", "kind": "사진", "madeLabel": "1944년 이전", "by": "찍은 사람 미상", "note": "주기철 목사의 생전 독사진(1944년 이전)."},
+  visserthooft: {"img": "ch-visserthooft-1961", "kind": "사진", "madeLabel": "1961년 6월 26일", "by": "아네포", "note": "1961년 6월 26일 네덜란드 아네포 통신사가 찍은 피서르트호프트 사진(네덜란드 국립문서보관소)."},
+  john23: {"img": "ch-john23-anefo", "kind": "사진", "madeLabel": "1958~1963년", "by": "아네포", "note": "교황 재위(1958~1963) 중의 요한 23세 얼굴 사진(네덜란드 국립문서보관소 아네포 모음)."},
+  athenagoras: {"img": "ch-athenagoras-1967", "kind": "사진", "madeLabel": "1967년 10월 25일", "by": "피터르 용에르하위스(아네포)", "note": "1967년 10월 25일 암스테르담 스히폴 공항에 도착한 아테나고라스 1세 사진."},
+  paul6: {"img": "ch-paul6-1963", "kind": "사진", "madeLabel": "1963년 6월", "by": "아네포", "note": "1963년 6월 교황으로 뽑힐 무렵의 바오로 6세 사진(네덜란드 국립문서보관소 아네포 모음)."},
+  gutierrez: {"img": "ch-gutierrez-1988", "kind": "사진", "madeLabel": "1988년", "by": "호세 카를로스 마리아테기 기록보관소", "note": "1988년 페루에서 찍은 사진에서 구티에레스 부분."},
+  stott: {"img": "ch-stott-langham", "kind": "사진", "madeLabel": "찍은 해 알려지지 않음", "by": "랭엄 파트너십", "note": "랭엄 파트너십이 가진 존 스토트의 생전 사진. 찍은 해는 알려져 있지 않다."},
+  johnpaul2: {"img": "pt-johnpaul2", "kind": "사진", "madeLabel": "1985년 5월 12일", "by": "롭 크루스", "note": "1985년 5월 12일 네덜란드 위트레흐트 방문 때 롭 크루스가 찍은 요한 바오로 2세."},
+  lefebvre: {"img": "ch-lefebvre-1981", "kind": "사진", "madeLabel": "1981년 7월 18일", "by": "마르설 안토니서(아네포)", "note": "1981년 7월 18일 네덜란드 펠트호벤에서 옛 전례 미사를 드린 르페브르의 얼굴 사진."},
+  shenouda3: {"img": "ch-shenouda3-2009", "kind": "사진", "madeLabel": "2009년 6월 4일", "by": "척 케네디(백악관)", "note": "2009년 6월 4일 카이로 대학에서 오바마 대통령의 연설을 듣는 셰누다 3세 사진."},
+  dinkha4: {"img": "ch-dinkha4-2008", "kind": "사진", "madeLabel": "2008년 6월 15일", "by": "론 로버슨", "note": "2008년 6월 15일 시카고의 예배에서 찍은 마르 딩카 4세."},
+  ratzinger: {"img": "ch-benedict16-2013", "kind": "사진", "madeLabel": "2013년 1월 16일", "by": "미국 국방부", "note": "2013년 1월 16일 바티칸 일반 알현 때의 베네딕토 16세 사진."},
+  bartholomew: {"img": "ch-bartholomew-2019", "kind": "사진", "madeLabel": "2019년 1월 6일", "by": "우크라이나 대통령실", "note": "2019년 1월 6일 우크라이나 정교회 독립 교서를 건넨 날의 바르톨로메오스 1세 사진."},
+  popefrancis: {"img": "ch-francis-korea-2014", "kind": "사진", "madeLabel": "2014년 8월 17일", "by": "전한(코리아넷)", "note": "2014년 8월 17일 해미읍성 아시아 청년대회 폐막 미사 때의 교황 프란치스코 사진."},
+  kirill: {"img": "pt-kirill", "kind": "사진", "madeLabel": "2014년 3월 26일", "by": "이고리 팔킨", "note": "2014년 3월 26일 러시아 대통령실이 공개한 키릴 총대주교의 공식 사진(이고리 팔킨)."},
+  kimsuhwan: {"img": "ch-kimsuhwan-1968", "kind": "사진", "madeLabel": "1968년", "by": "찍은 사람 미상", "note": "1968년 서울 대주교가 된 무렵의 김수환."},
+};
+export const PORTRAIT_IMG = {
+  "pt-zwingli": "File:Ulrich-Zwingli-1.jpg",
+  "pt-calvin": "File:Calvin 1562.jpg",
+  "pt-nikon": "File:Portrait of Patriarx Nikon 01 detail.jpg",
+  "pt-schleiermacher": "File:Portret van Friedrich Ernst Daniel Schleiermacher, RP-P-1913-196.jpg",
+  "pt-jugicheol": "File:Cyukityoru.jpg",
+  "pt-johnpaul2": "File:Paus luistert aandachtig naar maatschappelijke organisatie in de Jaarbeurs in Ut, Bestanddeelnr 933-3260 (cropped).jpg",
+  "pt-kirill": "File:Patriarch Kirill 2014 official portrait.jpg",
+};

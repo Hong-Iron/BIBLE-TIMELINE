@@ -1524,5 +1524,54 @@
   "author": "Unknown authorUnknown author",
   "license": "Public domain",
   "licenseUrl": ""
+ },
+ "pt-zwingli": {
+  "file": "File:Ulrich-Zwingli-1.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Ulrich-Zwingli-1.jpg",
+  "author": "Hans Asper",
+  "license": "Public domain",
+  "licenseUrl": ""
+ },
+ "pt-calvin": {
+  "file": "File:Calvin 1562.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Calvin_1562.jpg",
+  "author": "René Boyvin (1525 ?-1598 ?)",
+  "license": "Public domain",
+  "licenseUrl": ""
+ },
+ "pt-nikon": {
+  "file": "File:Portrait of Patriarx Nikon 01 detail.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Portrait_of_Patriarx_Nikon_01_detail.jpg",
+  "author": "AnonymousUnknown author",
+  "license": "Public domain",
+  "licenseUrl": ""
+ },
+ "pt-schleiermacher": {
+  "file": "File:Portret van Friedrich Ernst Daniel Schleiermacher, RP-P-1913-196.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Portret_van_Friedrich_Ernst_Daniel_Schleiermacher,_RP-P-1913-196.jpg",
+  "author": "Rijksmuseum",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "pt-jugicheol": {
+  "file": "File:Cyukityoru.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Cyukityoru.jpg",
+  "author": "pusan",
+  "license": "Public domain",
+  "licenseUrl": ""
+ },
+ "pt-johnpaul2": {
+  "file": "File:Paus luistert aandachtig naar maatschappelijke organisatie in de Jaarbeurs in Ut, Bestanddeelnr 933-3260 (cropped).jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Paus_luistert_aandachtig_naar_maatschappelijke_organisatie_in_de_Jaarbeurs_in_Ut,_Bestanddeelnr_933-3260_(cropped).jpg",
+  "author": "Rob Croes",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "pt-kirill": {
+  "file": "File:Patriarch Kirill 2014 official portrait.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Patriarch_Kirill_2014_official_portrait.jpg",
+  "author": "kremlin.ru / Игорь Палкин",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0"
  }
 }

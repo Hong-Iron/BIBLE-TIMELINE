@@ -105,6 +105,8 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
   function render(id) {
     // 교회사 인물처럼 칸이 빠진 프로필도 그릴 수 있게 빈 목록으로 채운다.
     const p = PERSON[id], f = { aliases: [], facts: [], family: [], places: [], life: [], quotes: [], records: [], books: [], ...PROFILES[id] };
+    // 맨 위 초상으로 올린 사진은 '성경 밖 기록' 칸에 다시 놓지 않는다.
+    if (PORTRAITS[id]) f.records = f.records.filter((r) => (r.ev || r.img) !== PORTRAITS[id].img);
     const events = EVENTS.filter((ev) => (ev.people || []).includes(id));
     page.innerHTML = `
       <aside class="p-side">
