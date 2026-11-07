@@ -51,6 +51,8 @@ button { font: inherit; color: inherit; }
 .books-btn { margin-left: auto; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; }
 .books-btn:hover { border-color: var(--accent); color: var(--accent); }
 .books-btn.church-btn { margin-left: 0; }
+.find-btn { display: inline-grid; place-items: center; width: 31px; height: 31px; border: 1px solid var(--line); background: var(--panel); border-radius: 50%; color: var(--ink); cursor: pointer; padding: 0; }
+.find-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* 왼쪽 지도 | 오른쪽 연표 */
 .split { display: grid; grid-template-columns: clamp(260px, 28vw, 420px) minmax(0, 1fr); min-height: 0; }
@@ -672,6 +674,30 @@ button { font: inherit; color: inherit; }
 /* ---------- 성경 책 해설 ---------- */
 .bookview { z-index: 56; }
 .debateview { z-index: 58; }
+/* 찾기: 다른 덮개 화면 위에서도 열 수 있게 가장 위에 둔다 */
+.findview { z-index: 60; }
+.f-page { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+.f-box { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--card-line); border-radius: 12px; padding: 0 14px; color: var(--muted); box-shadow: 0 8px 22px -14px rgba(60, 45, 25, 0.45); }
+.f-box:focus-within { border-color: var(--accent); color: var(--accent); }
+.f-box input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 500 18px/1 inherit; color: var(--ink); padding: 15px 0; }
+.f-box input::-webkit-search-cancel-button { cursor: pointer; }
+#fList { padding: 14px 0 40px; }
+.f-group { margin-top: 18px; }
+.f-group h3 { margin: 0 0 6px; padding: 0 4px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.06em; color: var(--muted); }
+.f-group h3 span { margin-left: 4px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.f-row { display: block; width: 100%; text-align: left; border: 1px solid transparent; background: transparent; border-radius: 10px; padding: 9px 12px; cursor: pointer; color: var(--ink); font: inherit; }
+.f-row b { display: block; font-size: 15px; font-weight: 600; }
+.f-row small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.f-row mark { background: #fbe3cf; color: inherit; border-radius: 3px; padding: 0 1px; }
+.f-row:hover, .f-row.on { background: #fff; border-color: var(--card-line); }
+.f-row.on b { color: var(--accent); }
+.f-more { margin: 2px 0 0 8px; border: 0; background: none; padding: 4px 4px; font-size: 12.5px; color: var(--accent); cursor: pointer; }
+.f-empty { padding: 26px 6px; color: var(--ink2); font-size: 14.5px; }
+.f-try { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.f-try button { border: 1px solid var(--card-line); background: #fff; border-radius: 999px; padding: 6px 13px; font-size: 13.5px; cursor: pointer; color: var(--ink); }
+.f-try button:hover { border-color: var(--accent); color: var(--accent); }
+.f-tip { font-size: 12.5px; color: var(--muted); }
+@media (max-width: 700px) { .f-page { padding: 0 14px; } .f-box input { font-size: 16px; padding: 13px 0; } }
 .bookview .p-page.is-lib, .debateview .p-page.is-lib { display: block; max-width: 1100px; }
 /* 교회사: 논쟁 목록, 주장, 결정, 각 교회의 입장 */
 .db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
@@ -887,6 +913,7 @@ button { font: inherit; color: inherit; }
   <h1 class="brand">바이블 타임라인</h1>
   <button class="books-btn" id="booksBtn" type="button">성경으로 보기</button>
   <button class="books-btn church-btn" id="churchBtn" type="button">교회사로 보기</button>
+  <button class="find-btn" id="findBtn" type="button" aria-label="찾기" title="찾기 (/ 또는 Ctrl·⌘+K)"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 </header>
 
 <div class="split">
@@ -992,6 +1019,20 @@ button { font: inherit; color: inherit; }
     <div class="g-readout"><span class="ry" id="gRy"></span><span class="re" id="gRe"></span></div>
     <div class="g-track" id="gTrack"></div>
   </nav>
+</div>
+
+<div class="profile findview" id="find" role="dialog" aria-modal="true" aria-label="찾기" aria-hidden="true" tabindex="-1">
+  <header class="g-top">
+    <div class="g-brand"><b>찾기</b></div>
+    <button class="g-close" id="fClose" type="button">돌아가기 <span aria-hidden="true">✕</span></button>
+  </header>
+  <div class="p-scroll" id="fScroll">
+    <div class="f-page">
+      <div class="f-box"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="fInput" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" placeholder="사건, 인물, 성경, 논쟁, 장소, 해" aria-label="찾을 말"></div>
+      <div id="fList" aria-live="polite"></div>
+    </div>
+  </div>
 </div>
 
 <div class="profile bookview debateview" id="debate" role="dialog" aria-modal="true" aria-label="교회사" aria-hidden="true" tabindex="-1">

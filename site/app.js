@@ -881,9 +881,23 @@ const debates = lazy(() => import("./debate.js").then((m) => m.createDebates({
   onClose: () => { frame(); scroller.focus({ preventScroll: true }); },
 })));
 $("churchBtn").addEventListener("click", () => debates.open(null));
+/* ---------- 찾기(#q-<검색어>) ---------- */
+// 결과를 고르면 그 화면의 주소로 옮겨 가고 route()가 그 화면 하나만 연다. 돌아가기를 누르면 검색 결과로 돌아온다.
+const PICK_HASH = { event: (g) => `#${g.id}`, person: (g) => `#p-${g.id}`, book: (g) => `#b-${g.id}`, scene: (g) => `#s-${g.id}`,
+  debate: (g) => `#c-${g.id}`, theme: (g) => `#d-${g.id}`, era: (g) => `#e-${g.id}` };
+const search = lazy(() => import("./search.js").then((m) => m.createSearch({
+  onPick: async (g) => {
+    nav.push(PICK_HASH[g.kind](g));
+    await route();
+    if (g.kind === "scene") story.open(g.id, g.i);
+  },
+  onBack: () => back(),
+  onClose: () => scroller.focus({ preventScroll: true }),
+})));
+$("findBtn").addEventListener("click", () => search.open(""));
 // 넓은 화면(대개 PC)은 첫 화면을 그린 뒤 쉬는 틈에 미리 불러 둔다. 휴대폰은 처음 열 때 불러온다.
 if (matchMedia("(min-width: 900px) and (pointer: fine)").matches) {
-  const warm = () => { books.ready(); profiles.ready(); story.ready(); debates.ready(); };
+  const warm = () => { books.ready(); profiles.ready(); story.ready(); debates.ready(); search.ready(); };
   window.requestIdleCallback ? requestIdleCallback(warm, { timeout: 5000 }) : setTimeout(warm, 2500);
 }
 
@@ -896,7 +910,7 @@ function back() {
 async function route() {
   const h = location.hash;
   const ev = EVENTS.find((e) => `#${e.id}` === h);
-  const want = ev ? "gallery" : h.startsWith("#p-") ? "profile" : h.startsWith("#s-") ? "story"
+  const want = ev ? "gallery" : h.startsWith("#q") ? "search" : h.startsWith("#p-") ? "profile" : h.startsWith("#s-") ? "story"
     : h.startsWith("#b-") || h.startsWith("#e-") || h === "#books" ? "book"
     : h.startsWith("#c-") || h.startsWith("#d-") || h === "#church" ? "debate" : "timeline";
   // 열 화면의 코드를 먼저 불러온 뒤, 방문 기록을 건드리지 않고 한꺼번에 바꾼다.
@@ -904,14 +918,17 @@ async function route() {
   if (want === "book" || want === "story") await books.ready();
   if (want === "story") await story.ready();
   if (want === "debate") await debates.ready();
+  if (want === "search") await search.ready();
   if (location.hash !== h) return; // 불러오는 사이에 다른 화면으로 넘어갔다
   nav.quietly(() => {
+    if (want !== "search") search.close();
     if (want !== "story") story.close();
     if (want !== "profile") profiles.close();
     if (want !== "book" && want !== "story") books.close();
     if (want !== "debate") debates.close();
     if (want !== "gallery") closeGallery();
-    if (want === "gallery") openGallery(ev);
+    if (want === "search") search.open(decodeURIComponent(h.slice(3)));
+    else if (want === "gallery") openGallery(ev);
     else if (want === "profile") profiles.open(h.slice(3));
     else if (want === "book") h === "#books" ? books.open(null) : h.startsWith("#e-") ? books.openEra(h.slice(3)) : books.open(h.slice(3));
     else if (want === "debate") h === "#church" ? debates.open(null) : h.startsWith("#d-") ? debates.openTheme(h.slice(3)) : debates.open(h.slice(3));
@@ -976,6 +993,9 @@ stage.addEventListener("click", (e) => { if (swallowClick) { e.stopPropagation()
 
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input, textarea, select")) return;
+  // 찾기: '/' 또는 Ctrl·⌘+K. 찾기 화면에서는 입력칸 밖에서 Esc를 누르면 돌아간다.
+  if (e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k")) { e.preventDefault(); search.open(""); return; }
+  if (search.isOpen()) { if (e.key === "Escape") back(); return; }
   if (story.isOpen()) {
     if (e.key === "Escape") back();
     else if (["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(e.key)) { e.preventDefault(); story.step(e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1); }
