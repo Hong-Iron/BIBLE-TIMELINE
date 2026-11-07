@@ -8,7 +8,7 @@ import { STORY_PLACES } from "./places_story.js";
 import { CH_ERAS, CH_EMPIRES, CH_PLACES, CH_MORE_PLACES, CH_EVENTS, CH_PEOPLE } from "./church_events.js";
 
 // 성경 시대(기원전 2200년~)에서 교회사의 종교개혁과 베스트팔렌 조약(1648년)까지
-export const RANGE = [-2200, 2030];
+export const RANGE = [-2200, 2020];
 
 // 연대는 전통 연대(열왕기상 6:1 등 성경 숫자로 거슬러 센 값)를 기본으로 둔다. 학계 연대는 각 사건의 dateNote에 적는다.
 export const ERAS = [

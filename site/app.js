@@ -69,6 +69,8 @@ const BOOK_PACK = pack(BOOKS, 0);
 const DEBATE_PACK = pack(CONTROVERSY_INDEX, 0);
 const SRC_NAME = { ...CH_SOURCES, ...BASE_SOURCES };
 const PEOPLE_PACK = pack(PEOPLE, 8);
+// 같은 때 있었던 제국(예: 오스만·러시아·조선)이 겹치지 않게 줄을 나눈다.
+const EMP_PACK = pack(EMPIRES, 0);
 
 const state = {
   ppy: 2, viewW: 1000, viewH: 400, center: EVENTS[0].year, mobile: false,
@@ -99,7 +101,7 @@ function layout() {
   const lane = (name, h) => { const top = y; y += h + d.gap; return { top, h, name }; };
   const off = () => ({ top: y, h: 0, hidden: true });
   L = { d };
-  L.emp = sh.emp ? lane("제국", d.emp) : off();
+  L.emp = sh.emp ? lane("제국", EMP_PACK.rows * d.emp) : off();
   L.era = lane("시대", d.era);
   L.debate = sh.debate && DEBATE_PACK.rows ? lane("논쟁", DEBATE_PACK.rows * d.bookRow) : off();
   L.book = sh.book ? lane("성경 책", BOOK_PACK.rows * d.bookRow) : off();
@@ -180,15 +182,16 @@ function render() {
     }).each(function (b) {
       const xa = X(b.from), xb = X(b.to);
       const gg = d3.select(this);
-      gg.select("rect").attr("x", xa + 0.5).attr("y", top + 0.5).attr("width", Math.max(1, xb - xa - 1)).attr("height", h - 1)
+      const y0 = top + (b.row || 0) * h;
+      gg.select("rect").attr("x", xa + 0.5).attr("y", y0 + 0.5).attr("width", Math.max(1, xb - xa - 1)).attr("height", h - 1)
         .attr("fill", fill(b)).attr("stroke", stroke(b));
       const w = tw(label(b), 11, 600);
       const lx = stickyLabelX(xa, xb, w);
-      gg.select("text").attr("x", lx ?? 0).attr("y", top + h / 2 + 4).attr("fill", text(b)).style("display", lx == null ? "none" : null).text(label(b));
+      gg.select("text").attr("x", lx ?? 0).attr("y", y0 + h / 2 + 4).attr("fill", text(b)).style("display", lx == null ? "none" : null).text(label(b));
       gg.select("title").text(`${label(b)} · ${rangeText(b.from, b.to)}`);
     });
   };
-  bands(G.emp, state.show.emp ? EMPIRES : [], L.emp.top, d.emp, (b) => hexA(b.color, 0.15), (b) => hexA(b.color, 0.4), (b) => darken(b.color), (b) => b.name);
+  bands(G.emp, state.show.emp ? EMP_PACK.items : [], L.emp.top, d.emp, (b) => hexA(b.color, 0.15), (b) => hexA(b.color, 0.4), (b) => darken(b.color), (b) => b.name);
   bands(G.era, ERAS, L.era.top, d.era, (b) => eraColor(b.hue), (b) => eraColor(b.hue, 72, 30), (b) => eraColor(b.hue, 27, 35), (b) => b.name);
   // 시대 띠를 누르면 그 시대의 당대 배경을 연다.
   G.era.selectAll("g.b").classed("era-link", true).on("click", (event, e) => books.openEra(e.id))
@@ -417,6 +420,7 @@ function sizeTrack() {
   track.style.height = `${L.height}px`;
   stage.style.width = `${state.viewW}px`;
   stage.style.height = `${L.height}px`;
+  updateBelow();
 }
 
 function setCenter(year, smooth = false) {
@@ -956,14 +960,21 @@ function stepEvent(dir) {
 }
 
 /* ---------- 입력 ---------- */
-scroller.addEventListener("scroll", () => onScroll(false), { passive: true });
+scroller.addEventListener("scroll", () => { onScroll(false); updateBelow(); }, { passive: true });
+// 연표가 화면보다 길어 아래에 내용(사진 줄)이 남아 있으면 아래쪽에 '더 있음' 안내를 띄운다. 누르면 맨 아래로 내린다.
+function updateBelow() {
+  $("belowHint").hidden = !(scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop > 6);
+}
+$("belowHint").addEventListener("click", () => scroller.scrollTo({ top: scroller.scrollHeight, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
 scroller.addEventListener("wheel", (e) => {
   if (e.ctrlKey || e.metaKey) {
     e.preventDefault();
     zoomBy(Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.006)));
     return;
   }
-  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+  // 위아래 휠은 시간을 옮긴다. 다만 차선을 많이 켜서 연표가 화면보다 길면 위아래로 움직여 아래의 사진까지 볼 수 있게 한다.
+  // 그때 시간은 좌우로 쓸기, Shift+휠, 끌기, 화살표 키로 옮긴다.
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.shiftKey && scroller.scrollHeight <= scroller.clientHeight + 2) {
     e.preventDefault();
     scroller.scrollLeft += e.deltaY * (e.deltaMode === 1 ? 32 : 1);
   }
