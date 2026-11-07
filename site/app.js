@@ -4,7 +4,7 @@
 import * as d3 from "./vendor/d3-7.9.0.js";
 import { RANGE, ERAS, EMPIRES, PEOPLE, BOOKS, EVENTS, STRENGTH, STRENGTH_CH, PLACES, byId, yearText, yearsBetween } from "./shared/data.js";
 import { createMap, THEMES } from "./shared/map.js";
-import { findBook } from "./shared/books.js";
+import { findBook, bookById } from "./shared/books.js";
 import { SOURCES as BASE_SOURCES } from "./shared/sources.js";
 import { CH_SOURCES } from "./shared/church_events.js";
 import { CONTROVERSY_INDEX } from "./shared/controversy_index.js";
@@ -913,6 +913,30 @@ const search = lazy(() => import("./search.js").then((m) => m.createSearch({
   onClose: () => scroller.focus({ preventScroll: true }),
 })));
 $("findBtn").addEventListener("click", () => search.open(""));
+/* ---------- 홍철(오른쪽 아래 픽셀 로봇) ---------- */
+// 지금 보는 화면을 알려 주면, 홍철이 그 화면과 이어진 대화(tags)를 먼저 꺼낸다. 답의 링크는 그 화면으로 간다.
+const THEME_NAME = { trinity: "하나님과 삼위일체", christ: "그리스도", grace: "은혜와 구원", church: "교회와 성례", scripture: "성경과 전통" };
+const EVENT = byId(EVENTS), PERSON_BY = byId(PEOPLE), ERA_BY = byId(ERAS), DEBATE_BY = byId(CONTROVERSY_INDEX);
+function hongcheolContext() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  const evKeys = (ev) => [`ev-${ev.id}`, ...(ev.controversy ? [`c-${ev.controversy}`] : []), ...(ev.people || []).map((p) => `p-${p}`)];
+  const zone = [state.zone];
+  if (EVENT[h]) return { keys: [...evKeys(EVENT[h]), ...zone], label: EVENT[h].short || EVENT[h].title };
+  const [kind, id] = [h.slice(0, 2), h.slice(2)];
+  if (kind === "p-" && PERSON_BY[id]) return { keys: [h, ...zone], label: PERSON_BY[id].name };
+  if (kind === "c-" && DEBATE_BY[id]) return { keys: [h, ...zone], label: DEBATE_BY[id].title };
+  if (kind === "d-" && THEME_NAME[id]) return { keys: [h, ...zone], label: THEME_NAME[id] };
+  if ((kind === "b-" || kind === "s-") && bookById[id.replace(/\.bg$/, "")]) return { keys: [`b-${id.replace(/\.bg$/, "")}`, "bible"], label: bookById[id.replace(/\.bg$/, "")].name };
+  if (kind === "e-" && ERA_BY[id]) return { keys: [h, ...zone], label: ERA_BY[id].name };
+  if (h === "church") return { keys: ["church", "church-zone"], label: "교회사" };
+  if (!h && state.near) return { keys: [...evKeys(state.near), ...zone], label: state.near.short || state.near.title };
+  return { keys: zone, label: "" };
+}
+const startHongcheol = () => import("./hongcheol.js").then((m) => m.createHongcheol({
+  getContext: hongcheolContext,
+  onLink: async (hash) => { nav.push(hash); await route(); },
+}));
+(window.requestIdleCallback ? (f) => requestIdleCallback(f, { timeout: 4000 }) : (f) => setTimeout(f, 1500))(startHongcheol);
 // 넓은 화면(대개 PC)은 첫 화면을 그린 뒤 쉬는 틈에 미리 불러 둔다. 휴대폰은 처음 열 때 불러온다.
 if (matchMedia("(min-width: 900px) and (pointer: fine)").matches) {
   const warm = () => { books.ready(); profiles.ready(); story.ready(); debates.ready(); search.ready(); };
