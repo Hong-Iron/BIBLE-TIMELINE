@@ -525,6 +525,9 @@ function followMap() {
   }, 140);
 }
 $("cap").addEventListener("click", () => state.near && openGallery(state.near));
+// 지도를 누르면 지금 지도에 보이는 사건부터 지도로 따라 읽기가 열린다(아래 왼쪽 상자는 전시실).
+$("map").addEventListener("click", () => state.near && story.openAt(state.near.id));
+$("map").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && state.near) { e.preventDefault(); e.stopPropagation(); story.openAt(state.near.id); } });
 
 /* ---------- 전시실: 사건이나 유물을 누르면 화면 가득 열린다 ---------- */
 // 사건 하나가 화면 한 칸짜리 방이다. 옆으로 넘기면 뒤쪽 연표도 같은 사건으로 옮겨 가서, 닫으면 그 자리에서 이어 본다.
@@ -794,6 +797,11 @@ $("gClose").addEventListener("click", () => back());
 $("gPrev").addEventListener("click", () => goRoom(here() - 1));
 $("gNext").addEventListener("click", () => goRoom(here() + 1));
 $("gMapToggle").addEventListener("click", () => setMapOpen(!gMapBox.classList.contains("open")));
+// 전시실의 지도를 눌러도 지금 방의 사건부터 지도로 따라 읽기가 열린다. 따라 읽기를 닫으면 이 방으로 돌아온다.
+$("gMap").addEventListener("click", () => {
+  const ev = EVENTS[here()];
+  if (ev) story.ready().then(() => { if (story.canOpenAt(ev.id)) { closeGallery(); story.openAt(ev.id); } });
+});
 
 // 세로 휠 한 번(관성 포함)에 방 하나를 넘긴다. 방 안에 아직 내릴 글이 있으면 그 글부터 내린다.
 const canScroll = (el, dy) => (dy > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0);
@@ -909,7 +917,8 @@ async function route() {
     else if (want === "debate") h === "#church" ? debates.open(null) : h.startsWith("#d-") ? debates.openTheme(h.slice(3)) : debates.open(h.slice(3));
     else if (want === "story") {
       const id = h.slice(3);
-      if (!books.isOpen() || books.currentId() !== id) books.open(id);
+      // 성경 책이면 그 책 해설을 아래에 깔아 둔다. 교회사(#s-church)는 아래에 깔 해설이 없다.
+      if (id !== "church" && (!books.isOpen() || books.currentId() !== id)) books.open(id);
       story.open(id);
     }
   });
