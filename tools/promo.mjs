@@ -1,6 +1,7 @@
 // 사이트를 소개할 그림(카톡·SNS에 올릴 카드)을 만든다. 미리보기 서버(tools/serve.py, 8793)가 떠 있어야 한다.
 // 사용: node tools/promo.mjs            → promo/ 에 00-한눈에.jpg, 01~08 기능 카드, 09-휴대폰.jpg
 //       node tools/promo.mjs --shots-only (화면만 다시 찍기) · --cards-only (찍어 둔 화면으로 카드만) · --only=home,story
+//       node tools/promo.mjs --only=m-home,m-bot,m-debate --card=phones3 (휴대폰 세 화면 카드 하나만)
 // 화면은 2배 해상도로 찍고, 카드 HTML을 만들어 다시 찍은 뒤 JPEG로 줄인다.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -16,6 +17,8 @@ const SITE = "http://localhost:8793/";
 // 찍기 전에 페이지에서 할 일
 const wait = (ms) => `await new Promise((r) => setTimeout(r, ${ms}));`;
 // '이동' 표시가 붙은 사건 가운데 장소가 가장 많은 것을 눌러 지도에 길이 그려진 장면을 찍는다.
+// 홍철 옆의 '!' 안내(처음 온 사람에게 뜨는 것)는 소개 그림에서 뺀다.
+const NOHINT = `document.querySelector(".robot")?.classList.remove("has-hint");`;
 const STORY_MOVE = `${wait(1500)} const moves = [...document.querySelectorAll(".st-step")].filter((c) => c.querySelector(".st-where b")?.textContent === "이동"); const n = (c) => (c.querySelector(".st-where").textContent.match(/→/g) || []).length; moves.sort((a, b) => n(b) - n(a))[0]?.click(); ${wait(3000)}`;
 const SHOTS = [
   { id: "home", url: "#sennacherib", w: 1440, h: 900, js: `${wait(1500)} document.getElementById("gClose").click(); ${wait(2500)}` },
@@ -26,10 +29,13 @@ const SHOTS = [
   { id: "bg", url: "#b-2-kings.bg", w: 1440, h: 900, js: wait(2000) },
   { id: "church", url: "#church", w: 1440, h: 900, js: wait(2500) },
   { id: "debate", url: "#c-chalcedon", w: 1440, h: 900, js: wait(2500) },
-  { id: "m-home", url: "", w: 390, h: 844, js: wait(2000) },
+  { id: "m-home", url: "", w: 390, h: 844, js: `${wait(3500)} ${NOHINT}` },
   { id: "m-gallery", url: "#david-king", w: 390, h: 844, js: wait(2500) },
   { id: "m-story", url: "#s-exodus", w: 390, h: 844, js: STORY_MOVE },
-  { id: "m-debate", url: "#c-chalcedon", w: 390, h: 844, js: wait(2500) },
+  // 논쟁: '오늘 각 교회의 입장' 칸이 위에 오도록 내린다.
+  { id: "m-debate", url: "#c-chalcedon", w: 390, h: 844, js: `${wait(3500)} const sc = document.getElementById("dScroll"), pos = document.querySelector(".db-pos")?.closest("section"); if (pos) sc.scrollTop = pos.offsetTop - 70; ${wait(800)} ${NOHINT}` },
+  // 홍철: 출애굽 전시실에서 말풍선을 열고 첫 질문을 고른 뒤, 답이 다 나온 장면(글자가 찍히는 중이면 눌러서 끝까지 보인다)
+  { id: "m-bot", url: "#exodus", w: 390, h: 844, js: `${wait(3000)} document.querySelector(".robot__button").click(); ${wait(4000)} document.querySelector(".robot__text").click(); ${wait(700)} document.querySelectorAll(".robot__choice")[0].click(); ${wait(1500)} document.querySelector(".robot__text").click(); ${wait(1500)} ${NOHINT}` },
 ];
 
 // CDN에서 d3·글꼴을 늦게 받으면 그리기 전에 찍힐 수 있다. 연표가 다 그려졌는지 보고, 아니면 세 번까지 다시 찍는다.
@@ -111,6 +117,25 @@ function phones() {
     <div class="url">hong-iron.github.io/BIBLE-TIMELINE</div>`);
 }
 
+// 휴대폰 세 화면: 소개할 때 한 장으로 보내는 그림
+const PHONES3 = [
+  ["m-home", "연표와 지도", "사건을 넘기면 지도와 유물이 따라와요"],
+  ["m-bot", "홍철에게 묻기", "보던 자리에서 궁금한 걸 골라 물어요"],
+  ["m-debate", "교회사 논쟁", "여섯 교회의 입장을 나란히 봐요"],
+];
+function phones3() {
+  return page(1600, 1290, `
+    <header style="position:absolute; left:0; right:0; top:52px; text-align:center">
+      <p style="margin:0; font-size:22px; font-weight:700; letter-spacing:0.12em; color:#c2410c">성경 · 교회사 · 연표 · 지도 · 유물</p>
+      <h1 style="margin:10px 0 0; font-size:60px; font-weight:800; letter-spacing:-0.035em">바이블 타임라인</h1>
+    </header>
+    ${PHONES3.map(([id, t, d], i) => `<div style="position:absolute; left:${110 + i * 480}px; top:200px; width:420px; text-align:center">
+      <img class="shot" src="${img(id)}" style="width:420px; height:909px; border-radius:30px; border:8px solid #1c1b19">
+      <b style="display:block; margin-top:20px; font-size:30px; letter-spacing:-0.02em">${t}</b>
+      <span style="display:block; margin-top:6px; font-size:21px; color:#45413a">${d}</span></div>`).join("")}
+    <div class="url">hong-iron.github.io/BIBLE-TIMELINE</div>`);
+}
+
 function render(name, html, w, h) {
   const file = join(TMP, `${name}.html`), png = join(TMP, `${name}-card.png`), js = join(TMP, "card.js");
   writeFileSync(file, html);
@@ -123,7 +148,10 @@ function render(name, html, w, h) {
 // --only=home,story 처럼 주면 그 화면만 다시 찍는다.
 const only = process.argv.find((a) => a.startsWith("--only="))?.slice(7).split(",");
 if (!process.argv.includes("--cards-only")) for (const s of SHOTS) if (!only || only.includes(s.id)) shoot(s);
-if (!process.argv.includes("--shots-only")) {
+const card = process.argv.find((a) => a.startsWith("--card="))?.slice(7);
+if (card === "phones3") render(`${CARDS.length + 2}-휴대폰세화면`, phones3(), 1600, 1290);
+else if (!process.argv.includes("--shots-only")) {
+  render(`${CARDS.length + 2}-휴대폰세화면`, phones3(), 1600, 1290);
   render("00-한눈에", overview(), 1600, 300 + Math.ceil(CARDS.length / 2) * 520 + 60);
   CARDS.forEach((c) => render(`0${c.no}-${c.title.replace(/\s/g, "")}`, featureCard(c), 1600, 1180));
   render(`0${CARDS.length + 1}-휴대폰`, phones(), 1600, 1090);
