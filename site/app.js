@@ -80,6 +80,12 @@ const state = {
 };
 const SHOW_KEY = "bt-show";
 try { Object.assign(state.show, JSON.parse(localStorage.getItem(SHOW_KEY)) || {}); } catch { /* 저장소를 못 쓰면 기본값 */ }
+// 성경 쪽(기원후 100년 전)에서는 '성경 책' 차선을, 교회사 쪽에서는 '논쟁' 차선을 쓴다. 둘은 한 차선처럼 켜고 끄며,
+// 경계를 넘으면 켜 둔 상태를 넘겨준다(성경 책을 켜 둔 채 교회사로 넘어가면 성경 책이 닫히고 논쟁이 열린다).
+const CHURCH_FROM = 100;
+const zoneOf = (year) => (year < CHURCH_FROM ? "bible" : "church");
+state.zone = zoneOf(state.center);
+const lanesOn = () => ({ ...state.show, book: state.zone === "bible" && state.show.book, debate: state.zone === "church" && state.show.debate });
 let L = {}; // 차선 위치
 let map = null, credits = {};
 
@@ -90,7 +96,7 @@ function layout() {
     axis: 26, gap: m ? 6 : 8, emp: m ? 18 : 20, era: m ? 20 : 22, bookRow: m ? 16 : 17, personRow: m ? 19 : 21,
     evRow: m ? 15 : 16, evRows: m ? 3 : 4, band: m ? 46 : 54, thumb: m ? 34 : 42, labelW: m ? 52 : 96,
   };
-  const sh = state.show;
+  const sh = lanesOn();
   // 책·인물 차선을 끈 간단한 보기에서는 남는 높이로 사건 이름 줄을 늘려(최대 9줄) 이름이 덜 숨게 한다.
   // 빼는 값: 눈금, 시대 띠, 띠 사이 간격, 사진 두 줄(최대 크기), 여백
   if (!sh.book && !sh.person) {
@@ -198,7 +204,7 @@ function render() {
     .select("title").text((e) => `${e.name} · ${rangeText(e.from, e.to)} · 누르면 시대 배경`);
 
   // 교회사 논쟁: 논쟁이 이어진 기간
-  const debateItems = state.show.debate ? DEBATE_PACK.items.filter((c) => vis(c.from, c.to)) : [];
+  const debateItems = lanesOn().debate ? DEBATE_PACK.items.filter((c) => vis(c.from, c.to)) : [];
   G.debate.selectAll("g.debate").data(debateItems, (c) => c.id).join((e) => {
     const g = e.append("g").attr("class", "debate");
     g.append("rect").attr("rx", 3);
@@ -222,7 +228,7 @@ function render() {
   });
 
   // 성경 책: 다루는 시기
-  const bookItems = state.show.book ? BOOK_PACK.items.filter((b) => vis(b.from, b.to)) : [];
+  const bookItems = lanesOn().book ? BOOK_PACK.items.filter((b) => vis(b.from, b.to)) : [];
   G.book.selectAll("g.book").data(bookItems, (b) => b.name).join((e) => {
     const g = e.append("g").attr("class", "book");
     g.append("rect").attr("rx", 3);
@@ -465,6 +471,8 @@ function onScroll(force) {
   const c = RANGE[0] + scroller.scrollLeft / state.ppy;
   if (!force && Math.abs(c - state.center) * state.ppy < 0.5) return;
   state.center = c;
+  const z = zoneOf(c);
+  if (z !== state.zone) switchZone(z);
   if (hintAnchor != null && Math.abs(scroller.scrollLeft - hintAnchor) > 60) $("hint").classList.add("gone");
   frame();
 }
@@ -1043,7 +1051,11 @@ function toggleLegend(open = lgPop.hidden) {
 lgBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleLegend(); });
 // 더 보기: 제국·성경 책·인물 차선 켜고 끄기. 단추는 줄 위(넓은 화면)와 범례 창 안 두 군데에 있다.
 function syncLayers() {
-  document.querySelectorAll("[data-layer]").forEach((b) => b.setAttribute("aria-pressed", String(state.show[b.dataset.layer])));
+  document.querySelectorAll("[data-layer]").forEach((b) => {
+    b.setAttribute("aria-pressed", String(state.show[b.dataset.layer]));
+    // 성경 쪽에는 논쟁 단추를, 교회사 쪽에는 성경 책 단추를 숨긴다.
+    b.hidden = (b.dataset.layer === "debate" && state.zone === "bible") || (b.dataset.layer === "book" && state.zone === "church");
+  });
   $("legendBar").classList.toggle("with-person", state.show.person);
 }
 document.querySelectorAll("[data-layer]").forEach((b) => b.addEventListener("click", (e) => {
@@ -1056,6 +1068,13 @@ document.querySelectorAll("[data-layer]").forEach((b) => b.addEventListener("cli
 }));
 syncLayers();
 document.addEventListener("click", (e) => { if (!lgPop.hidden && !lgPop.contains(e.target)) toggleLegend(false); });
+function switchZone(z) {
+  state.zone = z;
+  if (z === "church") state.show.debate = state.show.book; else state.show.book = state.show.debate;
+  try { localStorage.setItem(SHOW_KEY, JSON.stringify(state.show)); } catch { /* 기억하지 못해도 화면은 바뀐다 */ }
+  syncLayers();
+  onResize();
+}
 
 /* ---------- 크기 ---------- */
 const mq = matchMedia("(max-width: 700px)");
