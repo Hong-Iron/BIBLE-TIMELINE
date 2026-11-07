@@ -103,11 +103,14 @@ def main():
         "// tools/build_verses.py가 만든 파일이다. 손으로 고치지 않는다. 연표 사건의 장절만 담는다(전체는 verses.js).\n"
         f"export const EVENT_VERSES = {json.dumps(ev_out, ensure_ascii=False, separators=(',', ':'))};\n")
     # 연표의 '논쟁' 차선과 시대 배경 화면은 논쟁의 이름과 기간만 쓴다. 큰 controversies.js 대신 작은 색인을 둔다.
-    dump = subprocess.run(["node", "-e", 'import("./site/shared/controversies.js").then(m=>console.log(JSON.stringify(m.CONTROVERSIES.map(c=>({id:c.id,title:c.title,from:c.from,to:c.to,era:c.era,themes:c.themes})))))'],
+    # 인물 프로필이 논쟁 쪽 출처(예: roberson)를 가리킬 때 이름을 보이도록 출처 이름도 함께 둔다.
+    dump = subprocess.run(["node", "-e", 'import("./site/shared/controversies.js").then(m=>console.log(JSON.stringify(m.CONTROVERSIES.map(c=>({id:c.id,title:c.title,from:c.from,to:c.to,era:c.era,themes:c.themes})))+"\\n"+JSON.stringify(Object.fromEntries(Object.entries(m.CONTROVERSY_SOURCES).map(([k,v])=>[k,{name:v.name}])))))'],
                           cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    index, names = dump.strip().split("\n")
     (shared / "controversy_index.js").write_text(
-        "// tools/build_verses.py가 만든 파일이다. 손으로 고치지 않는다. 논쟁의 이름과 기간만 담는다(전체는 controversies.js).\n"
-        f"export const CONTROVERSY_INDEX = {dump.strip()};\n")
+        "// tools/build_verses.py가 만든 파일이다. 손으로 고치지 않는다. 논쟁의 이름과 기간, 논쟁 쪽 출처의 이름만 담는다(전체는 controversies.js).\n"
+        f"export const CONTROVERSY_INDEX = {index};\n"
+        f"export const CONTROVERSY_SOURCE_NAMES = {names};\n")
     if missing:
         print("찾지 못한 절:", *missing, sep="\n  ")
         sys.exit(1)

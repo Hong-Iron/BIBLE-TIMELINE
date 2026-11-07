@@ -779,7 +779,8 @@ gallery.addEventListener("click", (e) => {
   const db = e.target.closest("[data-debate]");
   if (db) { closeGallery(); debates.open(db.dataset.debate); return; }
   const per = e.target.closest(".g-person");
-  if (per) { closeGallery(); profiles.open(per.dataset.person); return; }
+  // 프로필이 없는 인물이면 전시실을 닫지 않는다(닫고 나서 아무것도 안 열리면 연표로 튕겨 나간 것처럼 보인다).
+  if (per) { const id = per.dataset.person; profiles.ready().then(() => { if (profiles.has(id)) { closeGallery(); profiles.open(id); } }); return; }
   const thumb = e.target.closest(".g-thumb");
   if (thumb) {
     const room = thumb.closest(".room");

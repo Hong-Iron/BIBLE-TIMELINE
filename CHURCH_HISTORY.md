@@ -131,6 +131,7 @@
 | 신조 | P. Schaff 『The Creeds of Christendom』(1877) | 저작권 만료 |
 | 교회의 공식 문서 | 각 교회의 공식 누리집, 교회 사이의 공동 선언(교황청, 세계교회협의회 등) | 링크와 짧은 인용 |
 | 현대 연구서 | J. N. D. Kelly 『Early Christian Doctrines』, J. Pelikan 『The Christian Tradition』 1권, W. H. C. Frend 『The Rise of the Monophysite Movement』, J. Meyendorff 『Imperial Unity and Christian Divisions』 등 | 출처로만 적음 |
+| 인물 사전과 법전 | 『Catholic Encyclopedia』(1907~1914), 『Dizionario Biografico degli Italiani』(이탈리아인 인명 사전, 바를라암), 『Neue Deutsche Biographie』(신 독일 인명 사전, 그레벨), 『테오도시우스 법전』 16권 | 앞의 것은 저작권 만료, 두 인명 사전은 출처로만 적음 |
 
 ## 화면
 

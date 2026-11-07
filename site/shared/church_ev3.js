@@ -344,6 +344,11 @@ export const CH_PEOPLE_3 = [
 
 // church_events.js의 CH_PLACES에 없는 장소만
 export const PLACES_CH3 = {
+  anagni: { name: "아나니", at: [13.16, 41.74] },
+  seminara: { name: "세미나라", at: [15.87, 38.33] },
+  gerace: { name: "게라체", at: [16.22, 38.27] },
+  vienna: { name: "빈", at: [16.37, 48.21] },
+  maienfeld: { name: "마이엔펠트", at: [9.53, 47.01] },
   fondi: { name: "폰디", at: [13.42, 41.36] },
   basel: { name: "바젤", at: [7.59, 47.56] },
   assisi: { name: "아시시", at: [12.61, 43.07] },

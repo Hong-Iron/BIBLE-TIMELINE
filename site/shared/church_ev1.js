@@ -250,6 +250,13 @@ export const CH_PEOPLE_1 = [
 
 // church_events.js의 CH_PLACES에 없는 장소만
 export const PLACES_CH1 = {
+  khorvirap: { name: "코르 비라프", at: [44.58, 39.88] },
+  split: { name: "스플리트(디오클레티아누스 궁전)", at: [16.44, 43.51] },
+  laodiceasyria: { name: "시리아의 라오디게아(라타키아)", at: [35.78, 35.52] },
+  nazianzus: { name: "나지안조스(지금의 악사라이 근처)", at: [34.37, 38.28] },
+  curubis: { name: "쿠루비스(지금의 튀니지 코르바)", at: [10.86, 36.58] },
+  sirmium: { name: "시르미움", at: [19.61, 44.97] },
+  lydda: { name: "룻다(디오스폴리스)", at: [34.89, 31.95] },
   sinope: { name: "시노페", at: [35.15, 42.03] },
   dura: { name: "두라 에우로포스", at: [40.73, 34.75] },
   nicomedia: { name: "니코메디아", at: [29.92, 40.77] },

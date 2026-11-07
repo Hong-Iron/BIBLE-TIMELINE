@@ -7,9 +7,12 @@ import { createMap, THEMES } from "./shared/map.js";
 import { VERSES } from "./shared/verses.js";
 import { findBook } from "./shared/books.js";
 import { SOURCES as BG_SOURCES } from "./shared/backgrounds.js";
-import { CH_SOURCES } from "./shared/church_events.js";
+import { CH_SOURCES, CH_PEOPLE } from "./shared/church_events.js";
+import { CONTROVERSY_SOURCE_NAMES } from "./shared/controversy_index.js";
 
-const SRC_NAME = { ...CH_SOURCES, ...BG_SOURCES };
+const SRC_NAME = { ...CONTROVERSY_SOURCE_NAMES, ...CH_SOURCES, ...BG_SOURCES };
+// 교회사 인물(이그나티오스처럼 기원후 100년 전에 태어난 사람도 있다)은 맺음말이 다르다.
+const CHURCH = new Set(CH_PEOPLE.map((p) => p.id));
 const PERSON = byId(PEOPLE);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const yearRange = (a, b) => (a < 0 && b < 0 ? `기원전 ${-a}~${-b}년` : a > 0 ? `기원후 ${a}~${b}년` : `기원전 ${-a}년~기원후 ${b}년`);
@@ -25,11 +28,17 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
 
   const refBtn = (ref) => (ref ? `<button class="vref" type="button" data-ref="${esc(ref)}">${esc(ref)}</button>` : "");
   // 출처가 "id: 위치"이고 id가 출처 목록에 있으면 자료 이름으로 보인다. 아니면(옛 프로필의 글 출처) 그대로 쓴다.
+  // 출처가 여럿이면 ';'로 나뉜다("a: 3장; b: 5권"). 숫자나 §로 시작하는 조각("schaffhcc: 4권 §71; 5권 §9")은 앞 출처의 다른 위치다.
   const srcTag = (src) => {
     if (!src) return "";
-    const s = String(src), i = s.indexOf(":"), id = i < 0 ? s.trim() : s.slice(0, i).trim(), loc = i < 0 ? "" : s.slice(i + 1).trim();
-    const known = SRC_NAME[id];
-    return `<span class="src">${esc(known ? `${known.name}${loc ? ` · ${loc}` : ""}` : s)}</span>`;
+    const out = [];
+    for (const s of String(src).split(";").map((x) => x.trim()).filter(Boolean)) {
+      const m = s.match(/^([a-z][a-z0-9]*)\s*:\s*(.*)$/), known = m && SRC_NAME[m[1]];
+      if (known) out.push(`${known.name}${m[2] ? ` · ${m[2]}` : ""}`);
+      else if (!m && out.length && /^[\d§]/.test(s)) out[out.length - 1] += `; ${s}`;
+      else out.push(s);
+    }
+    return `<span class="src">${esc(out.join(" / "))}</span>`;
   };
 
   function familyTree(p, f) {
@@ -137,7 +146,7 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
           <h2>등장하는 책</h2>
           <div class="books">${f.books.map((b) => findBook(b) ? `<button class="book-link" type="button" data-book="${esc(findBook(b).id)}">${esc(b)}</button>` : `<span>${esc(b)}</span>`).join("")}</div>
         </section>` : ""}
-        <p class="p-foot">${p.from >= 100 ? "연도는 사료에 따른 것이고 일부는 추정이다. 같은 사람을 교회마다 다르게 보는 경우 함께 적었다." : "연도는 성경에 적힌 나이와 햇수를 거슬러 더한 전통 연대이고 대부분 추정이다."} 장절을 누르면 개역한글 본문이 보인다.</p>
+        <p class="p-foot">${CHURCH.has(p.id) ? "연도는 사료에 따른 것이고 일부는 추정이다. 같은 사람을 교회마다 다르게 보는 경우 함께 적었다." : "연도는 성경에 적힌 나이와 햇수를 거슬러 더한 전통 연대이고 대부분 추정이다."} 장절을 누르면 개역한글 본문이 보인다.</p>
       </div>`;
     showMap(f.places);
   }
@@ -210,5 +219,5 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
     onClose();
   }
 
-  return { open, close, hidePop, isOpen: () => root.classList.contains("open"), popOpen: () => !pop.hidden };
+  return { open, close, hidePop, has: (id) => !!(PROFILES[id] && PERSON[id]), isOpen: () => root.classList.contains("open"), popOpen: () => !pop.hidden };
 }
