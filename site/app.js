@@ -919,12 +919,13 @@ const THEME_NAME = { trinity: "하나님과 삼위일체", christ: "그리스도
 const EVENT = byId(EVENTS), PERSON_BY = byId(PEOPLE), ERA_BY = byId(ERAS), DEBATE_BY = byId(CONTROVERSY_INDEX);
 function hongcheolContext() {
   const h = decodeURIComponent(location.hash.slice(1));
-  const evKeys = (ev) => [`ev-${ev.id}`, ...(ev.controversy ? [`c-${ev.controversy}`] : []), ...(ev.people || []).map((p) => `p-${p}`)];
+  // 사건이면 그 사건 → 이어진 논쟁 → 등장인물 → 시대 차례로 넘겨준다(홍철은 맨 앞 자리부터 꺼내고, 나머지는 '○○ 얘기도 해요'로).
+  const evKeys = (ev) => [`ev-${ev.id}`, ...(ev.controversy ? [`c-${ev.controversy}`] : []), ...(ev.people || []).map((p) => `p-${p}`), `e-${ev.era}`];
   const zone = [state.zone];
   if (EVENT[h]) return { keys: [...evKeys(EVENT[h]), ...zone], label: EVENT[h].short || EVENT[h].title };
   const [kind, id] = [h.slice(0, 2), h.slice(2)];
   if (kind === "p-" && PERSON_BY[id]) return { keys: [h, ...zone], label: PERSON_BY[id].name };
-  if (kind === "c-" && DEBATE_BY[id]) return { keys: [h, ...zone], label: DEBATE_BY[id].title };
+  if (kind === "c-" && DEBATE_BY[id]) return { keys: [h, `e-${DEBATE_BY[id].era}`, ...(DEBATE_BY[id].themes || []).map((t) => `d-${t}`), ...zone], label: DEBATE_BY[id].title };
   if (kind === "d-" && THEME_NAME[id]) return { keys: [h, ...zone], label: THEME_NAME[id] };
   if ((kind === "b-" || kind === "s-") && bookById[id.replace(/\.bg$/, "")]) return { keys: [`b-${id.replace(/\.bg$/, "")}`, "bible"], label: bookById[id.replace(/\.bg$/, "")].name };
   if (kind === "e-" && ERA_BY[id]) return { keys: [h, ...zone], label: ERA_BY[id].name };

@@ -8,6 +8,7 @@ import { VERSES } from "./shared/verses.js";
 import { findBook } from "./shared/books.js";
 import { SOURCES as BG_SOURCES } from "./shared/backgrounds.js";
 import { CH_SOURCES, CH_PEOPLE } from "./shared/church_events.js";
+import { PORTRAITS } from "./shared/portraits.js";
 import { CONTROVERSY_SOURCE_NAMES } from "./shared/controversy_index.js";
 
 const SRC_NAME = { ...CONTROVERSY_SOURCE_NAMES, ...CH_SOURCES, ...BG_SOURCES };
@@ -40,6 +41,18 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
     }
     return `<span class="src">${esc(out.join(" / "))}</span>`;
   };
+
+  // 생김새가 확실한 사진이나 생전 초상(shared/portraits.js). 누르면 원본(위키미디어 공용)이 열린다.
+  function portraitHTML(id, p) {
+    const pt = PORTRAITS[id];
+    if (!pt) return "";
+    const c = getCredits()[pt.img];
+    const credit = c ? `${esc(c.author)} · ${c.licenseUrl ? `<a href="${esc(c.licenseUrl)}" target="_blank" rel="noopener">${esc(c.license)}</a>` : esc(c.license)}` : "";
+    return `<figure class="p-portrait">
+      ${c?.page ? `<a href="${esc(c.page)}" target="_blank" rel="noopener" title="원본 보기">` : ""}<img src="img/${esc(pt.img)}.jpg" alt="${esc(p.name)}의 ${esc(pt.kind)}" decoding="async">${c?.page ? "</a>" : ""}
+      <figcaption><b>${esc(pt.kind)}</b> ${esc([pt.madeLabel, pt.by].filter(Boolean).join(" · "))}${pt.note ? `<span>${esc(pt.note)}</span>` : ""}${credit ? `<small>${credit}</small>` : ""}</figcaption>
+    </figure>`;
+  }
 
   function familyTree(p, f) {
     const chip = (m) => {
@@ -95,11 +108,14 @@ export function createProfiles({ getCredits, onEvent, onBook, onBack, onOpen, on
     const events = EVENTS.filter((ev) => (ev.people || []).includes(id));
     page.innerHTML = `
       <aside class="p-side">
-        <div class="p-hero">
+        <div class="p-hero${PORTRAITS[id] ? " has-portrait" : ""}">
+          ${portraitHTML(id, p)}
+          <div class="p-hero-text">
           <p class="p-role">${esc(f.role)}</p>
           <h1>${esc(p.name)}</h1>
           ${f.aliases.length ? `<p class="p-alias">다른 이름 · ${f.aliases.map(esc).join(", ")}</p>` : ""}
           <p class="p-years"><span>${esc(p.kind)}</span>${esc(p.now ? `기원후 ${p.from}년~` : yearRange(p.from, p.to))} ${p.now ? "<em>지금까지</em>" : p.from < 1600 ? "<em>추정</em>" : ""}</p>
+          </div>
         </div>
         <section class="p-card">
           <h3>기본 정보</h3>

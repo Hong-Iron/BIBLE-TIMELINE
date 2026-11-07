@@ -17,6 +17,7 @@ import { CH_EVENTS_5, CH_PEOPLE_5, PLACES_CH5, IMG_CH5, SRC_V5 } from "./church_
 import { CH_EVENTS_6, CH_PEOPLE_6, PLACES_CH6, IMG_CH6, SRC_V6 } from "./church_ev6.js";
 import { CH_EVENTS_7, CH_PEOPLE_7, PLACES_CH7, IMG_CH7, SRC_V7 } from "./church_ev7.js";
 import { CH_EVENTS_8, CH_PEOPLE_8, PLACES_CH8, IMG_CH8, SRC_V8 } from "./church_ev8.js";
+import { PORTRAIT_IMG } from "./portraits.js";
 
 export const CH_ERAS = [
   { id: "fathers", name: "교부와 박해", from: 100, to: 313, hue: 12 },
@@ -74,5 +75,5 @@ export const CH_PLACES = {
 export const CH_EVENTS = [...CH_EVENTS_1, ...CH_EVENTS_2, ...CH_EVENTS_3, ...CH_EVENTS_4, ...CH_EVENTS_5, ...CH_EVENTS_6, ...CH_EVENTS_7, ...CH_EVENTS_8];
 export const CH_PEOPLE = [...CH_PEOPLE_1, ...CH_PEOPLE_2, ...CH_PEOPLE_3, ...CH_PEOPLE_4, ...CH_PEOPLE_5, ...CH_PEOPLE_6, ...CH_PEOPLE_7, ...CH_PEOPLE_8];
 export const CH_MORE_PLACES = { ...PLACES_CH1, ...PLACES_CH2, ...PLACES_CH3, ...PLACES_CH4, ...PLACES_CH5, ...PLACES_CH6, ...PLACES_CH7, ...PLACES_CH8 };
-export const CH_IMG = { ...IMG_CH1, ...IMG_CH2, ...IMG_CH3, ...IMG_CH4, ...IMG_CH5, ...IMG_CH6, ...IMG_CH7, ...IMG_CH8 };
+export const CH_IMG = { ...IMG_CH1, ...IMG_CH2, ...IMG_CH3, ...IMG_CH4, ...IMG_CH5, ...IMG_CH6, ...IMG_CH7, ...IMG_CH8 , ...PORTRAIT_IMG };
 export const CH_SOURCES = { ...SRC_V1, ...SRC_V2, ...SRC_V3, ...SRC_V4, ...SRC_V5, ...SRC_V6, ...SRC_V7, ...SRC_V8 };

@@ -1,13 +1,12 @@
-// 홍철: 오른쪽 아래의 픽셀 로봇. 블로그(Hongs_Blog)의 홍철을 옮겨 왔고, 여기서는 철민의 팡세(묵상 글)에 쓴 생각으로
-// 신앙 질문에 답한다. 말풍선에는 세 가지가 있다.
-//   질문하기   정해 둔 질문과 답(답마다 이어서 물을 질문이 달린다)
-//   대화하기   분기형 대화: 방문자가 할 말을 고르면 홍철이 답하고, 그 답에서 다시 고를 말이 이어진다
-//   아무 얘기나 팡세에서 가져온 한마디(다 나올 때까지 겹치지 않는다)
-// 대사는 shared/hongcheol.json(형식은 tools/check_hongcheol.mjs 머리말)이고 말풍선을 처음 열 때 받는다.
-// 지금 보는 화면(사건·인물·논쟁·책)과 이어진 대화(tags)를 먼저 꺼내고, 답의 link를 누르면 그 화면으로 간다.
+// 홍철: 오른쪽 아래의 픽셀 로봇. 블로그(Hongs_Blog)의 홍철과 같은 얼굴과 말풍선이고, 여기서는 방문자가 지금 보고 있는 자리
+// (사건·인물·논쟁·성경 책·시대·교리의 줄기)에서 물을 법한 질문에 답한다. 답은 사이트를 만든 사람의 생각하는 방식으로 썼다.
+// 방문자는 글을 입력하지 않고 질문을 골라 누르며, 답마다 이어서 물을 질문이 갈라진다.
+//   shared/hongcheol.json          인사말과 자리 목록(spots: 열쇠 → 이름). 말풍선을 처음 열 때 받는다.
+//   shared/hongcheol/<열쇠>.json   그 자리의 질문과 답. 그 자리에서 처음 열 때 받는다.
+// 형식은 tools/check_hongcheol.mjs 머리말.
 import { FACE } from "./hongcheol_face.js";
 
-const DATA_URL = new URL("./shared/hongcheol.json", import.meta.url).href;
+const BASE = new URL("./shared/", import.meta.url).href;
 const FONT_URL = "https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css";
 const MEM_KEY = "hongcheol-memory";
 const pick = (v) => (Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : v);
@@ -21,8 +20,8 @@ const TAIL = '<svg class="robot__tail" viewBox="0 0 6 5" shape-rendering="crispE
   + [[1, 0, 4], [2, 1, 3], [3, 2, 2], [4, 3, 1]].map(([x, y, w]) => `<rect class="robot__tail-fill" x="${x}" y="${y}" width="${w}" height="1"/>`).join("")
   + "</svg>";
 
-// getContext(): { keys: ["c-justification", "p-luther", ...], label: "칭의 논쟁" } 지금 보는 화면
-// onLink(hash): 답에 달린 화면으로 간다(예: "#c-justification")
+// getContext(): { keys: [지금 자리, 이어진 자리…], label } — 예: 사건이면 ["ev-…", "c-…", "p-…", "e-…"]
+// onLink(hash): 그 화면으로 간다(예: "#c-justification")
 export function createHongcheol({ getContext, onLink }) {
   const root = document.createElement("div");
   root.className = "robot";
@@ -44,31 +43,31 @@ export function createHongcheol({ getContext, onLink }) {
   const choicesEl = $(".robot__choices"), nameSmall = $(".robot__name small");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  let script = null, loading = null, typing = null, bag = [], qShown = 0, ctx = { keys: [], label: "" };
+  let base = null, baseLoading = null, typing = null, ctx = { keys: [], label: "" }, here = null;
+  const spots = new Map(); // 열쇠 → 받은 자리(또는 받는 중인 Promise)
 
-  function load(then) {
-    if (script) return then();
+  function loadBase() {
     if (!document.querySelector(`link[href="${FONT_URL}"]`)) {
       const l = document.createElement("link");
       l.rel = "stylesheet"; l.href = FONT_URL;
       document.head.appendChild(l);
     }
-    loading ??= fetch(DATA_URL).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then((d) => { script = d; }).catch(() => { loading = null; });
-    loading.then(() => (script ? then() : say("어, 지금은 말이 잘 안 나오네요. 잠시 뒤에 다시 눌러 주세요.")));
+    baseLoading ??= fetch(`${BASE}hongcheol.json`).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then((d) => (base = d)).catch(() => { baseLoading = null; return null; });
+    return baseLoading;
+  }
+  const hasSpot = (k) => !!base?.spots?.[k];
+  function loadSpot(k) {
+    if (!hasSpot(k)) return Promise.resolve(null);
+    if (!spots.has(k)) spots.set(k, fetch(`${BASE}hongcheol/${encodeURIComponent(k)}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+    return spots.get(k);
   }
 
-  /* -- 기억: 이 브라우저 안에만 둔다(방문 횟수, 마지막 방문, 시작한 대화). 아무 데도 보내지 않는다. -- */
+  /* -- 기억: 이 브라우저 안에만 둔다(방문 횟수, 마지막 방문, 이미 들은 질문). 아무 데도 보내지 않는다. -- */
   let mem = {};
   try { mem = JSON.parse(localStorage.getItem(MEM_KEY) || "{}") || {}; } catch { mem = {}; }
   if (!Array.isArray(mem.heard)) mem.heard = [];
-  const heard = mem.heard;
   const save = () => { try { localStorage.setItem(MEM_KEY, JSON.stringify(mem)); } catch { /* 저장소를 못 쓰면 잊는다 */ } };
-  function forget() {
-    heard.length = 0;
-    mem = { heard, visits: 1, last: Date.now(), welcomed: true };
-    try { localStorage.removeItem(MEM_KEY); } catch { /* 저장소를 못 쓰면 그대로 */ }
-  }
   (() => {
     let fresh = true;
     try { fresh = sessionStorage.getItem("hongcheol-visit") !== "1"; sessionStorage.setItem("hongcheol-visit", "1"); } catch { /* 막힘 */ }
@@ -76,6 +75,8 @@ export function createHongcheol({ getContext, onLink }) {
     mem.last = Date.now();
     save();
   })();
+  const heard = (k, q) => mem.heard.includes(`${k}|${q}`);
+  const markHeard = (k, q) => { if (!heard(k, q)) { mem.heard.push(`${k}|${q}`); if (mem.heard.length > 600) mem.heard.splice(0, mem.heard.length - 600); save(); } };
 
   /* -- 글자 -- */
   const vars = {};
@@ -101,7 +102,7 @@ export function createHongcheol({ getContext, onLink }) {
     textEl.textContent = typing.full.slice(0, typing.i);
     if (typing.i >= typing.full.length) return finish(typing.then);
     const ch = typing.full.charAt(typing.i - 1);
-    typing.timer = setTimeout(step, /[.!?…]/.test(ch) ? 150 : /[,·]/.test(ch) ? 80 : 22);
+    typing.timer = setTimeout(step, /[.!?…]/.test(ch) ? 150 : /[,·]/.test(ch) ? 80 : 20);
   }
   function skip() { if (typing) { const then = typing.then; textEl.textContent = typing.full; finish(then); } }
   function stopTyping() { if (typing) clearTimeout(typing.timer); typing = null; }
@@ -112,8 +113,6 @@ export function createHongcheol({ getContext, onLink }) {
     root.classList.remove("is-talking");
     if (then) then();
   }
-
-  /* -- 고르기 -- */
   function choices(list) {
     choicesEl.innerHTML = "";
     for (const c of list) {
@@ -128,127 +127,95 @@ export function createHongcheol({ getContext, onLink }) {
     const first = choicesEl.querySelector(".robot__choice");
     if (first && document.activeElement === dialog) first.focus({ preventScroll: true });
   }
-  const linkChoice = (n) => (n && n.link ? [{ label: `${n.link_label || "화면 보러 가기"} →`, kind: "primary", run: () => { close(); onLink(n.link); } }] : []);
-
-  /* -- 지금 보는 화면과 이어진 것 -- */
-  const tagged = (list) => list.filter((n) => (n.tags || []).some((t) => ctx.keys.includes(t)));
+  const go = (hash) => { close(); onLink(hash); };
+  const linkChoice = (n) => (n && n.link ? [{ label: `${n.link_label || "화면 보러 가기"} →`, kind: "primary", run: () => go(n.link) }] : []);
 
   /* -- 화면 -- */
-  function menu() {
-    const here = tagged(script.chats || []).length + tagged(script.questions || []).length;
-    choices([
-      ...(here ? [{ label: `'${ctx.label}' 얘기 할래요`, run: hereTopics, kind: "primary" }] : []),
-      { label: "질문하기", run: questions, kind: here ? undefined : "primary" },
-      { label: "대화하기", run: topics },
-      { label: "아무 얘기나 해 줘요", run: talk, kind: "quiet" },
-    ]);
+  // 지금 자리의 질문(아직 안 들은 것부터)과, 이어진 자리(등장인물·논쟁·시대)로 넘어가는 단추
+  function spotMenu(spot, prompt) {
+    const qs = spot.questions || [];
+    const fresh = qs.filter((n) => !heard(spot.key, n.q));
+    const list = (fresh.length ? fresh : qs).slice(0, 4);
+    const related = ctx.keys.filter((k) => k !== spot.key && hasSpot(k)).slice(0, 2);
+    say(prompt, () => choices([
+      ...list.map((n) => ({ label: n.q, run: () => ask(spot, n, qs.filter((o) => o !== n)) })),
+      ...related.map((k) => ({ label: `${base.spots[k]} 얘기도 해요`, run: () => openSpot(k, true) })),
+      { label: "다른 데 얘기도 들려줘요", run: elsewhere, kind: "quiet" },
+    ]));
   }
-  function home(again) {
-    if (!again && welcomeBack()) return;
-    say(again ? pick(script.again) || "또 뭐 할까요?" : pick(script.greeting) || "안녕하세요!", menu);
+  async function openSpot(k, moved) {
+    const spot = await loadSpot(k);
+    if (!spot || !(spot.questions || []).length) return nowhere();
+    here = spot;
+    vars.here = spot.title;
+    nameSmall.textContent = ` · ${spot.title}`;
+    spotMenu(spot, pick(moved ? base.related_prompt : base.greeting) || "'{here}' 보고 계시네요. 이런 게 궁금하지 않아요?");
   }
-  function welcomeBack() {
-    const wb = script.welcome_back;
-    if (!wb || mem.welcomed || !mem.prevLast || (mem.visits || 0) < 2) return false;
+  // 이 자리에서 한 번 묻고 답하기. 막다른 데서는 아직 안 물은 같은 자리 질문을 다시 꺼낸다.
+  function ask(spot, node, rest) {
+    markHeard(spot.key, node.q);
+    say(pick(node.a), () => {
+      const kids = node.next || [];
+      const offer = kids.length ? kids : rest.filter((n) => !heard(spot.key, n.q)).slice(0, 3);
+      choices([
+        ...offer.map((n) => ({ label: n.q, run: () => ask(spot, n, kids.length ? rest : rest.filter((o) => o !== n)) })),
+        ...linkChoice(node),
+        { label: "처음 질문으로", run: () => spotMenu(spot, pick(base.again) || "또 뭐가 궁금해요?"), kind: "quiet" },
+      ]);
+    });
+  }
+  // 다른 자리 하나를 골라 그 자리 질문을 맛보기로 보여 주고, 그 화면으로 갈 수 있게 한다.
+  async function elsewhere() {
+    const keys = Object.keys(base.spots).filter((k) => k !== here?.key);
+    if (!keys.length) return say(pick(base.nowhere), () => choices([{ label: "닫기", run: close, kind: "quiet" }]));
+    const k = keys[Math.floor(Math.random() * keys.length)];
+    const spot = await loadSpot(k);
+    if (!spot) return nowhere();
+    const n = pick(spot.questions);
+    say(fill(pick(base.elsewhere_prompt) || "'{there}'에서는 이런 질문이 나와요.").replace("{there}", spot.title), () => choices([
+      { label: n.q, run: () => { here = spot; vars.here = spot.title; nameSmall.textContent = ` · ${spot.title}`; ask(spot, n, spot.questions.filter((o) => o !== n)); } },
+      { label: `'${spot.title}' 화면으로 갈래요 →`, kind: "primary", run: () => go(spot.link) },
+      { label: "다른 데도요", run: elsewhere },
+      ...(here ? [{ label: "아까 보던 데로", run: () => spotMenu(here, pick(base.again)), kind: "quiet" }] : []),
+    ]));
+  }
+  function nowhere() {
+    nameSmall.textContent = "";
+    say(pick(base.nowhere) || "사건이나 인물, 논쟁을 하나 열어 보세요. 그 자리에서 물을 만한 걸 얘기해 드릴게요.", () => choices([
+      { label: "아무 데나 골라 줘요", run: elsewhere, kind: "primary" },
+      { label: "괜찮아요", run: close, kind: "quiet" },
+    ]));
+  }
+  function welcomeLine() {
+    const wb = base.welcome_back;
+    if (!wb || mem.welcomed || !mem.prevLast || (mem.visits || 0) < 2) return "";
     mem.welcomed = true;
     save();
     const days = Math.floor((Date.now() - mem.prevLast) / 86400000);
     vars.days = days; vars.visits = mem.visits;
-    const parts = [pick(days < 1 ? wb.same_day : days < 14 ? wb.days : wb.long)];
-    if ([5, 10, 20, 50, 100].includes(mem.visits) && wb.visits) parts.push(pick(wb.visits));
-    const t = mem.thread, node = t && !t.done ? (script.chats || []).find((c) => c.q === t.q) : null;
-    if (node && wb.resume) {
-      vars.topic = node.q;
-      parts.push(pick(wb.resume));
-      say(parts.join(" "), () => choices([
-        { label: "이어서 할래요", run: () => reply(node, topics), kind: "primary" },
-        { label: "다른 거 할래요", run: () => { mem.thread = null; save(); home(true); } },
-      ]));
-    } else say(parts.join(" "), menu);
-    return true;
-  }
-
-  // 질문하기: 한 번에 여섯 개씩, 지금 화면과 이어진 질문을 먼저
-  function questions(more) {
-    const all = script.questions || [];
-    if (more !== true) qShown = 0;
-    const order = [...tagged(all), ...shuffled(all.filter((q) => !tagged(all).includes(q)))];
-    const page = order.slice(qShown, qShown + 6);
-    qShown += 6;
-    say(pick(script.ask) || "뭐가 궁금해요?", () => choices([
-      ...page.map((q) => ({ label: q.q, run: () => reply(q, questions) })),
-      ...(qShown < order.length ? [{ label: "다른 질문도 볼래요", run: () => questions(true) }] : []),
-      { label: "처음으로", run: () => home(true), kind: "quiet" },
-    ]));
-  }
-
-  // 대화하기: 아직 안 한 대화부터 넷
-  function offer(list) {
-    const fresh = list.filter((c) => !heard.includes(c.q));
-    return shuffled(fresh.length ? fresh : list).slice(0, 4);
-  }
-  function topics() { listTopics(offer(script.chats || []), pick(script.chat_prompt) || "무슨 얘기 할까요?", topics); }
-  function hereTopics() {
-    const list = [...tagged(script.chats || []), ...tagged(script.questions || [])];
-    listTopics(shuffled(list).slice(0, 5), fill(pick(script.here_prompt) || "'{here}' 얘기라면 이런 게 있어요."), hereTopics);
-  }
-  function listTopics(list, prompt, again) {
-    if (!list.length) return talk();
-    say(prompt, () => choices([
-      ...list.map((c) => ({ label: c.q, run: () => { startThread(c); reply(c, again); } })),
-      { label: "다른 얘기는 없어요?", run: again },
-      { label: "처음으로", run: () => home(true), kind: "quiet" },
-    ]));
-  }
-  function startThread(c) {
-    if (!heard.includes(c.q)) heard.push(c.q);
-    if (heard.length > 400) heard.splice(0, heard.length - 400);
-    mem.thread = { q: c.q, done: false };
-    save();
-  }
-  // 한 번 주고받기: 홍철이 답하고, 이어서 할 말을 꺼낸다. 막다른 데서는 같은 대화에서 아직 안 고른 말을 다시 꺼낸다.
-  function reply(node, back, rest = []) {
-    rest = rest.filter((n) => n !== node);
-    if (node.action === "forget") forget();
-    say(pick(node.a), () => {
-      const kids = node.next || [];
-      if (!kids.length && back === topics && mem.thread) { mem.thread.done = true; save(); }
-      const offerList = kids.length ? kids : rest.slice(0, 3);
-      const carry = kids.length ? rest : rest.slice(3);
-      const next = offerList.map((n) => ({ label: n.q, run: () => reply(n, back, offerList.filter((o) => o !== n).concat(carry)) }));
-      const tail = next.length
-        ? [{ label: back === questions ? "다른 거 물어볼래요" : "다른 얘기 해요", run: back, kind: "quiet" }]
-        : [{ label: back === questions ? "다른 것도 물어볼래요" : "다른 얘기 해요", run: back }, { label: "처음으로", run: () => home(true), kind: "quiet" }];
-      choices([...next, ...linkChoice(node), ...tail]);
-    });
-  }
-  function talk() {
-    const lines = script.talk || [];
-    if (!lines.length) return home(true);
-    if (!bag.length) bag = shuffled(lines);
-    const line = bag.pop();
-    say(pick(line.text), () => choices([
-      ...linkChoice(line),
-      { label: "더 얘기해 줘요", run: talk },
-      { label: "대화할래요", run: topics },
-      { label: "물어볼 게 있어요", run: questions, kind: "quiet" },
-    ]));
+    return `${pick(days < 1 ? wb.same_day : days < 14 ? wb.days : wb.long)} `;
   }
 
   /* -- 열고 닫기 -- */
-  function open() {
+  async function open() {
     root.classList.remove("has-hint");
     try { sessionStorage.setItem("hongcheol-seen", "1"); } catch { /* 막힘 */ }
     ctx = getContext() || { keys: [], label: "" };
-    vars.here = ctx.label;
-    nameSmall.textContent = ctx.label ? ` · ${ctx.label}` : "";
     dialog.hidden = false;
     root.classList.add("is-open");
     button.setAttribute("aria-expanded", "true");
     dialog.focus({ preventScroll: true });
-    if (script) return home();
-    textEl.textContent = "…";
-    load(() => home());
+    if (!base) { textEl.textContent = "…"; await loadBase(); }
+    if (!base) return say("어, 지금은 말이 잘 안 나오네요. 잠시 뒤에 다시 눌러 주세요.");
+    const wl = welcomeLine();
+    const k = ctx.keys.find(hasSpot);
+    if (!k) return nowhere();
+    const spot = await loadSpot(k);
+    if (!spot) return nowhere();
+    here = spot;
+    vars.here = spot.title;
+    nameSmall.textContent = ` · ${spot.title}`;
+    spotMenu(spot, wl + fill(pick(base.greeting)));
   }
   function close() {
     stopTyping();
